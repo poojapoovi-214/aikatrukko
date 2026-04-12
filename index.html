@@ -691,7 +691,7 @@ footer{
     <p class="hero-sub">Voice-guided lessons in clear India-English. Live AI prompts updated with real trends. One-time payment — no subscriptions. Start free today.</p>
     <div class="hero-btns">
       <button class="hbtn-p" onclick="scrollTo2('catsSection')">Explore Courses →</button>
-      <button class="hbtn-s" onclick="pick('student')">Try Free Lesson</button>
+      <button class="hbtn-s" onclick="pick('student')">Try Free Lesson →</button>
     </div>
     <div class="hero-trust">
       <div class="trust-i"><span class="trust-dot"></span>Module 1 Free — No Card</div>
@@ -1426,8 +1426,8 @@ let activeTrend = null;
 /* ══ RAZORPAY + ANTHROPIC CONFIG ════════════════
    ⚠️  Add your keys here before going live!
 ══════════════════════════════════════════════ */
-const RZP_KEY  = 'rzp_live_ScWX3BhL6ZTs10';  // razorpay.com → Settings → API Keys
-const GEMINI_KEY = 'AIzaSyC_LWyrZ0Ua8x2S9fLfyAdkdh6Pz3oQWrw'; // aistudio.google.com → Get API Key
+const RZP_KEY  = 'rzp_test_XXXXXXXXXXXXXXXXXX';  // ⚠️ Replace with your Razorpay key from razorpay.com → Settings → API Keys
+const GEMINI_KEY = 'AIzaSy-YOUR-GEMINI-KEY-HERE'; // aistudio.google.com → Get API Key
 
 
 function setAvatarSrc(src){
@@ -1451,6 +1451,11 @@ function goHome(){
 }
 
 function pick(cat){
+  if(!user){
+    openAuth('login');
+    toast('Please login or sign up to access courses','info');
+    return;
+  }
   curCat = cat;
   document.getElementById('homepage').style.display='none';
   document.getElementById('platform').style.display='block';
@@ -1498,7 +1503,7 @@ function renderMods(){
       html+=`<div class="lesson-row ${isDone?'done':''}" onclick="openLesson(${mi},${li})" id="lesRow${mi}_${li}">
         <div class="lesson-num">${isDone?'✓':li+1}</div>
         <div class="lesson-title">${les.icon} ${les.title}</div>
-        <div class="lesson-lock ${canAccess?'free':''}">${canAccess?'FREE':'🔒'}</div>
+        <div class="lesson-lock ${canAccess?'free':''}">${isFree?'<span style="color:var(--aqua);font-size:.6rem;font-weight:800;">FREE</span>':(hasAcc?'<span style="color:var(--aqua);font-size:.6rem;font-weight:800;">✓</span>':'<span style="font-size:.75rem;">🔒</span>')}</div>
       </div>`;
     });
     html+=`</div></div>`;
@@ -1776,12 +1781,13 @@ function switchAuth(mode){
     `Already have an account? <span onclick="switchAuth('login')">Login →</span>`;
 }
 function doLogin(){
-  const e=document.getElementById('liEmail').value.trim();
+  const e=document.getElementById('liEmail').value.trim().toLowerCase();
   const p=document.getElementById('liPass').value;
   if(!e||!p){toast('Please fill all fields','err');return;}
+  if(!e.includes('@')){toast('Please enter a valid email','err');return;}
   const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
   const found=stored.find(u=>u.email===e&&u.pass===p);
-  if(!found){toast('Invalid email or password','err');return;}
+  if(!found){toast('Invalid email or password. New here? Sign Up!','err');return;}
   const purch=JSON.parse(localStorage.getItem('ak_purch_'+e)||'[]');
   localStorage.setItem('ak_user',JSON.stringify(found));
   localStorage.setItem('ak_purchases',JSON.stringify(purch));
@@ -1797,7 +1803,7 @@ function doSignup(){
   if(p.length<6){toast('Password must be at least 6 characters','err');return;}
   const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
   if(stored.find(u=>u.email===e)){toast('Email already registered. Login instead.','err');return;}
-  const newUser={name:n,email:e,pass:p};
+  const newUser={name:n,email:e.toLowerCase(),pass:p};
   stored.push(newUser);
   localStorage.setItem('ak_users',JSON.stringify(stored));
   localStorage.setItem('ak_user',JSON.stringify(newUser));
@@ -1876,35 +1882,50 @@ function openPayModal(){
 function selGw(gw){ selGateway=gw; }
 function doPayment(){
   const cat=curCat||'student', C=CATS[cat];
-  if(typeof Razorpay==='undefined'){toast('Payment loading... try again in a moment','err');return;}
-  {
-    // Amount in paise
-    const amounts={student:19900,business:69900,unemployed:39900};
-    const options={
-      key: RZP_KEY,
-      amount: amounts[cat]||19900,
-      currency: 'INR',
-      name: 'AI Katrukko',
-      description: C.label+' Plan — Lifetime Access',
-      prefill:{name:user?.name||'',email:user?.email||''},
-      theme:{color:'#dc143c'},
-      handler:function(response){
-        // Payment success — grant access
-        grantAccess(cat);
-        closeOv('payOverlay');
-        toast('Payment successful! Full access unlocked 🚀','ok');
-      },
-      modal:{ondismiss:()=>toast('Payment cancelled.','info')}
-    };
-    const rzp=new Razorpay(options);
-    rzp.open();
+  if(!user){toast('Please login first','err');return;}
+  if(RZP_KEY.includes('XXXX')){
+    toast('Razorpay key not configured yet. Contact us at poojagunasekaran.ux@gmail.com','err');
+    return;
   }
+  if(typeof Razorpay==='undefined'){
+    toast('Payment gateway loading... please try again','err');
+    return;
+  }
+  const amounts={student:19900,business:69900,unemployed:39900};
+  const options={
+    key: RZP_KEY,
+    amount: amounts[cat]||19900,
+    currency: 'INR',
+    name: 'AI Katrukko',
+    description: C.label+' Plan — Lifetime Access',
+    image: '',
+    prefill:{name:user?.name||'',email:user?.email||''},
+    theme:{color:'#dc143c'},
+    handler:function(response){
+      grantAccess(cat);
+      closeOv('payOverlay');
+      toast('🎉 Payment successful! Full access unlocked!','ok');
+      // Save purchase linked to this email
+      const purch=JSON.parse(localStorage.getItem('ak_purch_'+user.email)||'[]');
+      if(!purch.includes(cat)) purch.push(cat);
+      localStorage.setItem('ak_purch_'+user.email, JSON.stringify(purch));
+      renderMods();
+    },
+    modal:{ondismiss:()=>toast('Payment cancelled.','info')}
+  };
+  const rzp=new Razorpay(options);
+  rzp.open();
 }
 
 function grantAccess(cat){
-  // Now handled by backend — this is kept for fallback only
   if(!purchases.includes(cat)) purchases.push(cat);
   localStorage.setItem('ak_purchases',JSON.stringify(purchases));
+  // Also save per-user email so it loads on next login
+  if(user?.email){
+    const purch=JSON.parse(localStorage.getItem('ak_purch_'+user.email)||'[]');
+    if(!purch.includes(cat)) purch.push(cat);
+    localStorage.setItem('ak_purch_'+user.email, JSON.stringify(purch));
+  }
   updateBadges();
   if(curCat===cat){renderMods();renderCoach();renderPricing();}
 }
@@ -1983,12 +2004,15 @@ window.addEventListener('load',()=>{
 });
 
 function setLoggedInSilent(u,p){
-  user=u;purchases=p||[];
+  user=u;
+  // Always load latest purchases from per-email store (catches post-payment state)
+  const freshPurch=JSON.parse(localStorage.getItem('ak_purch_'+u.email)||'[]');
+  purchases=freshPurch.length ? freshPurch : (p||[]);
+  localStorage.setItem('ak_purchases',JSON.stringify(purchases));
   document.getElementById('navUser').classList.add('show');
   document.getElementById('navAuth').style.display='none';
   document.getElementById('navName').textContent=u.name.split(' ')[0];
   updateBadges();
-  // No profile modal on page reload - only on fresh login
 }
 
 
@@ -2019,3 +2043,7 @@ function goLesson(offset){
   }
   openLesson(mi, li);
 }
+
+</script>
+</body>
+</html>
