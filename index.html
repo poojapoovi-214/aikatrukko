@@ -1426,7 +1426,7 @@ let activeTrend = null;
 /* ══ RAZORPAY + ANTHROPIC CONFIG ════════════════
    ⚠️  Add your keys here before going live!
 ══════════════════════════════════════════════ */
-const RZP_KEY  = 'rzp_live_XXXXXXXXXXXXXXXXXX';  // razorpay.com → Settings → API Keys
+const RZP_KEY  = 'rzp_live_ScWX3BhL6ZTs10';  // razorpay.com → Settings → API Keys
 const GEMINI_KEY = 'AIzaSyC_LWyrZ0Ua8x2S9fLfyAdkdh6Pz3oQWrw'; // aistudio.google.com → Get API Key
 
 
@@ -2019,70 +2019,3 @@ function goLesson(offset){
   }
   openLesson(mi, li);
 }
-
-</script>
-</body>
-</html>
-<h2>Contact Us</h2>
-<p>Email: aikatrukko@gmail.com</p>
-<p>Phone: 9865760325</p>
-<h2>About</h2>
-<p>This website provides AI-based learning and tools.</p>
-<h2>Refund Policy</h2>
-<p>No refunds once the service is delivered.</p>
-
-<h2>Terms & Conditions</h2>
-<p>By using this site, you agree to our terms.</p>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script>
-const RZP_KEY = "rzp_live_ScWX3BhL6ZTs10";
-
-/* =========================
-   PAYMENT FUNCTION
-========================= */
-function payNow(amount, planName){
-
-    var options = {
-        key: RZP_KEY,
-        amount: amount,   // paise format
-        currency: "INR",
-        name: "Aikatrukko",
-        description: planName,
-
-        handler: function (response){
-            alert("Payment Successful for " + planName);
-        }
-    };
-
-    var rzp = new Razorpay(options);
-    rzp.open();
-}
-</script>
-<h2>🔥 Our Plans</h2>
-
-<!-- STUDENTS -->
-<div>
-  <h3>🎓 Students</h3>
-  <p>₹199 / lifetime</p>
-  <button onclick="payNow(19900,'Students Plan')">
-    Pay ₹199
-  </button>
-</div>
-
-<!-- BUSINESS -->
-<div>
-  <h3>💼 Business</h3>
-  <p>₹699 / lifetime</p>
-  <button onclick="payNow(69900,'Business Plan')">
-    Pay ₹699
-  </button>
-</div>
-
-<!-- JOB SEEKERS -->
-<div>
-  <h3>🚀 Job Seekers</h3>
-  <p>₹399 / lifetime</p>
-  <button onclick="payNow(39900,'Job Seekers Plan')">
-    Pay ₹399
-  </button>
-</div>
