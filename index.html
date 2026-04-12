@@ -2033,4 +2033,56 @@ function goLesson(offset){
 
 <h2>Terms & Conditions</h2>
 <p>By using this site, you agree to our terms.</p>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+const RZP_KEY = "rzp_live_ScWX3BhL6ZTs10";
 
+/* =========================
+   PAYMENT FUNCTION
+========================= */
+function payNow(amount, planName){
+
+    var options = {
+        key: RZP_KEY,
+        amount: amount,   // paise format
+        currency: "INR",
+        name: "Aikatrukko",
+        description: planName,
+
+        handler: function (response){
+            alert("Payment Successful for " + planName);
+        }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.open();
+}
+</script>
+<h2>🔥 Our Plans</h2>
+
+<!-- STUDENTS -->
+<div>
+  <h3>🎓 Students</h3>
+  <p>₹199 / lifetime</p>
+  <button onclick="payNow(19900,'Students Plan')">
+    Pay ₹199
+  </button>
+</div>
+
+<!-- BUSINESS -->
+<div>
+  <h3>💼 Business</h3>
+  <p>₹699 / lifetime</p>
+  <button onclick="payNow(69900,'Business Plan')">
+    Pay ₹699
+  </button>
+</div>
+
+<!-- JOB SEEKERS -->
+<div>
+  <h3>🚀 Job Seekers</h3>
+  <p>₹399 / lifetime</p>
+  <button onclick="payNow(39900,'Job Seekers Plan')">
+    Pay ₹399
+  </button>
+</div>
