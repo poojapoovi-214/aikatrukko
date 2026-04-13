@@ -2213,37 +2213,81 @@ function switchAuth(mode){
     `Don't have an account? <span onclick="switchAuth('signup')">Sign up free →</span>`:
     `Already have an account? <span onclick="switchAuth('login')">Login →</span>`;
 }
-function doLogin(){
+async function doLogin(){
   const e=document.getElementById('liEmail').value.trim().toLowerCase();
   const p=document.getElementById('liPass').value;
   if(!e||!p){toast('Please fill all fields','err');return;}
   if(!e.includes('@')){toast('Please enter a valid email','err');return;}
-  const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
-  const found=stored.find(u=>u.email===e&&u.pass===p);
-  if(!found){toast('Invalid email or password. New here? Sign Up!','err');return;}
-  const purch=JSON.parse(localStorage.getItem('ak_purch_'+e)||'[]');
+  const btn=document.querySelector('#loginForm .submit-btn');
+  if(btn){btn.textContent='Logging in…';btn.disabled=true;}
+  let found=null, purch=[];
+  try{
+    // ── Try backend first (multi-device login) ──
+    const r=await fetch(API_BASE+'/api/login',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:e,password:p})
+    });
+    const d=await r.json();
+    if(r.ok&&d.user){
+      found=d.user; purch=d.purchases||[];
+      const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
+      const idx=stored.findIndex(u=>u.email===e);
+      if(idx>=0) stored[idx]={...stored[idx],...found}; else stored.push({...found,pass:p});
+      localStorage.setItem('ak_users',JSON.stringify(stored));
+      localStorage.setItem('ak_purch_'+e,JSON.stringify(purch));
+    } else {
+      toast(d.error||'Invalid email or password. New here? Sign Up!','err');
+      if(btn){btn.textContent='Login →';btn.disabled=false;} return;
+    }
+  }catch(err){
+    // ── Backend offline — fallback to localStorage ──
+    const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
+    found=stored.find(u=>u.email===e&&u.pass===p)||null;
+    if(!found){toast('Invalid email or password. New here? Sign Up!','err');if(btn){btn.textContent='Login →';btn.disabled=false;}return;}
+    purch=JSON.parse(localStorage.getItem('ak_purch_'+e)||'[]');
+  }
   localStorage.setItem('ak_user',JSON.stringify(found));
   localStorage.setItem('ak_purchases',JSON.stringify(purch));
   setLoggedIn(found,purch);
   closeOv('authOverlay');
   toast('Welcome back, '+found.name.split(' ')[0]+'! 👋','ok');
+  if(btn){btn.textContent='Login →';btn.disabled=false;}
 }
-function doSignup(){
+async function doSignup(){
   const n=document.getElementById('suName').value.trim();
-  const e=document.getElementById('suEmail').value.trim();
+  const e=document.getElementById('suEmail').value.trim().toLowerCase();
   const p=document.getElementById('suPass').value;
   if(!n||!e||!p){toast('Please fill all fields','err');return;}
   if(p.length<6){toast('Password must be at least 6 characters','err');return;}
-  const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
-  if(stored.find(u=>u.email===e)){toast('Email already registered. Login instead.','err');return;}
-  const newUser={name:n,email:e.toLowerCase(),pass:p};
-  stored.push(newUser);
-  localStorage.setItem('ak_users',JSON.stringify(stored));
+  const btn=document.querySelector('#signupForm .submit-btn');
+  if(btn){btn.textContent='Creating account…';btn.disabled=true;}
+  let newUser={name:n,email:e,pass:p};
+  try{
+    // ── Try backend first (multi-device signup) ──
+    const r=await fetch(API_BASE+'/api/register',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:n,email:e,password:p})
+    });
+    const d=await r.json();
+    if(r.ok&&d.user){
+      newUser=d.user;
+    } else {
+      toast(d.error||'Email already registered. Login instead.','err');
+      if(btn){btn.textContent='Sign Up →';btn.disabled=false;} return;
+    }
+  }catch(err){
+    // ── Backend offline — fallback to localStorage ──
+    const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
+    if(stored.find(u=>u.email===e)){toast('Email already registered. Login instead.','err');if(btn){btn.textContent='Sign Up →';btn.disabled=false;}return;}
+    stored.push(newUser);
+    localStorage.setItem('ak_users',JSON.stringify(stored));
+  }
   localStorage.setItem('ak_user',JSON.stringify(newUser));
   localStorage.setItem('ak_purchases','[]');
   setLoggedIn(newUser,[]);
   closeOv('authOverlay');
   toast('Account created! Module 1 is free 🎉','ok');
+  if(btn){btn.textContent='Sign Up →';btn.disabled=false;}
 }
 
 function setLoggedIn(u,p){
@@ -2440,7 +2484,7 @@ function renderForgotStep(){
         <div style="font-size:.68rem;font-weight:700;color:var(--aqua);margin-bottom:4px;">📧 CODE SENT TO</div>
         <div style="font-size:.8rem;color:var(--white);font-weight:600;">${fpEmail}</div>
         <div style="font-size:.68rem;color:var(--gray2);margin-top:6px;">Check your email inbox. Code expires in 10 minutes.</div>
-        <div id="fpCodeDisplay" style="display:none;margin-top:10px;padding:8px;background:rgba(220,20,60,.1);border-radius:6px;font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--aqua);text-align:center;letter-spacing:4px;"></div>
+        <!-- Code is sent to email only — not shown on screen -->
       </div>
       <div class="field"><label>6-Digit Code</label><input type="text" id="fpCodeInp" placeholder="123456" maxlength="6" style="letter-spacing:4px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;text-align:center;"></div>
       <button class="submit-btn" onclick="verifyResetCode()">Verify Code →</button>
@@ -2454,27 +2498,39 @@ function renderForgotStep(){
   }
 }
 
-function sendResetCode(){
+async function sendResetCode(){
   const emailInp=document.getElementById('fpEmailInp');
   const em=(emailInp?emailInp.value:fpEmail).trim().toLowerCase();
   if(!em||!em.includes('@')){toast('Enter a valid email','err');return;}
-  const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
-  const found=stored.find(u=>u.email===em);
+
+  // Check if email exists — try backend first, then localStorage fallback
+  let found=null;
+  try{
+    const r=await fetch(API_BASE+'/api/check-email',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:em})
+    });
+    if(r.ok){const d=await r.json();found=d.exists?{email:em,name:d.name}:null;}
+  }catch(e){
+    // Backend offline — fallback to localStorage
+    const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
+    found=stored.find(u=>u.email===em)||null;
+  }
+
   if(!found){toast('No account found with this email','err');return;}
   fpEmail=em;
   fpCode=Math.floor(100000+Math.random()*900000).toString();
-  const expiry=Date.now()+(10*60*1000); // 10 mins
+  const expiry=Date.now()+(10*60*1000);
   localStorage.setItem('ak_reset_'+em,JSON.stringify({code:fpCode,expiry}));
   fpStep=1;
   renderForgotStep();
-  /* Show code on screen (demo mode — replace with EmailJS for real emails) */
-  const disp=document.getElementById('fpCodeDisplay');
-  if(disp){disp.style.display='block';disp.textContent=fpCode;}
-  toast('Code generated! ✅','ok');
-  /* ── EmailJS (optional — add your keys below to send real emails) ──
-  emailjs.send('YOUR_SERVICE_ID','YOUR_TEMPLATE_ID',{
+  // ⚠️ Code is NOT shown on screen — user must check their email
+  // To send real email: add EmailJS below with your keys
+  /* emailjs.send('YOUR_SERVICE_ID','YOUR_TEMPLATE_ID',{
     to_email:em, to_name:found.name, reset_code:fpCode
   }).catch(()=>{}); */
+  toast('If this email is registered, a code has been sent. Check your inbox.','ok');
 }
 
 function verifyResetCode(){
@@ -2489,21 +2545,23 @@ function verifyResetCode(){
   renderForgotStep();
 }
 
-function doResetPassword(){
+async function doResetPassword(){
   const np=document.getElementById('fpNewPass').value;
   const cp=document.getElementById('fpConfPass').value;
   if(!np||np.length<6){toast('Password must be at least 6 characters','err');return;}
   if(np!==cp){toast('Passwords do not match','err');return;}
+  // Update in localStorage
   const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
   const idx=stored.findIndex(u=>u.email===fpEmail);
-  if(idx<0){toast('Account not found','err');return;}
-  stored[idx].pass=np;
-  localStorage.setItem('ak_users',JSON.stringify(stored));
-  /* If this is the currently logged-in user, update their session */
-  if(user&&user.email===fpEmail){
-    user.pass=np;
-    localStorage.setItem('ak_user',JSON.stringify(user));
-  }
+  if(idx>=0){ stored[idx].pass=np; localStorage.setItem('ak_users',JSON.stringify(stored)); }
+  if(user&&user.email===fpEmail){ user.pass=np; localStorage.setItem('ak_user',JSON.stringify(user)); }
+  // Also sync to backend (multi-device)
+  try{
+    await fetch(API_BASE+'/api/reset-password',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email:fpEmail,newPassword:np})
+    });
+  }catch(e){}
   localStorage.removeItem('ak_reset_'+fpEmail);
   closeOv('forgotOverlay');
   fpStep=0; fpEmail=''; fpCode='';
