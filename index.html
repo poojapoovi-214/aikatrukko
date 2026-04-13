@@ -643,6 +643,9 @@ footer{
 
 /* ══ MOBILE (max 600px) ══ */
 @media(max-width:600px){
+  #homeWeeklyGrid{grid-template-columns:1fr !important;}
+  .weekly-widget{margin-top:14px;}
+
   /* TRUST BAR / WHY BANNER */
   div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr !important;}
 
@@ -769,6 +772,94 @@ footer{
   flex:1;text-align:center;font-size:.68rem;color:var(--gray2);font-weight:600;
 }
 
+
+/* == PROFILE OVERLAY == */
+.profile-modal{background:#fff;border:1px solid var(--border);border-radius:20px;padding:0;width:100%;max-width:560px;margin:16px;max-height:92vh;overflow-y:auto;animation:slideUp .25s ease;}
+.prof-hero{background:linear-gradient(135deg,rgba(220,20,60,0.07),rgba(220,20,60,0.01));padding:24px 26px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;}
+.prof-ava{width:62px;height:62px;border-radius:14px;background:var(--aqua);display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;cursor:pointer;border:2px solid rgba(220,20,60,.2);overflow:hidden;}
+.prof-ava img{width:100%;height:100%;object-fit:cover;border-radius:12px;}
+.prof-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:var(--white);}
+.prof-email{font-size:.72rem;color:var(--gray2);margin-top:3px;}
+.prof-badge{display:inline-flex;align-items:center;gap:4px;margin-top:6px;padding:3px 10px;border-radius:100px;background:var(--aqua-dim);border:1px solid rgba(220,20,60,.18);font-size:.6rem;font-weight:700;color:var(--aqua);}
+.prof-body{padding:20px 26px;}
+.prof-section{margin-bottom:22px;}
+.prof-sec-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.76rem;color:var(--white);margin-bottom:11px;letter-spacing:.2px;}
+.prof-edit-field{width:100%;padding:10px 13px;border-radius:8px;background:#f8fafc;border:1px solid var(--border2);color:var(--text-main);font-family:'DM Sans',sans-serif;font-size:.83rem;margin-bottom:9px;transition:border-color .2s;}
+.prof-edit-field:focus{outline:none;border-color:var(--aqua);}
+.prof-save-btn{padding:9px 20px;border-radius:7px;background:var(--aqua);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;border:none;cursor:pointer;transition:all .2s;}
+.prof-save-btn:hover{background:var(--aqua3);}
+.course-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.cs-card{background:var(--bg-main);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center;transition:all .2s;}
+.cs-card.owned{border-color:var(--aqua);background:var(--aqua-dim);}
+.cs-num{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--aqua);}
+.cs-lbl{font-size:.58rem;font-weight:700;color:var(--gray2);margin-top:2px;text-transform:uppercase;letter-spacing:.3px;}
+.cs-badge{display:inline-block;font-size:.52rem;font-weight:800;padding:2px 7px;border-radius:100px;background:var(--aqua);color:#fff;margin-top:5px;}
+.lesson-prog-list{display:flex;flex-direction:column;gap:8px;}
+.lp-row{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--bg-main);border:1px solid var(--border);border-radius:10px;}
+.lp-label{font-size:.73rem;font-weight:600;color:var(--white);min-width:88px;}
+.lp-count{font-size:.68rem;color:var(--aqua);font-weight:700;min-width:34px;text-align:right;}
+.lp-bar-wrap{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;}
+.lp-bar{height:100%;background:linear-gradient(90deg,var(--aqua),var(--aqua3));border-radius:3px;transition:width .6s;}
+.prof-prompt-box{background:var(--bg-main);border:1px solid var(--border);border-radius:12px;padding:15px;}
+.prof-prompt-title{font-size:.72rem;font-weight:700;color:var(--white);margin-bottom:9px;}
+.prof-prompt-text{font-size:.73rem;color:var(--gray1);line-height:1.65;background:#fff;border:1px solid var(--border2);border-radius:8px;padding:12px;min-height:58px;}
+.prof-prompt-btns{display:flex;gap:8px;margin-top:10px;}
+.prof-regen-btn{padding:7px 14px;border-radius:7px;background:var(--aqua-dim);border:1px solid rgba(220,20,60,.2);color:var(--aqua);font-size:.68rem;font-weight:700;cursor:pointer;transition:all .2s;}
+.prof-regen-btn:hover{background:var(--aqua);color:#fff;}
+.prof-copy-btn{padding:7px 14px;border-radius:7px;background:#f8fafc;border:1px solid var(--border2);color:var(--gray1);font-size:.68rem;font-weight:600;cursor:pointer;transition:all .2s;}
+.prof-copy-btn:hover{border-color:var(--aqua);color:var(--aqua);}
+.aim-card{background:#fff;border:1px solid var(--border);border-radius:11px;padding:13px;position:relative;margin-bottom:9px;}
+.aim-new::before{content:'NEW';position:absolute;top:9px;right:10px;background:var(--aqua);color:#fff;font-size:.5rem;font-weight:800;padding:2px 6px;border-radius:100px;}
+
+/* ══ WEEKLY CONTENT WIDGET ══ */
+.weekly-widget{
+  margin-top:20px;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(220,20,60,0.2);
+  background:linear-gradient(135deg,rgba(220,20,60,0.04),rgba(255,255,255,0.9));
+}
+.weekly-widget-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;background:var(--aqua);
+}
+.weekly-widget-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;color:#fff;display:flex;align-items:center;gap:6px;}
+.weekly-week-badge{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(255,255,255,0.25);color:#fff;}
+.weekly-widget-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+.weekly-tip{background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px 14px;position:relative;}
+.weekly-tip-label{font-size:.58rem;font-weight:800;color:var(--aqua);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;}
+.weekly-tip-text{font-size:.78rem;color:var(--gray1);line-height:1.7;}
+.weekly-tip-text em{color:var(--aqua);font-style:normal;font-weight:600;}
+.weekly-prompt-box{background:#fff;border:1px solid rgba(220,20,60,0.2);border-radius:10px;padding:12px 14px;}
+.weekly-prompt-label{font-size:.58rem;font-weight:800;color:var(--aqua);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.wk-copy-btn{padding:3px 10px;border-radius:5px;background:var(--aqua-dim);border:1px solid rgba(220,20,60,0.25);color:var(--aqua);font-size:.58rem;font-weight:700;cursor:pointer;}
+.wk-copy-btn:hover{background:var(--aqua);color:#fff;}
+.weekly-prompt-text{font-size:.76rem;color:var(--gray1);line-height:1.7;}
+.weekly-prompt-text em{color:var(--aqua);font-style:normal;font-weight:600;}
+.weekly-ai-loading{font-size:.72rem;color:var(--gray2);display:flex;align-items:center;gap:6px;padding:4px 0;}
+.weekly-refresh-btn{padding:6px 14px;border-radius:7px;background:transparent;border:1px solid rgba(220,20,60,0.25);color:var(--aqua);font-size:.65rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
+.weekly-refresh-btn:hover{background:var(--aqua);color:#fff;}
+
+/* ══ INDIA EXAMPLE BLOCK ══ */
+.india-example{
+  background:linear-gradient(135deg,rgba(255,153,0,0.07),rgba(19,136,8,0.05));
+  border:1px solid rgba(255,153,0,0.25);border-radius:10px;
+  padding:12px 14px;margin:14px 0;
+}
+.india-example-label{font-size:.58rem;font-weight:800;color:#b8600a;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;}
+.india-example-text{font-size:.77rem;color:var(--gray1);line-height:1.7;}
+.india-example-text em{color:#b8600a;font-style:normal;font-weight:600;}
+
+/* ══ DO THIS NOW BOX ══ */
+.do-now-box{
+  background:linear-gradient(135deg,rgba(220,20,60,0.06),rgba(255,255,255,0.9));
+  border:1.5px solid rgba(220,20,60,0.3);border-radius:10px;
+  padding:12px 14px;margin:14px 0;
+}
+.do-now-label{font-size:.58rem;font-weight:800;color:var(--aqua);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:4px;}
+.do-now-text{font-size:.78rem;color:var(--gray1);line-height:1.7;}
+.do-now-text em{color:var(--aqua);font-style:normal;font-weight:600;}
+.aim-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--white);margin-bottom:4px;}
+.aim-desc{font-size:.7rem;color:var(--gray1);line-height:1.6;}
+
 </style>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
@@ -787,7 +878,8 @@ footer{
   </div>
   <div class="nav-r">
     <div class="nav-user" id="navUser">
-      <span class="nav-name" id="navName"></span>
+      <span class="nav-name" id="navName" onclick="openProfile()" style="cursor:pointer;" title="My Profile"></span>
+      <button class="nb nb-o" onclick="openProfile()" style="padding:6px 10px;font-size:.7rem;">👤 Profile</button>
       <button class="nb nb-o" onclick="logout()">Logout</button>
     </div>
     <div id="navAuth" style="display:flex;gap:8px;">
@@ -1002,6 +1094,19 @@ footer{
 </div>
 
 
+<!-- ══ WEEKLY AI UPDATES ══ -->
+<div class="sec" id="weeklySection" style="background:#fff;">
+  <div class="sec-in">
+    <div class="sec-eye">🗓️ Updated Every Week</div>
+    <div class="sec-title">This Week's AI Tips</div>
+    <div class="sec-sub">Fresh AI prompts and strategies — updated every Monday for Indian students, business owners, and job seekers.</div>
+    <div id="homeWeeklyGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;"></div>
+    <div style="text-align:center;margin-top:24px;">
+      <div id="homeWeeklyLoading" style="font-size:.78rem;color:var(--gray2);display:flex;align-items:center;justify-content:center;gap:8px;"><div class="dots"><span></span><span></span><span></span></div> Loading this week's tips…</div>
+    </div>
+  </div>
+</div>
+
 <!-- FAQ -->
 <div class="sec" id="faqSection">
   <div class="sec-in">
@@ -1091,10 +1196,10 @@ footer{
     <span class="foot-lnk" onclick="scrollTo2('catsSection')">Courses</span>
     <span class="foot-lnk" onclick="scrollTo2('faqSection')">FAQ</span>
     <span class="foot-lnk" onclick="openAuth('signup')">Sign Up Free</span>
-    <a class="foot-lnk" href="mailto:aikatrukko@gmail.com">Contact</a>
+    <a class="foot-lnk" href="/cdn-cgi/l/email-protection#ccada5a7adb8beb9a7a7a38caba1ada5a0e2afa3a1">Contact</a>
     <a class="foot-lnk" href="https://www.linkedin.com/in/pooja-gunasekaran-a8a855260" target="_blank">LinkedIn</a>
   </div>
-  <div style="font-size:.7rem;color:var(--aqua);font-weight:600;margin-bottom:8px;">📧 aikatrukko@gmail.com</div>
+  <div style="font-size:.7rem;color:var(--aqua);font-weight:600;margin-bottom:8px;">📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1b7a72707a6f696e7070745b7c767a727735787476">[email&#160;protected]</a></div>
   <div class="foot-copy">© 2026 AIKatrukko.in · Made in India 🇮🇳</div>
 </footer>
 
@@ -1142,9 +1247,59 @@ footer{
   <footer>
     <div class="foot-logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAf8AAACICAIAAABmw3UkAAABCGlDQ1BJQ0MgUHJvZmlsZQAAeJxjYGA8wQAELAYMDLl5JUVB7k4KEZFRCuwPGBiBEAwSk4sLGHADoKpv1yBqL+viUYcLcKakFicD6Q9ArFIEtBxopAiQLZIOYWuA2EkQtg2IXV5SUAJkB4DYRSFBzkB2CpCtkY7ETkJiJxcUgdT3ANk2uTmlyQh3M/Ck5oUGA2kOIJZhKGYIYnBncAL5H6IkfxEDg8VXBgbmCQixpJkMDNtbGRgkbiHEVBYwMPC3MDBsO48QQ4RJQWJRIliIBYiZ0tIYGD4tZ2DgjWRgEL7AwMAVDQsIHG5TALvNnSEfCNMZchhSgSKeDHkMyQx6QJYRgwGDIYMZAKbWPz9HbOBQAABfeklEQVR42u1dd3iUVda/b5mZd1o6HQREqp2OoCgiuoKIlF1dREVQLKgIioq9Ypciiqi4KHYRlM8FYS3ALgKCdERs1FDSk2lv//74keN1kgwhBhW858mTZzJ5y62/c+6pkuO6TFDVJB3h54vR/2PH/69GYr0JIpLFEAgSJEiQQH9BggQJEiTQX5AgQYIEHaOkiiH4Y0nYFQT9ldezWJ9C9hckSJAgQQL9BQkSJEiQQH9BggQJElTrJPT+gn5Fwr9ezO9fuT1/KTuEkP0FCRIkSMj+go4xYUNI8oL+5OtZLFEh+wsS+C9IkCCB/oIECRIkSKC/IEGCBAkS6C9IkCBBggT6CxIkSJCgmpB0pPP7/9ny2AgrqCBBgv4o/BGyvyBBggQJEugvSJAgQYIE+gsSJEiQIIH+ggQJEiRIoL8gQYIECRLoL0iQIEGCBPoLEiRIkKDDoGM2x6dblSeuyxhjkiT8/gUJEvRb6aiuYyxkf0GCBAn6K5JAf0GCBAn6K9KfTvPjVpF5oipdjfvXqsUmSJAgQUL2FyRIkCBBAv0FCRIkSJBAf0GCBAkSJNBfkCBBgv4EJHG/jz70lw7zhzHmVqBKv6R/VUWWZZmmic+GYeAhkssq/WGOW+mPJEnRaBT30tNqkWzb5v9MJBKJRAKfS0tLqfGu6+q6zhijNjiOk/RBkCBBxyYDcA+Bmb9TSw63uksNGlcR0yVJcg/3vb/2+dm1a9fcuXN1XZdluZovTfpvLBZTVXXUqFE5OTmmaXo8nloZULzXcRzXdVX1oEtVLBbTNE2WZV3Xy8rKcnJyiouLP/74Y0VRhgwZ4vV6cQv6Qh8ECRJ0rJF7aDD93bwYjxr0tywLAB2NRn0+3+eff96/f3/LspJk7eqQoigA2aysrK+++qply5ZHYmQNw/B6vYlEwrbtYDBI3zDGNm7ceMEFF+Tm5mZkZOzdu1fTNIH+ggQJ9P+d0f+oQRmSowOBgKqq6enpuq7bti1VQVU9x+v12rYN2bykpESSJPxZW+3EowD0lmX5fL5gMJhIJCzL8nq9hYWFDz30UKdOnfLy8jweTzAYrPhqkYVCkCBBvweoHi0NNU0TSO31eiVJMgxDkiRFUSzLOtwzBBBWkiQ8SpKkWpS1ZVk2TRMyvqqqrutalgXpfvPmzXfcccenn35qWZYsy47j4GTgum5qjiVIkCBBf130B55C+QPcBPRXGQNchWYJsOvz+eLxOKR+WZaBv7V2tnNdxpht24qiJBIJv98fj8e/+OKLK6+8Mh6PU5uDwSCOL0L2FyRI0O9PR43mx3Ecco+RZZmMtIfrOwTZPx6P03midgHXdV2o+xVFiUajfr+fMXbnnXf27ds3Pz8fRguPx+M4TjQaBSsSq1CQIEFC9q+aTZUDpa7rPp8PWvUaWI8ZY5qmAZ0VRYHg7zgOTMG1gv6SJGmaZtu23+8vLi5u0aJFUVERji+macLdkzGmKAraTyeP2j2CCBIkSNARQf/UsEsoVullPMxVH76hnfd6vcDrmkE/YwwO+LZty7IMhXvNoD8ajUJ74/P5qFPUJFmW58yZc/PNNxcWFoLHmKaJ/+IynGbI6oAB+S0OP7Ztx+PxUCiEwVm/fn1BQYHruoqiwBRRWlraqVOnnJwc3r3VMAwwQrQf9mpyT/ryyy/BLMl/SVXVQCDQpUuX0tLStLS0w23knj171qxZk56eXlZW5jgODOO2bffv359OcrzvEznjJhKJzz77LCsra+/eveFwOBKJBIPBwsJCr9fbt29fVVUVRYG2Db91XYdpBwe+kpKSb775Bq8wDEPTNMMwAoFAt27dMH14BSw08CZYuXJlJBLBOlFV1ePxJBKJQCAQi8UCgQD8zSRJchwHhzlFUQzDMAzD4/GoqmpZlmVZ+G+rVq2aNm2Kvmzbtq2oqMgwDFVVVVUtKyvz+/2BQCA/Pz89PR12IPQ9FArl5ORkZGRommZZFjk+sHK9Yjwel2UZA4g1vHLlSrTKsiy/319WVsYYy8rKOvXUU03TVFW1KvFiz549P/zwQyAQgKUKC0BRlM6dO9OK1XVd07RNmzbt3bsXHdc0raysTFGUQCBw1llnxeNxn88HQQ2TCBENI/Ptt9/u2LEDN+q6rqqq4ziGYWRlZfXu3Ru9++67737++We0M5FIYGpKS0svueQSajmGgroMKioqWr9+vaqqRUVFoVAoLy8vIyOjtLQ0kUhcfvnlpaWlmqZB/OIHATNiWdbq1asXL178008//fTTT7TqWrRo0aVLl65du7Zu3RprgFYjv1CPYnJc97B+iJyUdMjLqvkc/nraGI7jLFu27LeLyR6P56effnJrRGhMJBJBkwDu1K/S0tIJEyaQLRfLlBpM6ibs+YqPrQFZloUPiUTCdd3Vq1drmqZpmt/vVxTF4/F4PB5FUc4444ySkhLsZF3X+dtxKEFH8K+ysrJOnTohUgF8V5Ikn8/3j3/8A5yMn8dq0uTJk+H/KklSOBzGh3r16qFJ/JLAK9C2ffv2nXXWWcCCQCBAv/1+//Dhw6PRKD0/Ho/zjzIMIxKJOI5z6qmner1eTdN8Ph96gQXw0UcfGYYRi8XoCRjARCLRvHlzxpjP51NVFVwEvIEXR3hEJp0kgQKQIhAIzJkzBw+PxWLnnXceDq+s3JMNrAurAt9IkoQpC4VCJ5xwwtlnn/3QQw/973//c10XnXUch9pM3S8tLW3fvj1QGwdQxlgwGBw5ciQmPQUNHz48PT2dhogxlpaW1rFjR8MwaCIwsLfddltWVlaSyrRz586FhYUk4vCbAn+uW7eubt26uAX4i4H1+/3vv/8+Ztk0zdtvvx1jrihKKBTC81u0aFFcXIzZ5JdcLBYDI7Esq2fPnrjY7/erqhoMBjEL11xzDW0N7FZaYIZhLF++/Oqrr87JyaGpJI7COxmedNJJ48aN27x5M7/Nwf4Pe6NWCqZVX3JEfwT61xD9gRFJSwq4uWvXrvPOO4+AHvv8d0B/xBVjn48fP56QC6hEfOibb77BfjBNkzYG/14eTFu3bo3beaQbMGAArq9Ba998802StQkl69evj6fBnk8jDOwoKiq66KKL6BZe4Bo9ejShPM8Cbdvm27Z///6srCx+6mmT9+3bN4mH0Y316tVLAnfSHIIX8i2hK+nJZNtnjM2ZMwcGf9d1zznnHFoJ6A5uwWPpdr6n+KBp2vnnn79+/Xo8Jx6Po9eYcTQbHAvPpxPe3//+d9ySYr7GjRtHXaDmdevWjcYEyGvb9s0334ylhRFAB1u1asUvxbKyMqAzltm6devA6alHODUqivLuu++iF2DbY8aMoQbAZsYYy8nJIbh3XRecgCg3N7d3796YEZ49ezyem2++GQdW0zR5YcKyrI0bNw4ZMgRXJk0lGqBpWtLsN2vWbMyYMXl5eWgqLTaB/n859Ce04uEyHo9//vnn2HWappEYCAZQKfrn5eXxo0F9rPFxxHXdgoKC7Oxs7ARawdAzMMaGDx9Oz8ctJM7woAkUPvHEE/lxhjrisssuQwRDDRo5depUfmNDDES4NVpCRxA0KRaLDR48OMky7/P5fD7fiBEjotGoYRhoKhCHcAQdwb8uv/xykqnxHEiXsixrmrZx40a6kSRW0zSbNGmCRYJzBiaUNHU0sDhUJWtUVZVXr0H2R2MuvvhigmZVVQl3IBTjXyQxJKlSMW7Tpk2rOOlg/23btuXvgiA8bNiwJHZYkYDpeIvX60UDOnXqRLNMi+Suu+4i/k1M68QTT6QOYvxJQP7555+PO+442gU8QL/zzjtJ586xY8cm9d3n82VnZxuGkXRUxZ+RSGTQoEE8A8ZBTZKkoUOHoiXENnBQSCQSH374YTAYVBQFpy5a25hcLAxqANqDb/x+f/369b/77jv0jm/S0Yj+Iqa05oSYA5wNS0pKGGP33Xdf3759TdOErhwbJhgMIitRDcwnNbDExOPxF154oaCgAJpox3GwKyDyMMZef/31H3/8EVmGCMjQwoqLnteTQPkbiURisRjQM0W/qqL09HRo2CniGvpTsoRDvR6PxyVJKikpue666z744AO/348LSI/frl27adOmQUPi8/lc1w2FQlCIa5pmmib6Al44e/ZseNbSiwzDoKPG5MmTMRpQr7PyoA1SDeNeXddN0/T5fDCrUKAJIDhJ8OdDCH0+H+V6gqUHkSvoCC7zeDzkqwYWSLMAPoEpwO233HLLo48+iqMenmOaJoYOcw1GhXHGKyRJIrNTVUYjQn/eMYFxaUvw30gkAq09zEUYOhg8MBGapuGNgOy+ffvu3LmTlbvb4XcwGJwyZcqAAQMwUx6PBxeT5QkQLEkSeUWjSbgd/43FYqNGjZozZw6YHFkaHMfp06fPSy+9RBMKrolZu+OOOwYOHBiNRm3bhvYGnADdxPkGuwbjSXOBjbBv377WrVsvXbo0FotVZNJHFx1x9D/cWNyjiDRNi8fjWP2RSKRz585PPfVUPB5XVTWRSGA5ejyeaDSaIolQkn9qjUeGjGB+v//dd9/lAQ6WN1VVYQawbfudd94BmhAqJSkZAECGYWAv/ZJT79fa3hqs/qQOkhkcxjdqA4Ik7rnnntdffx0sDboCXNOjR4/ly5fjBIC2QbCFBRv8DFdqmvbWW28BW2FvTGK6kiR9+OGHJSUlBH9kbQacAfdJ0k8kEkClJOne6/XSgYZYArQ30IQgysTj8cASi5bgOVgqFMzIewFA7Q4TKFAVYS6PPvroli1bCOVxgeM4kUgEd/GexNhxYORVzQt/fAGroGMNrLgEwWBIwE04CyiKAk8B3IuOoy/nnHPOli1bYLgmdGaMjRgx4qabbiITBbFJCAe0dHFLWloaePyvDJaOM2bMmLfffluSJGjVDMPA9Z06dYJ0j5VQXFxM5uKnn3562rRp+DMYDGL0EPpDTAJcDXYItBZWfVmW8ahAIDBw4MANGzYIj8+/KMHVB8tl8uTJd955J5CUtgHWDVAmhW9Abcn+2Ieu6y5YsGDTpk20n+EDAzGH4HXatGkjRoxo0KCBLMsQtYBuuAwgRRuSD0qQywm6EahEDosKCgp4dKakeKw8NBqoUVJSMmXKlOeffx7th+NHOBwuKyvr3LnzvHnzcMCSZdnr9WIu0BHwKk3T0P39+/dPnDiRBHkSabGZ0ZGSkpLZs2ffcMMNpHsB4nTr1i0/Px/WV1VVo9FoWlpaNBrNysr64IMPaEyQgcowjA4dOjRu3Ni2bYwe7/xTp06daDQKMybgHhoVfp0MGjSotLRU13WSqfPy8vbt2wc1N9gDXooowquuumrFihVQdJBaD58poB2jB70NPlcliFAzwIqwhgH6aA/+C9BHl7EGaPqwF0gKkWX5wgsvXLt2LWOsuLgYB0dM8bBhwyZPnkwrChOHFCx0JX5j6uPxeGlpqd/vp/GUZfmWW255+eWXifVCTIHU/9FHH6ENYJwZGRng33Pnzn3ggQeI2SDXL9/+nJyc7t27N2rUKBaLbd26dfv27Tt37sT2AcPDGCYSiVgsNnLkyEWLFjVs2FD4/FSp1j+0Huyo1fu7rvv9999fcsklpD0kRQqkLWxIgshK9f779u3DwuWV3TXQ+5Oa9aSTTqooldN5i/JbTJ8+HVpa4g3koYGDPx7Ypk0bgAi6hm4OGjSoxgbq6dOnVzwH1K1blzxY8N7nn3+eXsebQ0855ZRdu3bR+EBCJwchWioQhF3X/eijj6jvpPpPsuZB/1taWko6bl3XcWbivVaov7FYrFGjRqw8YoOeOX36dNxCc4G7eHuj4zjQ+/OnKJ/Pd9ppp5Hum+51HGfVqlVXXHEF31RMBI6VeXl5uAxTqes6bBXEDHDLiBEjeL+dSmnkyJFJMorX6+3atSu1hJoHtxxyIsBdzZs3J4MqDNFw4cXYojEQxv/5z3/y5hlcD2Hfdd3bbruNjlAk7NetW5ds+xhPMg/g+dTmM888s6SkBM+kFYWWl5aWtm7dGs0mSztt2PPPP//jjz+mzCtQ6JeWlj7//PPYAkk7F7dfddVVfy29v1v+wyQpxc8vl9VUNZRCUwTjTI3Rnw81SKo3UNUtOFDzKlHG2Ntvv92rV6+5c+d6PB6IPBAiCEQgT8VisUrRH9AAgYJXSlSH+OSmwBqIXbt37/72229JIw9B7+9//zvv/AP1yCuvvELCFwRD0pWTnsR1XTiA4xhO2mq6sQYHF16/jLegATR0uq5/+OGHMELS1ODGnJyc+fPnZ2dnU8AEtjGUD5QuCccXHMUmT55MQRiQWEOhEFxENE0rN3KqlmV9+OEHiiIx5ti26fWqkuTiT1WVGXMYcxCEAFhErDiQghYPib2YTWoSBF5ejc53DWI+HMnxga40DKNjx46zZs2Cdwr12u/3g+FNnjzZcSxJcn0+j+NYHo+iaV5J+mV5kNIGs59ivuB9z2v/EJGgKJJtm5LkejwKMTZaxuVdll1XcpyD7NA0zfHjxy9YsICkcjwzkUicd955b7zxBmmQaOjgH+E4TiAQgMkHx2ta4fgMq/vUqVOnTZuGFY5BxmVt27b+v//7WFVlRZFc18bE2bbp8SiMOY8//tiPP/5ISw72IXT56aef/fDDeRde2A8nXZwYMM433njjpk2bunfvTvuCP0S+++6727dvR1PRQloSVaPPoRP5/265/oXV9xAE7A6FQlimEJyj0eill146evToXbt24WQKBnC40R81YGBYWzheECiDXNe9//77Icvzpsu77rqrY8eOwBcAgWVZ69evX758OYQdZD3iHdV/f4JBQpKkL774YvDgwXzUm67rOD9t2LChfv36fr+/Oqn9/H7/8uXL//vf/7qu6/f7yZ7Rq1evp556CrZl13UlicXjOmPs6aefJjZTM5N7dXghTVZSrAB6RDq3WCyGWCcA7pQpUxDkCK5A+LhkyZLqr5nqLEV+Qaa2zxHvB4BqmibLzDAsSZJgrcHaI/uw4zhNmzb99NNP8UxeD1mVUY3EFz6zywsvvDBhwgToxzIzM3EaUBQlIyPt888/l2UZS4Wi9ykR5IIFCxAmRokXE4mEx+N5+OGHhw8fHghoiiI5DoOSB3sBsXiKonzyySd/+9vf0CPeSTeRSNx9993wBeBDPoXV9xghLCbCWcMw1qxZ06VLlzlz5hQWFlKECFZDbZWISaWp4wQ0/gzkOE5eXh4EK7QKUaYtWrRo1arVqFGjwAwIUk3TfOSRR8gSiOM2RNoj7QWQZHRFUxE2sXjx4ksuucR1XVj/MOYY/2+//TY7O5vg4JDHC8bYa6+9Rr7kYCeqql555ZUnnXQSHIT8fr/HAzdBedOmLYsWLYIjRw18mQ7XDwIiOczdmEeI85iCQCAA+INnS/369eHKyfsyqar6888//3bcryiIkCk+xTgjkQl5wuzfvz+RMLxe9Z577pk6dSqCfmkR6rretGnTVatWJRIJHA7Q6ySs5PlNIpHIyMgA4Nq2XVZWlkgkXn31VQSy4EskUEGa9GXLltWvXx+7NRqN4vhLZpK1a9euXbueZ3KY4u7du0+YMCEtLcQYMwwL9hUYe8EzQqFQLBZLS0u79957YbbBxNEamzt3LoLO0FnaegL9jwUiTxIcP5955pnu3btv3rwZkfTkEgA9Q+pZTzo21sz3iay7PAhiLb755pukVaBV+Mgjj0iSdNFFFzVu3BjfoNKALMuff/45slAQ6PNeK0cU/ZOGBf4wy5cvHzZsGLpQUlKCRAKSJAWDwUWLFrVu3RqR+qQHqJTIUSc3N/eTTz7hubLjOG3atOnVqxdjDFFF8XjcMCxJwr6Vn3/+edxbA1+mSmX/SsGX5p3iKsplZ9nj8dAUkDNoKBRKJBLhcJh01sT+q4My1T+UHBb6s/IsDlDWZWVlaZr34YcfnTx5Ms6RmCMYqNu2bYssHRT4AgZQFZfFcY0cbMC5v/zyy1tuuQWnIj6a2rbtlStXnnTSSbjMMAwYGKDYQSNnzZoFqYjkd8dxvF7vHXfcIctyImFYluP1qqTehK0iGo2CPScSiW7duvXp04fei5HHc/Ly8jBZxJiPlgwQAv2rMUaybNv23r17L7jgggkTJkBTT5IyEuAwxkhUOaKaH8b5kpNlUpKk0tLSyZMnk+sO2SQvuugiv9+vado//vEPikuCdlKW5XHjxpmm6ff7yafzdxjMik6ftm0vX768X79++fn55LoOATAUCr3++usdOnSARRd8K8UZC/8qLi5+9dVX9+7da9t2IBCgeenbty/gdezYsYSn6LRlOZ9//vmOHTsgUR4hzQ8/DuRkCdsy/A4Nw8C6gu8N/FIkSfr2229hQqAM4YZh1CDPUmrRJGlqUqAYDEV8gsIZM1558MEHkbkWZxS48TRv3nz+/PktWrQgiRvzi/NBVbI/+Y/quh6LxVasWNGvXz+MBl8TKS0t7X//+1/Hjh2LiorIfSjJYuQ4zsKFC32+X1yKIaTn5OScddZZpmlqmldRYP5V+LeTGQznsIsvvhjvhYgAWIAygPx0D633F+h/dMn+qqouWrSoRYsWa9aswQRTTTHyR2Rc0fYjCv2s3FTIOAuqLMv//ve/d+/eTepj2P369+9PqpXhw4cDWFl5FjPIRPv27SNpl9z/fx/05/N29evXr6ysjOAM8CHLciQSadq0aSAQgHsJYn8qTcBAz0T8zosvvkiPwnt9Pt/QoUOhEwgGg126dPF4PMGgX5IOtiQWS0yZMiUzM/NwSwbVgE/AfEpqH/QOjvPgTwjUgirjxRdfRPge8XU8qk+fPtXB9OpwpsPFLCwhVp4mYceOHXCZJQSHSyhjLBwON2jQAHZRv9+PUD4cNMHJkhgAf5yFaA8/TgyL1+uNRqNer5cE/PT0dNM0MzMzI5EIRoYyTMBDFA6jaAzxKnjHQcXPGJMkRqdAZACkozAYcyQS6dmzJ982etTGjRt5katm3hAC/f+kgv/OnTsHDhwI5SN5DfIuyVAow2Ph92EA1Da0JxKJTJ8+nd4OKPd6vWPGjEE2Sr/ff/zxx7dq1YrO2hClfT7fokWLSG31O2h+KnXWsm0b1nVwUHKgwmY+88wzoWGIRCKIMU4hnoNtfP311wcOHKDDPsyn3bt3b9OmDRDWtu2rrrrKMIxoNO66zLZdr1eVZfbOO+/A1+XIif+U05vcSSm+jJV7PQGDkMny008/vf3228moiMgjqESuvPLKWrcnVbM7MJ/6fD60FjANNKfQaIgpW7ZsueSSSxRFgVCiaVogEIB3E41zkh0IsI44W8xgIBCIRCL4BseOaDSqquqePXsGDx4sSVIkEgmFQnCgCgQCSZENiqKgf/zaq1evHoIxGWNlZVGvV7UsB5wpFAqBXaFrfr8/FAplZmZS2DxpeLAaKelLVYMp0P+oJMuykIGSVO0k9QNAsRvhTkDOnUeUkrApEols2LBh2bJleDtFk7Zq1apLly6kyvT5fE8++SSlcKFj9V133QUV7REVeFMzPN6MAZgDAwBAGIbRvn17VVVDoRAgMjMzM4XmJxaL9e3bl7ybwBJc173hhhvIaU9V1SFDhrRu3RrN8XgUw7AchxUXF0+fPv3IWX2TPLsprHfHjh1z58595plnpk6d+sorrzzyyCMPPPDA1Vdf3aZNm4suugjGJwwRVMx+v79evXqnnXZa7Wp+qi+0YsFj5YTDYQgQZIqAhzF0I6Zpfvnll7Nnz4ZGhVKMkCBV6fNx9EGMlc/nw9rmowJZuWPPunXrrr/++lAoBNs+/osbYb/FkoA8xOMymgeJJxwO6rqpqnIwGMRqgRsPtElYRfn5+ThBUk9xGqO4aGyoWiwWcsSR5DDWB7z82R/mz0R5w8mZumboQypO8uRJDbUw/rBya1WSTEQ6ZfJrTgqyTzL2QkrCzvf7/dnZ2cA4Pr4/RZPi8TjcvUlxHAwGH374YXodvX3EiBG8Acq27d69ewcCgeLiYqppI0lScXHxp59+OmjQIOwNslzxwRZJ0IB1X7OQCxpzfhjRzqSaDbw4uXbt2qeeeur222/nq2bybUDOJXDiVatWgf9RSKokSX6//8wzzyTIAG8YOnTofffdx3dN180nn3zyxhtvxMMp4z8Cd1P3t9yF9BfbbEUlQNKQkldiYWEhorqoWjUFtULsZVyAdDAYjEajTz31FIzVpHOAxdvn8yYSBqANR9KysjJ8rlhUgzYUcuxQ5AQfCkNLgu8KPCYB9Bht+EpRYQNKuITVPmrUqLPPPvu4446D+g6HBorVqrTah6ZplEQIjeTTgfDKz5kzZ/bqdfY///lPVl6vAupZ8jvy+XyqKpMtAW8pLS1VFKWkpAQOZl6vx3URrSRFIhEkJc3Pz0cKQsZl3eDBwbKsnJwcioVGv+AXLmT/v6KdoOJWJ4Ed8iwAOjMz89VXX+Vzu1eH4BdP8aiMse3bt3/zzTdADTIJZGRktG3btrCwcPPmzevXr1+3bt2WLVt27NjRoUMHOFHwyodXX32VCqr8zpofUp4S9JPTDrYchfuPHz9+6dKlwDgK1EQKHcZlQ7Ms64UXXkCuMcZ5lF566aUFBQU//PDDli1btm3b9uOPP+bm5p5++unhcJAxZlmOokg+nwegsHLlSviJ4iEU51GzUIBKifpIJUspLgy8zbIsFOqBxgPAh1DtaDQ6cuTIQYMGAX2oOA+04YmE4fN5iCWQvEzHILL6gBFi5STZhAD9FdMY8B6Z6AUAGtCflpaGt1BRa9u2oZc3DGPw4MH5+fm0FygCsVKCMwWsbmDqSNhg2zbeiIHC9nFd97rrrtu0aROyB4Kv8I5VjRo1siwHRmaKw//888+j0Wh52kFDkphl2cjTFQ6HwSpycnJIhsjNzaVsGThkoLMnnXQSb1Q4rO38B1P1w4Jt17Fdp8aZIWqFKK38ihUrajbEvMlRkqTvv/+eTzhR6UuLi4sJSg7rpbBbJsX0Y+U1aNBgyZIlNUkPzjUS2s+rr76aF0Yo4AXLmhKBQWbksxOnpaVRqxYvXkzpcPmsBh06dKjY5UsuuaTGdQhmzpzJn3L4MzJ8ky6//HJKV0BSHrrQsGFDysyh6zrlHgAoIOEBTHCVUigUSsqhDyWY3+9TVUqzzBhjHTu2d11b1+OuazuOFYtFXNd2XduyDlYRSKoWAHr88ccrDkvF1B1kisf5BpZJvv4PUoBUtWhDodDNN99MCS1MU0fb8OHss8+CIot0EYwxeLbwGbmRDZuSYxuG0blz54r5DEaPHo0RwG8M8m233cZrIBHr6/P5FcXDmBwIBK666irG5WngHYfGjBkDkyyqrVVcHg8++CC/mGnpYkAyMjJuvPFGmkd+P2qat1OnDoaRwGiUlZWUz5dt2+Zdd92BMUlaVwsWLHBdt6ioxDRt07ST1j9MF1SYYcSIEbz4QuEOSdli4P5fW4j3Z8nvL9D/sNC/Yo4K8j3PycnBiqlBinx+XWIbA4n4PDx0oKYFSnncsItoU1FGzKFDh1ZaKqDW0f+1117j2SGP/pqmDRs2LJFIrF+/nrLA0wX40LNnTz6VPxgAX45m7NixtMl5h0gMBZ8kh/1SdwHXy7LM/H4fY0xRpFWrVgA4bNsEsFqWYdtm9dGfx/2K6E8tqcqcQ1ktEZiG7jdv3nzx4sWIjCtXQtq2bRJGX331VeBkNMjoeFlZGdYMFQWDEI0Pubm5eAvjYj7C4fCUKVN49MceQZ6fXxfDkhmTPR6fpgWmTZsWj8evu+46Vl4jBV0gvdMHH3xANtKKq4jQn3Lp8GUPnnnmmQMHDsCbC3XBGJdHKxQKjB59QyIRc10bv+ln9epVwaCfF33w+fTTTy9fSCiYo0O9Q/Vz+Npk0AXR3gEbCAaDRUVFqQFEoP9fC/0rXgatNIyxlFCMr2RyWEuH8ljNmDGDFxtJ8Gfl5ZMo53vFcwmPOPXq1du7dy8lxjqisn/FZqDZSB4Xi8Visdh7771HVRKJAWC3jxs3jvgfqjZSm3Nzc+l8wxOl9KG+kO7I61UVJSmLFGOM/eMfQ0xTJ8kaIHtYsn9q9E/KFwbBlpUXJ6l0OXk8nlGjRlWoxWabpg6Adl173rwPZZlhAPgSOs8++ywvbZB8CkaCYCgSHVi55+LmzZsJ/V33IGQD/fnDk8fjY0wOBsNPP/0s8uvFYrETTjiB13FRRzIyMvbs2ZNUjrRS9GdcGUiv1zt16lTi+pdeeimNCb+809PDb701m7g1sUbDSBx/fDNYcWnYMdT3339/LJYgBkBslS/ZFI1GL7jgAr4vYJYej+e66677TaW+BPofY+hfaVo67Khhw4bxGT3p1YcsvVTpUOTn59erV69SlkMVJUnmgl6Fcakuk1Bm7Nixv4/mJ2l7Y1P169cPNehBRUVFffv2pTeSkw/07x999FGS5Ai+9fjjj5P9HBuV1z/wlbl+zYGYokjQDCiK5PVC0lQ2bFhHCh9CwNToz0NAavTnMUuW5eOPP37OnDmfffbZf/7zn48//njVqlV9+vShDPUkcno8HlTmQd9jsRjxJxxTotEyTBfpuOAjGw6H9+zZQzksqfBZLBbLy8tr0KAB+3U6HYxSLBariP6Ua4GmQ1W9Xq927733W9YvEv327dsbNWoEvkuHAKgfO3ToABynKp6Van4YF1f17LPP0nQXFRUZhkFVzKBnV1VZ07yMsaZNm+Tl7Yfs7zgW6YKmTJmUxOFYeTLU559/wXFcXTdpIUG2QLk013UHDBjAfp3HhWIddu/ezbcftV1rkRMI9D+60R9q63A4fP/990OgiEQiWFXk7k1n4YrK/YoEda1pmgsXLvy1COahMuL0IcUIEA5CSGzQoAHtxiOq+Ul6uyzL4XCYrwlOtY5PPPFETjvvJ1NhgwYNoDqDNx4aE41G27VrR6hKvC3JPZTYHk4VvMafDgFgAOPH32aaumUZuh7nDgFVov/EiRP5DM98cvKq9P7EnJo2bYoRoEil5cuXU1U1okAg0KpVK0xT+ZNJKX9QQ/W3v51PF/MnwkaNGn3++efwgySvgX//+9+NGjVKquiL33379k0kEo5j8ZwP6I8VzhUdkxs3Pg4SNF/seubMmTxi8gxv3LhxqfX+1HGPx4ME4Lx+LxKJbNu2rU6dOljhiqJg7jCuXbt2Bujrehyc23GsRCLWsWNHfldy6nv5wgv7ffPNukgkRoswHo+XlZW9++677dq1o0ReuB43pqWlDR8+nD8uHHWyv6jucsRdXHDGnDFjxpAhQ+CQEAwGyWOhopcnNnYKl2H40tm2PWHCBJxh4e+IsKYrrrjilFNOMQwjIyMDZcWoLgJEwmg0aprm1KlT8/Ly4JKICJeCgoJ//etfo0aN+h3GhE/vBQ1yWloauRhmZ2djHF555ZXevXvDIxaJAeDvkZeXd+mll/73v/8lzYllWQsXLtyyZQv5t8D7MC0tbcyYMZTcNBKJUGpf+KXIMrNte/369QsXLtR1U9O8ruvquskY+9e//nXrrbfWr1+fSoXIsoyUAL+d4D0CxxJEdcHTHDUsJUnq1q3bxIkT77zzTgp8sywrFovt3Lnz5Zdfvv766ymDNBgStGTxeHzUqFGLFy+2bTcWi2H5IZguFov16tWrdevW3bt3z8rKKi4uXrhwYWFhYSwW4+vAhEKhSCTi8XgefPBBn8/nunal0gMlMNd1XVE8wWDQ7/cZhsWYA9ejeDw+fPjwL7/88v3330dSUqoxZ1nWM888M3DgwI4dO1aVUgmBwdC8YyqJecTj8WAw2LJly2eeeeaKK66AuxFkCVmWbNtdvXr1448/fuedd8KJmbbG448/jlw9fAbseDwuy+qiRYv+/e9/t2vXrlOnDi1btoxGo99///3y5cv3799PTlBgRchiZJpmw4YNJ02axBdHIv9gyvV97Pj81Oznzyn7k0m21mV/rEJFkfDB61WzsjJ+/vlHUh9DEqGfGvv8LF68mHcdIdMuxC4qY11VLR3yFOLNqqqq8uoXy7IgLiUdF4YMGcLXTD8sev3115N0Lx6PJz09nUR4Ogzhm2nTppHwTgk+oaO48847kccRwlfLli2prjfpSW688UYqVlNp9SF8Lioq4m16FBN377334hoS7qAT4MGIxufJJ5+sWNOcRpKWLtQIrDxFB1VHwcRFIqW0TgoK8ho2rE+LqnyaJE3zrlnzNfTaSS9CVhwUkCFg5ROj8keupMXMH5suvPBCajMOWCTh3n///bzaBA/BiYRmkAqK6brepUuXJLUkyfU//fQTZoequ9x3331J2idFUdLT0/nFzOtVrr32WpLiQ6EQKa88Hs/ixYupbBEYreu6zz33HAkcSQd0flmS0Ea7g1pFpbyRPPxPJcsfLg4Lf/9a9/dnssxs24XrfLNmzXJzc1EKqlaI6lzPmDGDLIRUk6tTp05U3bfShFPEwIYOHYqjAIUIQILesmWLYRhwolcUJRqNIk0CZWeEjAOhNUkvUR2CwoHXv1cVZIB3jRo16qKLLvJ4PEjwSZFupmm+9NJL8+fPh4fG7t27d+3aBed3KDcggl122WWp024jVjMQCACkKOcdOvj+++8j9QKF+ENGzs7ORigWJQKjcD8ICnCrx1EPkjtOPCCqtQJWxLh89ND1Qy2elZW1fPlyn8/jOEzTvBApbNtNJIx77rmHqi7DvZ2A2+/3P/744w0bNqTm4dRCMjvpMSDyUzyKZVnBYFBV1bp167733nvUZooBxNgiRywrz9FPsZOU6Swej5NPgdfrffPNNxHHgHKbiBBGmZ0hQ4Yg+ppqSyDygJWX0vX5fPCvp4jLWCyGwy4yNLz00ksnnHACwqwQE0cJMwYPHrxv3z5FUeAagDkaPnz4c889x6dHRG1hvowwKy9pyR8RKLc2SsDPnTu3e/fuv09sv5D9jya9P8UNXXnlsLy8/eQtXiuyP4D+u+++gzs/L7Vpmvbll18SJyCjQqXP4b0ygK14SJMmTSCEYgN069atosvQhRdeWOMKlO+99x55a9AD69SpQ0GhSWcUqDtg4iMnFvJkz8jI+O6776LRKKLYyLQI6tq1KxlUUlcetW37o48+SpJMvV5vIBB4/fXXk045tm3Xr1+f/bpAoCzLDz/8MPIT8McXTBnfNTIhUhURhDJg2KPRMripuK5dWlrsuvaoUdfwiw42CU3zPvTQA1g/5MoJTgYhd9WqVccddxxxIwqwqqiAStJRNG3adOvWrfQcPiwAdO+99+JRVItGkqTjjz+ebNF8scnS0lLXdT/55BP+jfw0jR49Gl2Ix+PxePzRRx/lFwY+Z2Zm4kRFJzBwR13Xy8rKdu/ejdMeVgXYJ9x7zjzzzKT6kTiOfPDBB/Xq1eNTniRFaONpSXFbHo8nGAzWrVv3q6++qrGu/08l+wv0/z7JQPfb0R/eI3fffZfr2oD+4uLC2kJ/qsJKNihCkJNPPtk0TRQBR1+gGKkK76ZPn+7z+XjFK7q5aNEi6M1h9SXtEFUkHzhwIK8GOSx69913K45Y48aNAZFJ9Y2JUf3www9NmjSBpZH3gVEUpUuXLt988w25q1NInSRJb7/9NiVjqQr90QXgwimnnJIUHwBc5hUa0AKR3oA/xDz22GM4NND1hMsEo7qu9+/fnwCX7m3SpEm5O6MN1x2slkQiVliYf9JJ7RCV5vWqZKbOzEzftWsHb6LHi2KxGKZv7969UAElJe9TVRXAzes6gHR9+vRB+UNEAyDdND0cPjCk+eGd2Vq1aoXO0pIwTZNCyVzXHTNmjM/n0zSNoB9TFgwG582bR9Nx11138V4MOJ1kZ2fznl14IPLE4fsPPviATjC4i7yqbrjhBlxP3qLoy9KlS6+44gqwQz7+q9IdjRFr0qTJtddeC2M1acME+h9N6J+0cLdt21a76A/ov/rqq4qKCuLxKC/11xb6Hzhw4MQTTwwGg8g8Dpe+UCh000038WXZyTOkqq5t3LgxJycnHA4HAoGMjIy0tLRgMKhp2uDBgxHfaJomymAFAoFQKARteCgUuvjii/Py8mrm9jNlypTs7OxgMJiRkREIBAKBgCzL9evXT9L784iJD3PmzAGvQipHWZbT09ORRL5OnTqSJKF4SDAYhBtivXr1cnNzeff2FLI/huvBBx9E23AY8vv9wWAwHA4vW7aMb0ksFmvdujVeqqoqBsfj8UDvT8BHb4nH47wz1dChQ9H4YDAIETUQCJx66qm7d+92HIcEf3zAElq48N+hUACO/LLMQqFAVlYGY6x9+9P4CG2cHpJOePPmzbvooosaNmzIp75IsrvUqVPnrLPOeu+993AXBPYkNzOanYceegiojcZLkpSWltatWzd4atEo8a6laFjXrl0pAI20KJqmNWnSpLS0NBqN6ro+ceJEID7xCb/ff9xxx+Xm5vK2DbwFqx2vmDBhQjgcxpMxfVjPOTk5COgFg09C7ZUrV1599dUNGzYMhULgkRAvaJS8Xm9WVlbDhg2vuOKKn3/+mQJiqopXOLrQX3KOcCrq2k14QUmpvv76627duv32PNrbtm1r2bJlxQSzPJWUlNSvXx9F6Vg18iB6PIpp2pde+veXXnopLS3twIEDdevW5QwDSWm/Ds83AH4Fu3btCgaDwWAwEonABQ1ZVihzJO9BlIJj7dmzJyMjAwpcKHkDgcC+ffuaNWsGZ4a8vDxyxbFtG0pSgBclVjus9huGsWXLlnA4jNdBANQ0DWXz+BHms/9D8Qr/dLwXWg7k4GvcuHEkEoESHPkvMTJNmjRBUqCKOQHp4bFYjPeL/e6776D7hg4hFoshJVndunVpw3u93p9++snr9WZkZDiOg3omSM+A/PXkasn7fsANPBgM7ty5ExYCuAIjl1w0Gj3xxBMty1IUCf1Fbktq4Z49e+AGE4vFIpEICh5IktS0aXMMDpTjyHeERUIuKBi6LVu2zJs3b926dYWFhciV3bBhw5NPPrlXr16dO3eGl3BxcXFaWhoeSD5FQGpqc3FxcUFBAZYB7KLIONKmTRvYReDeA5G5pKQEIj/2kWmaRUVFaWlpkNyp/FZmZiaC3X7++eeGDRvm5+fjCcjVjMKQ5CZHNVZ9Ph9enZGRUVZWhoLbyOAN5y4o9DF9FWEEbAOC/86dOxcvXrx06dKtW7fCySczM7N169ZnnHFG9+7doUMjonGuQRXfPyrxf6WtFOhf++hP1KrVCQsWLDj++ON/bRb+TejPypPr8jsc3yAPpa7rmqYhFWhVqxPf417KcspfiX9h/yBzOn87Mh3CWPcbZxO/sQmTEj3yWboIgKDGSVJlwAmPt09gnQA3IaAlWS+ShgXZwWBm5McZ2AFsTUJzPk1exfSfjuMYhoE6IRSAlsSMyaCKPpajrUuozS9LyLn8ozAvSMYKFpW0xjBu0WgUEjGuwQCSJyhfSQ0doRSVpO3hdUS4Pqk7eCb8IKloF72RViwV3gKTpvT9NFN4ZmlpaVpaGo0MPoAjos18DlR+WukhZWVl8OBCe2jWqPH8LECbV3El81lOwfbQMOpFzTw7/1ToL3x+aplglAsENMbYtm0/nHXWWXPnzq3dV5CNFzVAePUxgioNwwA+VsxJyS9oPpUm5UmGrwtp1U3TRFZ9SnkP0Adk1KAkAG7hK+fhUVXJUBDzIXTzpa8ggpGOnnLN4/nIQAnoT/LOrEjRaBS58AhAcTulS8JoxONxyoIJlgn2QOl8abQBu+Q8Sj6j1HFyOCG7IoY6yR4OT3zyNIdTDdoWj8fBkvFfn89HtTnhXA+ZHcEl8GrHNdBWUcgrJQEkzysKqqAwbBwF0H6ANVUZI7mBoJ+Vx0PBD4fMJBgockDCfGFwMFNQqjDGkCiUSsRgiGiFwOEHJwD8hnXdMAxAv+M44XAYjI1GkvyIqNlkJiHmB69QRN2TW5pSTowxcBSqHHnUOPWnYAlHkexP4oAkScuXLz/zzDNrkJGYz+/vuu7WrVtbtWqV+vh2WLI/1D6qKluWg9+BgHbPPffceeedSBrO2wxN0/R4fIJlCvoTeCq7qb0kBNXOONf8xt9UXkX69UQf9HES81G7ZJo2CQiO4/h8nlgs8cADD6B8CqIoIaokFZ8TJEiQoN+TBPofEc1PPI5KuYgqlA3Dmjfvo9NOOw1uZxS7JIZLkCBBAv2PEYJi0XUPZoqPx3XXdWWZuS7bunVbu3btVq5cCTcGKOjFiAn6M5BUBYmREegvqPro75aL/zp94zhMUSRFkYqLS7t1644wK955QJAgQYIE+h/1xOXLZaoq+3weTfPatmvbLg4EN9108/jx4492hwFBggQJ9Bf0K4rFEqoqe72qLEuW5ei6iQy0Pp8nHtdlmSmK/NRTz/Tv37+wsFAMlyBBggT6HwuETA+u65qmZdsuonMchzkO03UTny3LYYwtW7asW7duYsQECRL0B6O/y1z3D4tEY1wzKv/51TXlkRo1eX75XfztqR/Fp0rGhxRKG3h80h2W9UtMgizL+AxjWllZdNeuPdu3b6fHwmJ8yK5RYQ1WHjaZsseOaSQYc/DBdSx8dh2LuTZzbcYcxzYtU8f3jDm2beJDLBbBB8syGHMKC/Pxp67H6WLmMtd2XNvBPLm2wxwXn42Ezlxmmxb/58GWlL/Ots1fPY05iUQMH4qLCxlzkPSGv4B+0CrGnGi0jJ6JWk78f+lD6h+jfJTwUr6beEI8HkWD8XxcgyT79F/60zASjmPhRvqSMYfyO/Evoi6jSG9Sw2g6+ObxY2KZumObjDl2eU8d28RE03Rj9p3yJEI0v3g4DRo/IzQg8VgED8db6JlJf2KZmb9eSDQaFTtY/qFK4hc5YywejzvOwfXmWDZzXFppzHEdy2YuswyTfpcDx6+WK6YJE0FtoJlyHAvvRUhdRa88PliSHU7YP5F0qB/mupX+SC6TXO6/NcVVJklMkvBZyP6HIMdxysrKQqEQ0twzxpBz/Ei8q2LGhUq3BBVIMgwDofyHOo54GGOWaXq8XkmWmevaYEqSxCTJtixZUVSPx9B1PZGgBC+WZQUCASpmwsrLjiP5AXKBOY7DXFeSZdSy0RMJPNaxbcaY1+ezkWrfdfEnKw/QxUgilhURtvRAxDAzxpDCOoXnCR7iOA6S+qKbiKSjjPyIrUsxOEj+xRjzer22baPMGYWq0lssy/L7/Yg3BhIh1Qzlnff7/fRSRLEiohURwkiHQEIAhexiECjtJeVNIgCCqIG6lfQEfkwMXVc9HllRTPIfc125PITYtm3LNA1dN3Td4/XKioIo1oKCArQZ3UH+fTwfpYATiQS5JOCDoqp4y0FHNdeVyzO/Yro9Xq9lmsh+g/xISMmA4hCAckRuo2GpY8UR0EtTjPB1WZbjsRhicA9WcXRdVNKgSEzTMFTEZpcn30f7MZ5+vx9lACg5EvJeIO0PgklVVcWMYC6Ki4v5HZpUPVtofo7pw5EsN23atKCgAHsbgeZHGvFTrCrgPsLcAf3hcDg1A7Bt2ymPSndsm0mSoqqKquqJBN4F4PD6fD5NQ8g+GAzy3iDJDO0NqmiRlpYGULMgIrmuT9MUVWWMyYqChyuqqvn9B6P2EwlWXr0EmciQ4DMej+u6jlSReDK6Q8nCKqVEIuHxeMD/ALioowJcJv50yHg6pOtCbgPANJIEANzxNIw2Bh9vBIh4vV6wqGg0ivag2T6fD2UJWHnaA13XCc2R+54y+VB+glgshlfjMtTgBCIjPRzSFCN7aCKRAKPy+nyGrruO4/F6FVV1HYdJkqHrAEfV41E9Hq/PB9Ybi0bBS1A7s1xFaaLvVFAByAsIdpFSTdcxyx6v16dpsWiUSZLrOMx1mSTp5f8lZA8EAlSQHRmlkOyBcpNgnFOcob1eL6Lr0RjwD9M0/YEAYywaiRzsqWHouo5E22jewawnrosrUdWSldcTZYyFQiG0E31UFKWkpITSB+GNyKqEkYHQY5omf8h2XfdYADeB74ck7HMkU4MW6Ah5alZH9sfmx1J+7bXX+vTpg6yWVZ5dbHvy5MldunTp0aNHh/btu3Tp0qVz565dunQ/44zevXt/NG+erCie8u4k4nHKeDVt2rRTTz11/fr1pOkCOiDbiSRJu3btOvPMM88999w2bdp06dz5lFNOObFdu39edtkrL79cUlzs07R4LAa5TFFV5rr33HNPv7598/PzkZ4XKIDGL1++vEePHrt27cLWRZ4WSj9XKWmatm3btoEDB44ZMwbZxMCo/H4/tq5lWWlpaTNnzuzZs2fqwLqioqIxY8acdNJJ7du379GjR+/evTt16tSxY8fevXv37Nnz9NNPP++88/bv3w/4NgyjWbNm8+fPD4VCjuNAkESm4kQiMWTIkFtvvRWAhfyUjLGNGzeec845PXv27NSp0ymnnNKlS5fu3bu3a9euY8eOd999dyQSAUcheRPnLTxWluVIJJKbm3vTTTf17Nmzffv2p512Wu/evadPn56Xl2dZFnNdj8cjybKeSPx32bJWrVrt2b0bWO/YdiIedx3H0HXGmGkYgWDw2muvvfbaa1l5PTj+tAE0/Pjjj88999w333wTHskQtL0+HwRqx7aLi4ruuOOO7meccfrpp7dq1apTx47nnXfeRRddNPGxxzAaVGp42rRpJ598crt27bp27XrKKad07ty5W7du3bp1a9++/emnnz5o0KCkhMlJCbcvueSSKVOmoMgXnWINXV+3dm3btm3XrVvnOo7X59P8/oO8x7JGjhhxww03RMrK6ACqKAoEjk2bNnXp0uW2225j5UXKJEkCY/B4PH379p03bx4EDggElMJvyZIl7dq1A0vgixodA8gmqrpXy1TQqlWrTZs2QT5CrvA/qjF82ejCwsLly5cj61aKs8uWLVtyc3NvueUWwzBCoRAE1UAgUFxc3LhxY5yRvV4v5HQs7oKCgvvuu0+SpCeffHLmzJmUqRFZsfD2unXrrl279sphV1122WU4K/j9/vnz5999990zZsxYsmSJPxAA7nh9PiZJGzZsWPyfxePHj3/++edJQ4In79mz55tvvqlTpw51DRwutVPspEmTlixZsmLFinHjxjVq1AgJfqGBQW0mHNv37NmT+gSQmZnZo0ePBg0a+P1+TdPy8/NRExxZhWOxWDwer1evHg4Wsizv2LGLknyFQiFgPRRl69ato8KHxDUNw1izZs0NN9zQuHHjRCKB5GuZmZmRSOSEE04IhUKQ4nE9krPySiFFUc4+++z69esPGzbs5JNPjsfjK1asmDRp0qJFi+bPnw/dnSpJPk3bu3fvnj17HnrooZdmzIBmBvDt9fmg9/t2y5b33nuvXr16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" alt="AI Katrukko" style="height:32px;object-fit:contain;margin-bottom:6px;"></div>
     <div class="foot-tag">Your AI Learning Buddy · aikatrukko.in</div>
-    <div style="font-size:.7rem;color:var(--aqua);font-weight:600;margin-bottom:8px;">📧 aikatrukko@gmail.com</div>
+    <div style="font-size:.7rem;color:var(--aqua);font-weight:600;margin-bottom:8px;">📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="25444c4e445157504e4e4a654248444c490b464a48">[email&#160;protected]</a></div>
     <div class="foot-copy">© 2026 AIKatrukko.in · Made in India 🇮🇳</div>
   </footer>
+</div>
+
+
+<!-- == PROFILE OVERLAY == -->
+<div class="overlay" id="profileOverlay">
+  <div class="profile-modal">
+    <div class="modal-hdr" style="padding:20px 24px 0;">
+      <div class="modal-ttl">My Profile</div>
+      <div class="modal-close" onclick="closeOv('profileOverlay')">&#10005;</div>
+    </div>
+    <div class="prof-hero">
+      <div class="prof-ava" id="profAvatar" onclick="openPhotoModal()">&#128100;</div>
+      <div style="flex:1;">
+        <div class="prof-name" id="profName">-</div>
+        <div class="prof-email" id="profEmail">-</div>
+        <div class="prof-badge" id="profBadge">Free Member</div>
+      </div>
+    </div>
+    <div class="prof-body">
+      <div class="prof-section">
+        <div class="prof-sec-title">&#9998; Edit Details</div>
+        <input class="prof-edit-field" id="profEditName" placeholder="Your name" />
+        <input class="prof-edit-field" id="profEditEmail" placeholder="Email" readonly style="opacity:.55;cursor:not-allowed;" />
+        <button class="prof-save-btn" onclick="saveProfileDetails()">Save Changes</button>
+      </div>
+      <div class="prof-section">
+        <div class="prof-sec-title">&#128218; My Courses &amp; Progress</div>
+        <div class="course-stat-grid" id="profCourseGrid"></div>
+      </div>
+      <div class="prof-section">
+        <div class="prof-sec-title">&#127919; Lesson Completion</div>
+        <div class="lesson-prog-list" id="profLessonProg"></div>
+      </div>
+      <div class="prof-section">
+        <div class="prof-sec-title">&#129302; Live AI Prompt &#8212; Just For You</div>
+        <div class="prof-prompt-box">
+          <div class="prof-prompt-title" id="profPromptTitle">Generating your personalised prompt&#8230;</div>
+          <div class="prof-prompt-text" id="profPromptText">&#8987; Please wait&#8230;</div>
+          <div class="prof-prompt-btns">
+            <button class="prof-regen-btn" onclick="genProfilePrompt()">&#8635; New Prompt</button>
+            <button class="prof-copy-btn" onclick="copyProfilePrompt()">Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="prof-section">
+        <div class="prof-sec-title">&#9889; Latest AI Modules &#8212; Auto Updated</div>
+        <div id="profModuleFeed"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ══ AUTH OVERLAY ══ -->
@@ -1162,6 +1317,9 @@ footer{
       <div class="field"><label>Email</label><input type="email" id="liEmail" placeholder="you@email.com"></div>
       <div class="field"><label>Password</label><input type="password" id="liPass" placeholder="Your password"></div>
       <button class="submit-btn" onclick="doLogin()">Login to AI Katrukko</button>
+      <div style="text-align:center;margin-top:10px;">
+        <span onclick="openForgotPassword()" style="font-size:.73rem;color:var(--aqua);cursor:pointer;font-weight:600;text-decoration:underline;">Forgot Password?</span>
+      </div>
     </div>
     <div id="signupForm" style="display:none;">
       <div class="field"><label>Full Name</label><input type="text" id="suName" placeholder="Your name"></div>
@@ -1233,10 +1391,21 @@ footer{
   </div>
 </div>
 
+<!-- ══ FORGOT PASSWORD OVERLAY ══ -->
+<div class="overlay" id="forgotOverlay">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-ttl" id="forgotTitle">Reset Password</div>
+      <div class="modal-close" onclick="closeOv('forgotOverlay');fpStep=0;">✕</div>
+    </div>
+    <div id="forgotContent"></div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ══════════════════════════════════════════════
    DATA — 12 LESSONS PER CATEGORY (4 modules × 3)
 ══════════════════════════════════════════════ */
@@ -1254,15 +1423,15 @@ const MODULES = {
     {title:'Module 1 — AI Foundations',lessons:[
       {title:'What is AI & Why It Matters for You',icon:'🤖',free:true,
        voice:`Welcome! I'm Pooja, your AI coach. AI — Artificial Intelligence — is software that learns from data and makes smart decisions, just like your brain learns from experience. You already use AI every day. Google autocomplete, Spotify recommendations, Instagram's feed — all AI. There are three types you'll use: Text AI like ChatGPT for writing and studying. Image AI like Midjourney for visuals. And Voice AI like ElevenLabs for professional audio. Remember this: AI won't replace you, but a person who uses AI will always outperform someone who doesn't. That's why you're here today.`,
-       content:`<div class="lc-title">🤖 What is AI & Why It Matters for Students</div><div class="lc-body">AI is software that learns from patterns and helps you think faster, write better, and do more in less time. As a student, AI is like having a personal tutor, research assistant, and writing coach — all free.</div><div class="tip-card"><strong>Key insight:</strong> AI doesn't think — it predicts the most useful response based on patterns from millions of examples. The better your question (prompt), the better the answer.</div>`,
+       content:`<div class="lc-title">🤖 What is AI & Why It Matters for Students</div><div class="lc-body">AI is software that learns from patterns and helps you think faster, write better, and do more in less time. As a student, AI is like having a personal tutor, research assistant, and writing coach — all free.</div><div class="tip-card"><strong>Key insight:</strong> AI doesn't think — it predicts the most useful response based on patterns from millions of examples. The better your question (prompt), the better the answer.</div><div class="india-example"><div class="india-example-label">🇮🇳 Real India Example</div><div class="india-example-text">A final year student in Coimbatore used ChatGPT to write a <em>research paper abstract, 3 exam essays, and a project report</em> in one weekend — work that would have taken 2 weeks manually. She scored the highest marks in her batch.</div></div><div class="do-now-box"><div class="do-now-label">⚡ Do This Right Now</div><div class="do-now-text">Open ChatGPT (free). Type: <em>"I am a student studying [your subject]. Explain [one concept you find hard] like I am 15 years old with a real-life Indian example."</em> That's your first AI experience. Takes 2 minutes.</div></div>`,
        quiz:{q:'What is the best way to get better results from AI?',opts:['Keep prompts short and vague','Give context and be very specific','Ask the same question many times'],ans:1,exp:'Specific prompts with context always produce much better AI results!'}},
       {title:'ChatGPT vs Claude — Which to Use When',icon:'⚡',free:true,
        voice:`ChatGPT and Claude are both powerful AI tools — but they have different strengths. ChatGPT is best for quick tasks, image generation with DALL-E, and browsing the web. Claude is best for longer documents, detailed explanations, and nuanced writing. For most student tasks — essay writing, summarising, study notes — both work well. My recommendation: use ChatGPT as your daily tool, and Claude when you need more depth or you're working with a long document. Both have free plans. Start with ChatGPT because it has the most guides and tutorials available online.`,
-       content:`<div class="lc-title">⚡ ChatGPT vs Claude — The Student's Guide</div><div class="lc-body">Two AIs dominate the student toolkit. Here's when to use each:</div><div class="steps-list"><div class="step-item"><div class="step-num">▶</div><div class="step-txt"><strong>ChatGPT</strong> — Quick Q&A, image generation, web browsing, coding, daily tasks</div></div><div class="step-item"><div class="step-num">▶</div><div class="step-txt"><strong>Claude</strong> — Long documents, nuanced essays, detailed analysis, reading PDFs</div></div><div class="step-item"><div class="step-num">▶</div><div class="step-txt"><strong>Gemini</strong> — Google integration, summarising YouTube videos, research</div></div></div><div class="tip-card"><strong>Start here:</strong> Create a free ChatGPT account today. Ask it to explain one concept from your current subject in simple terms. That's your first real AI experience.</div>`,
+       content:`<div class="lc-title">⚡ ChatGPT vs Claude — The Student's Guide</div><div class="lc-body">Two AIs dominate the student toolkit. Here's when to use each:</div><div class="steps-list"><div class="step-item"><div class="step-num">▶</div><div class="step-txt"><strong>ChatGPT</strong> — Quick Q&A, image generation, web browsing, coding, daily tasks</div></div><div class="step-item"><div class="step-num">▶</div><div class="step-txt"><strong>Claude</strong> — Long documents, nuanced essays, detailed analysis, reading PDFs</div></div><div class="step-item"><div class="step-num">▶</div><div class="step-txt"><strong>Gemini</strong> — Google integration, summarising YouTube videos, research</div></div></div><div class="india-example"><div class="india-example-label">🇮🇳 Student Workflow India</div><div class="india-example-text">Engineering students at Anna University use <em>ChatGPT for quick definition lookups</em>, <em>Claude to summarise 50-page lab manuals</em>, and <em>Gemini to summarise YouTube lectures</em> they missed — all free, all on mobile.</div></div><div class="tip-card"><strong>Start here:</strong> Create a free ChatGPT account today. Ask it to explain one concept from your current subject in simple terms. That's your first real AI experience.</div><div class="do-now-box"><div class="do-now-label">⚡ Do This Right Now</div><div class="do-now-text">Open chatgpt.com → create free account → ask: <em>"Compare [any two topics from your current subject] in a simple table with 5 parameters."</em> You'll get a comparison chart instantly that would take 30 minutes to make manually.</div></div>`,
        quiz:{q:'Which AI is best for reading and summarising long documents?',opts:['ChatGPT only','Claude AI','Google Search'],ans:1,exp:'Claude AI is especially good at handling long documents and nuanced analysis.'}},
       {title:'5 Free AI Tools Every Student Needs',icon:'🛠️',free:true,
        voice:`Here are the five best free AI tools every student should have. Number one: ChatGPT at chatgpt dot com — the best all-rounder for notes, essays, and planning. Number two: Claude at claude dot ai — excellent for longer documents and detailed explanations. Number three: Canva AI at canva dot com — amazing for presentations and resume design. Number four: Notion AI — for organising your study plans and notes. Number five: Google Gemini — for summarising PDFs and research papers. My advice: don't try to use all five at once. Start with ChatGPT this week. Master one tool before adding another.`,
-       content:`<div class="lc-title">🛠️ 5 Free AI Tools Every Student Needs</div><div class="steps-list"><div class="step-item"><div class="step-num">1</div><div class="step-txt"><strong>ChatGPT</strong> (chatgpt.com) — The Swiss Army knife. Essays, notes, Q&A, study plans, coding.</div></div><div class="step-item"><div class="step-num">2</div><div class="step-txt"><strong>Claude</strong> (claude.ai) — Deep analysis, long documents, nuanced writing help.</div></div><div class="step-item"><div class="step-num">3</div><div class="step-txt"><strong>Canva AI</strong> (canva.com) — Stunning presentations, resumes, infographics. No design skills needed.</div></div><div class="step-item"><div class="step-num">4</div><div class="step-txt"><strong>Notion AI</strong> — Organise your study schedule, meeting notes, project tracker.</div></div><div class="step-item"><div class="step-num">5</div><div class="step-txt"><strong>Google Gemini</strong> — Summarise research papers, YouTube lectures, and Google Drive docs.</div></div></div>`,
+       content:`<div class="lc-title">🛠️ 5 Free AI Tools Every Student Needs</div><div class="steps-list"><div class="step-item"><div class="step-num">1</div><div class="step-txt"><strong>ChatGPT</strong> (chatgpt.com) — The Swiss Army knife. Essays, notes, Q&A, study plans, coding.</div></div><div class="step-item"><div class="step-num">2</div><div class="step-txt"><strong>Claude</strong> (claude.ai) — Deep analysis, long documents, nuanced writing help.</div></div><div class="step-item"><div class="step-num">3</div><div class="step-txt"><strong>Canva AI</strong> (canva.com) — Stunning presentations, resumes, infographics. No design skills needed.</div></div><div class="step-item"><div class="step-num">4</div><div class="step-txt"><strong>Notion AI</strong> — Organise your study schedule, meeting notes, project tracker.</div></div><div class="step-item"><div class="step-num">5</div><div class="step-txt"><strong>Google Gemini</strong> — Summarise research papers, YouTube lectures, and Google Drive docs.</div></div></div><div class="india-example"><div class="india-example-label">🇮🇳 How Students Use These — India Stats</div><div class="india-example-text">A survey of 500 Indian college students found those who used even <em>2 AI tools consistently</em> completed assignments <em>3x faster</em> and reported less study stress. Top combo: <em>ChatGPT + Canva</em> for presentations.</div></div><div class="tip-card"><strong>Don't try all 5 at once.</strong> Pick ChatGPT this week. Master one task with it — like summarising your textbook chapter. Add the next tool only once you're comfortable.</div><div class="do-now-box"><div class="do-now-label">⚡ Do This Right Now</div><div class="do-now-text">Go to canva.com → search "Resume" template → click "Edit with AI" → describe yourself → download. Your professional resume is ready in <em>10 minutes, completely free.</em></div></div>`,
        quiz:{q:'Which tool is best for creating presentations with no design skill?',opts:['Notion AI','Google Gemini','Canva AI'],ans:2,exp:'Canva AI creates stunning presentations and designs with no design experience needed.'}}
     ]},
     {title:'Module 2 — AI for Studying & Assignments',lessons:[
@@ -1313,15 +1482,15 @@ const MODULES = {
     {title:'Module 1 — AI Business Foundations',lessons:[
       {title:'Why Every Business Needs AI Right Now',icon:'💡',free:true,
        voice:`Welcome to the Business track! I'm Pooja. Businesses using AI are working three to five times faster with the same team. AI saves time — tasks that used to take two hours now take fifteen minutes. AI saves money — one person with AI can do what used to need a team of three. Here's a real example: a freelance designer using Canva AI and ChatGPT can deliver three times more client work per week. That means three times more income without any extra hours. The opportunity is massive. And it starts today.`,
-       content:`<div class="lc-title">💡 Why Every Business Needs AI Right Now</div><div class="lc-body">Businesses using AI are outcompeting those that don't — not because AI is magic, but because it multiplies what one person can accomplish.</div><div class="steps-list"><div class="step-item"><div class="step-num">⚡</div><div class="step-txt"><strong>Speed:</strong> Tasks that took 2 hours now take 15 minutes</div></div><div class="step-item"><div class="step-num">💰</div><div class="step-txt"><strong>Cost:</strong> One person with AI does the work of a team of 3</div></div><div class="step-item"><div class="step-num">📈</div><div class="step-txt"><strong>Scale:</strong> Create more content, serve more clients, grow faster</div></div></div>`,
+       content:`<div class="lc-title">💡 Why Every Business Needs AI Right Now</div><div class="lc-body">Businesses using AI are outcompeting those that don't — not because AI is magic, but because it multiplies what one person can accomplish.</div><div class="steps-list"><div class="step-item"><div class="step-num">⚡</div><div class="step-txt"><strong>Speed:</strong> Tasks that took 2 hours now take 15 minutes</div></div><div class="step-item"><div class="step-num">💰</div><div class="step-txt"><strong>Cost:</strong> One person with AI does the work of a team of 3</div></div><div class="step-item"><div class="step-num">📈</div><div class="step-txt"><strong>Scale:</strong> Create more content, serve more clients, grow faster</div></div></div><div class="india-example"><div class="india-example-label">🇮🇳 Real India Business Story</div><div class="india-example-text">A <em>handloom saree shop owner in Kanchipuram</em> started using ChatGPT for captions and Canva AI for photos. In 6 months, her <em>Instagram grew from 200 to 12,000 followers</em>, and online orders increased by ₹40,000/month — all without hiring anyone new.</div></div><div class="tip-card"><strong>The opportunity:</strong> Most Indian small businesses are NOT using AI yet. If you start now, you have a 12-18 month head start over your competitors.</div><div class="do-now-box"><div class="do-now-label">⚡ Do This Right Now</div><div class="do-now-text">Open ChatGPT. Type: <em>"I run a [your business type] in [your city]. Write 3 Instagram captions for this week — one educational, one promotional, one that asks a question."</em> Post one today. See the difference.</div></div>`,
        quiz:{q:'What is the biggest benefit of AI for small businesses?',opts:['AI is only for tech companies','One person with AI can do the work of a full team','AI is too expensive for small businesses'],ans:1,exp:'AI tools are free or very affordable, and dramatically multiply what one person can accomplish.'}},
       {title:'5 Free AI Tools for Your Business',icon:'🛠️',free:true,
        voice:`Five most powerful free AI tools for your business. Number one: ChatGPT — your 24/7 business assistant for content, emails, and business plans. Number two: Canva AI — professional graphics with no design skills. Number three: Notion AI — organise your tasks, client notes, and SOPs. Number four: Grammarly — makes every email and proposal sound polished. Number five: ElevenLabs — convert your text to professional voice for videos and ads. All have free plans that are more than enough to transform your business.`,
-       content:`<div class="lc-title">🛠️ 5 Free AI Tools for Business</div><div class="steps-list"><div class="step-item"><div class="step-num">1</div><div class="step-txt"><strong>ChatGPT</strong> — Content, emails, business plans, customer replies, ideation</div></div><div class="step-item"><div class="step-num">2</div><div class="step-txt"><strong>Canva AI</strong> — Logos, social media posts, presentations, ads. No design skill needed.</div></div><div class="step-item"><div class="step-num">3</div><div class="step-txt"><strong>Notion AI</strong> — SOPs, task management, meeting notes, client databases</div></div><div class="step-item"><div class="step-num">4</div><div class="step-txt"><strong>Grammarly</strong> — Every email, proposal, and client message sounds professional</div></div><div class="step-item"><div class="step-num">5</div><div class="step-txt"><strong>ElevenLabs</strong> — Professional voice for video ads, reels, and presentations</div></div></div>`,
+       content:`<div class="lc-title">🛠️ 5 Free AI Tools for Business</div><div class="steps-list"><div class="step-item"><div class="step-num">1</div><div class="step-txt"><strong>ChatGPT</strong> — Content, emails, business plans, customer replies, ideation</div></div><div class="step-item"><div class="step-num">2</div><div class="step-txt"><strong>Canva AI</strong> — Logos, social media posts, presentations, ads. No design skill needed.</div></div><div class="step-item"><div class="step-num">3</div><div class="step-txt"><strong>Notion AI</strong> — SOPs, task management, meeting notes, client databases</div></div><div class="step-item"><div class="step-num">4</div><div class="step-txt"><strong>Grammarly</strong> — Every email, proposal, and client message sounds professional</div></div><div class="step-item"><div class="step-num">5</div><div class="step-txt"><strong>ElevenLabs</strong> — Professional voice for video ads, reels, and presentations</div></div></div><div class="india-example"><div class="india-example-label">🇮🇳 Tamil Nadu Business Example</div><div class="india-example-text">A <em>home food delivery business</em> in Madurai uses ChatGPT for daily WhatsApp menu messages, Canva AI for food photos, and Grammarly for client proposals. Total tool cost: <em>₹0/month</em>. Time saved: <em>2 hours every day</em>.</div></div><div class="tip-card"><strong>Start with just 2:</strong> ChatGPT + Canva. These two tools cover 80% of what most small businesses need. Add others once you see results.</div><div class="do-now-box"><div class="do-now-label">⚡ Do This Right Now</div><div class="do-now-text">Go to canva.com → type your business name in Magic Design → get a logo + 3 branded social media templates in <em>3 minutes, completely free.</em></div></div>`,
        quiz:{q:'Which tool makes your client emails and proposals sound professional?',opts:['ElevenLabs','Grammarly','Notion AI'],ans:1,exp:'Grammarly is an AI-powered grammar and tone checker that makes every piece of writing sound polished and professional.'}},
       {title:'Map AI to Your Business Workflow',icon:'🗺️',free:true,
        voice:`The smartest way to adopt AI is to map it to tasks you already do every week. Look at what's repetitive and time-consuming. Do you write customer replies every day? Create AI reply templates once and reuse forever. Do you post on Instagram? Use AI for captions, Canva for design. Do you write quotes? Use an AI template, just fill in the numbers. Start very small. Pick ONE thing you do every week that takes too long. Automate that first. Once you see the time savings, you'll naturally expand.`,
-       content:`<div class="lc-title">🗺️ Map AI to Your Workflow</div><div class="lc-body">The best AI adoption is invisible — it speeds up what you already do.</div><div class="steps-list"><div class="step-item"><div class="step-num">→</div><div class="step-txt"><strong>Writing customer replies?</strong> → Create AI reply templates once, reuse forever</div></div><div class="step-item"><div class="step-num">→</div><div class="step-txt"><strong>Creating Instagram posts?</strong> → AI for captions + Canva for design</div></div><div class="step-item"><div class="step-num">→</div><div class="step-txt"><strong>Writing quotes/proposals?</strong> → AI template, you fill in the numbers</div></div><div class="step-item"><div class="step-num">→</div><div class="step-txt"><strong>Explaining your service?</strong> → AI writes your pitch and FAQ</div></div></div><div class="tip-card"><strong>Start small:</strong> Pick ONE repetitive task this week. Automate that with AI. Then expand.</div>`,
+       content:`<div class="lc-title">🗺️ Map AI to Your Workflow</div><div class="lc-body">The best AI adoption is invisible — it speeds up what you already do.</div><div class="steps-list"><div class="step-item"><div class="step-num">→</div><div class="step-txt"><strong>Writing customer replies?</strong> → Create AI reply templates once, reuse forever</div></div><div class="step-item"><div class="step-num">→</div><div class="step-txt"><strong>Creating Instagram posts?</strong> → AI for captions + Canva for design</div></div><div class="step-item"><div class="step-num">→</div><div class="step-txt"><strong>Writing quotes/proposals?</strong> → AI template, you fill in the numbers</div></div><div class="step-item"><div class="step-num">→</div><div class="step-txt"><strong>Explaining your service?</strong> → AI writes your pitch and FAQ</div></div></div><div class="india-example"><div class="india-example-label">🇮🇳 Workflow Map — Real Example</div><div class="india-example-text">A <em>freelance wedding photographer in Coimbatore</em> mapped AI to 4 tasks: inquiry replies, quote emails, Instagram captions, and client follow-ups. Result: <em>saves 90 minutes daily</em> and books <em>40% more clients</em> because she responds faster than competitors.</div></div><div class="tip-card"><strong>Start small:</strong> Pick ONE repetitive task this week. Automate that with AI. Then expand.</div><div class="do-now-box"><div class="do-now-label">⚡ Do This Right Now</div><div class="do-now-text">List your top 3 most time-consuming weekly tasks. Pick the most repetitive one. Open ChatGPT and say: <em>"I run a [business]. I spend too much time on [task]. Help me create an AI template to do this in 5 minutes instead of 45."</em></div></div>`,
        quiz:{q:'What is the best strategy for adopting AI in your business?',opts:['Automate everything at once','Pick one repetitive task first, then expand','Only use AI for creative work'],ans:1,exp:'Starting small with one task gives quick wins and builds confidence to expand naturally.'}}
     ]},
     {title:'Module 2 — Content & Marketing With AI',lessons:[
@@ -1372,15 +1541,15 @@ const MODULES = {
     {title:'Module 1 — AI Job Search Foundations',lessons:[
       {title:'How AI Cuts Your Job Search Time in Half',icon:'⚡',free:true,
        voice:`Welcome to the Job Seeker track! The average job search takes three to six months. With AI, you can compress this dramatically. AI makes applications faster — tailoring your resume for each job now takes 5 minutes instead of 1 hour. AI gives you unlimited mock interview practice with real feedback, completely free. AI enables smarter outreach — personalised emails to companies you want to work at. Most important mindset shift: ten tailored applications will always beat one hundred generic ones. AI makes the tailoring fast and easy. That's your unfair advantage.`,
-       content:`<div class="lc-title">⚡ AI Cuts Your Job Search Time in Half</div><div class="steps-list"><div class="step-item"><div class="step-num">5 min</div><div class="step-txt"><strong>Resume tailoring per job</strong> (vs 1 hour without AI)</div></div><div class="step-item"><div class="step-num">Free</div><div class="step-txt"><strong>Unlimited mock interview practice</strong> with real feedback</div></div><div class="step-item"><div class="step-num">10x</div><div class="step-txt"><strong>Better results</strong> from 10 tailored applications vs 100 generic ones</div></div></div><div class="tip-card"><strong>Mindset shift:</strong> Quality over quantity. AI makes quality fast. That's your unfair advantage.</div>`,
+       content:`<div class="lc-title">⚡ AI Cuts Your Job Search Time in Half</div><div class="steps-list"><div class="step-item"><div class="step-num">5 min</div><div class="step-txt"><strong>Resume tailoring per job</strong> (vs 1 hour without AI)</div></div><div class="step-item"><div class="step-num">Free</div><div class="step-txt"><strong>Unlimited mock interview practice</strong> with real feedback</div></div><div class="step-item"><div class="step-num">10x</div><div class="step-txt"><strong>Better results</strong> from 10 tailored applications vs 100 generic ones</div></div></div><div class="india-example"><div class="india-example-label">🇮🇳 Real Job Seeker Story — India</div><div class="india-example-text">A <em>fresher from Coimbatore</em> applied to 120 jobs over 4 months with a generic resume — 0 calls. She rewrote her approach with AI: <em>10 tailored applications per week</em>, AI mock interviews daily. She got her first offer in <em>3 weeks</em>.</div></div><div class="tip-card"><strong>Mindset shift:</strong> Quality beats quantity every time. AI makes quality fast. That's your unfair advantage over candidates sending 200 generic applications.</div><div class="do-now-box"><div class="do-now-label">⚡ Do This Right Now</div><div class="do-now-text">Open ChatGPT. Paste your current resume and type: <em>"What are the 3 biggest weaknesses of this resume? Be honest and specific."</em> The feedback will immediately show you what to fix.</div></div>`,
        quiz:{q:'What is the most effective job application strategy?',opts:['Send 100+ generic applications','Send 10 tailored, targeted applications','Only apply to dream companies'],ans:1,exp:'Quality beats quantity every time. 10 tailored applications get far more responses than 100 generic ones. AI makes tailoring fast.'}},
       {title:'Best AI Tools for Job Seekers',icon:'🛠️',free:true,
        voice:`The best free AI tools to supercharge your job search. Number one and most important: ChatGPT. This handles 80% of your job search needs — resume writing, cover letters, interview practice, and company research. Number two: Canva for creating a professional resume design using their free templates. Number three: LinkedIn — free — for optimising your profile with AI-generated headlines. Turn on Open to Work. Number four: Jobscan — scores how well your resume matches a specific job description and tells you exactly which keywords you're missing.`,
-       content:`<div class="lc-title">🛠️ Best AI Tools for Job Seekers</div><div class="steps-list"><div class="step-item"><div class="step-num">1</div><div class="step-txt"><strong>ChatGPT</strong> — Resume writing, cover letters, interview practice, company research (80% of needs)</div></div><div class="step-item"><div class="step-num">2</div><div class="step-txt"><strong>Canva</strong> — Professional resume design with free templates. No design skill needed.</div></div><div class="step-item"><div class="step-num">3</div><div class="step-txt"><strong>LinkedIn</strong> — Optimise profile with AI headlines. Turn on Open to Work.</div></div><div class="step-item"><div class="step-num">4</div><div class="step-txt"><strong>Jobscan</strong> — Scores your resume against any job description. Shows missing keywords.</div></div></div>`,
+       content:`<div class="lc-title">🛠️ Best AI Tools for Job Seekers</div><div class="steps-list"><div class="step-item"><div class="step-num">1</div><div class="step-txt"><strong>ChatGPT</strong> — Resume writing, cover letters, interview practice, company research (80% of needs)</div></div><div class="step-item"><div class="step-num">2</div><div class="step-txt"><strong>Canva</strong> — Professional resume design with free templates. No design skill needed.</div></div><div class="step-item"><div class="step-num">3</div><div class="step-txt"><strong>LinkedIn</strong> — Optimise profile with AI headlines. Turn on Open to Work.</div></div><div class="step-item"><div class="step-num">4</div><div class="step-txt"><strong>Jobscan</strong> — Scores your resume against any job description. Shows missing keywords.</div></div></div><div class="india-example"><div class="india-example-label">🇮🇳 India Job Seeker Tool Stack</div><div class="india-example-text">Top candidates at TCS NQT, Infosys, and Wipro drives use this exact stack. <em>ChatGPT to tailor resume per JD</em>, <em>Canva for clean formatting</em>, <em>LinkedIn Open to Work</em> for recruiter visibility. Candidates using all 3 get <em>2.5x more callbacks</em>.</div></div><div class="tip-card"><strong>Priority order:</strong> ChatGPT first → fix your resume → then LinkedIn. Don't try to optimise everything at once. One tool, one week.</div><div class="do-now-box"><div class="do-now-label">⚡ Do This Right Now</div><div class="do-now-text">Go to LinkedIn → Settings → Open to Work → set to "Recruiters only" → Save. This one 30-second action can double your recruiter inbox messages starting this week.</div></div>`,
        quiz:{q:'What does ATS stand for in job applications?',opts:['Advanced Technical Score','Applicant Tracking System','Application Testing Software'],ans:1,exp:'ATS — Applicant Tracking System — scans resumes for keywords before a human ever reads it. Over 75% of resumes are rejected here.'}},
       {title:'Set Up Your AI Job Search System in 30 Minutes',icon:'⚙️',free:true,
        voice:`Set up your complete AI job search system in thirty minutes. Step one: create a free ChatGPT account. Step two: paste your current resume and ask — what are the three biggest weaknesses of this resume? The feedback will immediately show you what to fix. Step three: create a master resume document with your complete experience and skills. You'll tailor this for each application. Step four: rewrite your LinkedIn headline and About section using AI suggestions. Step five: set a daily routine — one hour of applications, thirty minutes of skill building, thirty minutes of networking. Consistency beats everything.`,
-       content:`<div class="lc-title">⚙️ Your AI Job Search System</div><div class="steps-list"><div class="step-item"><div class="step-num">1</div><div class="step-txt">Create a free ChatGPT account at chatgpt.com</div></div><div class="step-item"><div class="step-num">2</div><div class="step-txt">Paste your resume → "What are the 3 biggest weaknesses of this resume?"</div></div><div class="step-item"><div class="step-num">3</div><div class="step-txt">Create a master resume document — the full version you'll tailor for each job</div></div><div class="step-item"><div class="step-num">4</div><div class="step-txt">Rewrite LinkedIn headline + About section with AI suggestions</div></div><div class="step-item"><div class="step-num">5</div><div class="step-txt"><strong>Daily routine:</strong> 1hr applications + 30min skill building + 30min networking</div></div></div>`,
+       content:`<div class="lc-title">⚙️ Your AI Job Search System</div><div class="steps-list"><div class="step-item"><div class="step-num">1</div><div class="step-txt">Create a free ChatGPT account at chatgpt.com</div></div><div class="step-item"><div class="step-num">2</div><div class="step-txt">Paste your resume → "What are the 3 biggest weaknesses of this resume?"</div></div><div class="step-item"><div class="step-num">3</div><div class="step-txt">Create a master resume document — the full version you'll tailor for each job</div></div><div class="step-item"><div class="step-num">4</div><div class="step-txt">Rewrite LinkedIn headline + About section with AI suggestions</div></div><div class="step-item"><div class="step-num">5</div><div class="step-txt"><strong>Daily routine:</strong> 1hr applications + 30min skill building + 30min networking</div></div></div><div class="india-example"><div class="india-example-label">🇮🇳 30-Minute Setup That Changed Everything</div><div class="india-example-text">A <em>2023 MBA graduate from Salem</em> had been applying for 5 months with no results. She set up this exact system in one afternoon. Within <em>3 weeks</em>: 4 interview calls, 1 offer at ₹6.5 LPA — <em>her first ever.</em></div></div><div class="tip-card"><strong>Key insight:</strong> Most job seekers apply reactively. This system makes you proactive — you tailor, follow up, and network systematically. AI handles the execution speed.</div><div class="do-now-box"><div class="do-now-label">⚡ Do This Right Now — All 3 Steps Take 30 Minutes</div><div class="do-now-text">1. Create ChatGPT account (5 min) → 2. Paste your resume, ask for weaknesses (5 min) → 3. Ask: <em>"Rewrite my LinkedIn headline for [target role]. Give me 5 options, keyword-rich, under 15 words."</em> (10 min) → Update LinkedIn (5 min). Done.</div></div>`,
        quiz:{q:'What should you do first when setting up your AI job search system?',opts:['Apply to 50 jobs immediately','Paste your resume into ChatGPT and ask for its weaknesses','Create a new LinkedIn account'],ans:1,exp:'Getting AI feedback on your current resume first shows you exactly what to fix — before you waste time applying with a weak resume.'}}
     ]},
     {title:'Module 2 — Resume & Cover Letter Mastery',lessons:[
@@ -1507,20 +1676,25 @@ const API_BASE = 'https://aikatrukko-api.onrender.com';
 let user = JSON.parse(localStorage.getItem('ak_user')||'null');
 let purchases = JSON.parse(localStorage.getItem('ak_purchases')||'[]');
 let completed = JSON.parse(localStorage.getItem('ak_done')||'{}');
-let photoSrc = localStorage.getItem('ak_photo')||null;
+let userPhotoSrc = localStorage.getItem('ak_photo')||null;  /* user's own uploaded photo */
+let photoSrc = null; /* kept for hero/coach avatar — set by savePhoto */
 let curCat = null, selGateway = 'razorpay';
 let curMod = 0, curLes = 0;
 let synth = null; try{ synth = window.speechSynthesis||null; }catch(e){}
 let vTimer = null, vWords = [], vIdx = 0;
 let curActiveMod = null, curActiveLesson = null;
 let activeTrend = null;
+/* ── Forgot password state ── */
+let fpStep = 0, fpEmail = '', fpCode = '';
 
 /* ══ RAZORPAY + ANTHROPIC CONFIG ════════════════
    ⚠️  Add your keys here before going live!
 ══════════════════════════════════════════════ */
 const RZP_KEY  = 'rzp_live_ScX1xgIfmOwmP8';  // ⚠️ Replace with your Razorpay Live/Test key
-const OPENROUTER_KEY = 'YOUR_KEY_HERE';
-   function setAvatarSrc(src){
+const GEMINI_KEY = 'AIzaSy-YOUR-GEMINI-KEY-HERE'; // aistudio.google.com → Get API Key
+
+
+function setAvatarSrc(src){
   const av = document.getElementById('heroAvatar');
   if(av){ av.innerHTML=''; const img=document.createElement('img'); img.src=src; av.appendChild(img); }
 }
@@ -1631,7 +1805,7 @@ function openLesson(mi,li){
 
   if(canAccess){
     panel+=`<div class="voice-bar">
-      <button class="v-play" id="vP${mi}${li}" onclick="startVoice(${JSON.stringify(les.voice||'')},${mi},${li})">🎙️ Play Lesson</button>
+      <button class="v-play" id="vP${mi}${li}" onclick="startVoice(${mi},${li})">🎙️ Play Lesson</button>
       <button class="v-stop" id="vS${mi}${li}" onclick="stopVoice(${mi},${li})">⏹ Stop</button>
       <div class="v-prog-wrap"><div class="v-prog" id="vf${mi}${li}"></div></div>
       <select class="v-speed" id="vSp${mi}${li}"><option value="0.75">0.75x</option><option value="0.88" selected>0.88x</option><option value="1">1x</option><option value="1.25">1.25x</option></select>
@@ -1665,9 +1839,178 @@ function openLesson(mi,li){
     <div class="ln-progress">Lesson ${_cur+1} of ${_total}</div>
     <button class="ln-btn primary" onclick="goLesson(1)" ${!hasNext?'disabled':''}>Next &#8594;</button>
   </div>`;
+  // ── Weekly Fresh Content Widget (accessible lessons only) ──
+  if(canAccess){
+    const weekNum = getWeekNumber();
+    panel+=`<div class="weekly-widget" id="weeklyWidget${mi}${li}">
+      <div class="weekly-widget-head">
+        <div class="weekly-widget-title">🗓️ This Week's Fresh Content</div>
+        <span class="weekly-week-badge">Week ${weekNum}</span>
+      </div>
+      <div class="weekly-widget-body" id="weeklyBody${mi}${li}">
+        <div class="weekly-ai-loading"><div class="dots"><span></span><span></span><span></span></div> Generating weekly tips just for you…</div>
+      </div>
+    </div>`;
+  }
   panel+=`</div>`;
   document.getElementById('lessonPanel').innerHTML=panel;
   document.getElementById('lessonPanel').scrollIntoView({behavior:'smooth',block:'start'});
+  if(canAccess) loadWeeklyContent(mi, li, cat);
+}
+
+/* ── Week number helper ── */
+function getWeekNumber(){
+  const now=new Date();
+  const start=new Date(now.getFullYear(),0,1);
+  return Math.ceil(((now-start)/86400000+start.getDay()+1)/7);
+}
+
+/* ── Weekly content per lesson (cached in localStorage) ── */
+async function loadWeeklyContent(mi,li,cat){
+  const cacheKey=`ak_weekly_${cat}_${mi}_${li}_w${getWeekNumber()}`;
+  const cached=localStorage.getItem(cacheKey);
+  const container=document.getElementById(`weeklyBody${mi}${li}`);
+  if(!container) return;
+
+  if(cached){
+    try{ renderWeeklyContent(container, JSON.parse(cached)); return; }catch(e){}
+  }
+
+  // Static weekly content pools (12 weeks × per category/module, rotated by week)
+  const les=MODULES[cat][mi].lessons[li];
+  const weekNum=getWeekNumber();
+  const staticPool=getWeeklyPool(cat, mi, weekNum);
+  renderWeeklyContent(container, staticPool);
+  localStorage.setItem(cacheKey, JSON.stringify(staticPool));
+
+  // Also try AI to get a fresh generated tip (non-blocking)
+  try{
+    const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+    const prompt=`Generate a weekly fresh AI tip for an Indian ${cat==='student'?'student':cat==='business'?'business owner':'job seeker'} learning about "${les.title}". Week ${weekNum} of ${new Date().getFullYear()}. Return ONLY valid JSON: {"tip":"one specific actionable tip under 30 words related to this lesson","prompt":"a ready-to-use ChatGPT prompt under 40 words with placeholders in [brackets]","india_example":"a real Indian context example under 25 words"}`;
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.8,maxOutputTokens:200}})});
+    if(!r.ok) return;
+    const d=await r.json();
+    const raw=d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
+    const p=JSON.parse(raw);
+    if(p.tip&&p.prompt){
+      const aiData={...staticPool, ai_tip:p.tip, ai_prompt:p.prompt, ai_india:p.india_example, ai_generated:true};
+      renderWeeklyContent(container, aiData);
+      localStorage.setItem(cacheKey, JSON.stringify(aiData));
+    }
+  }catch(e){}
+}
+
+function renderWeeklyContent(container, data){
+  let h='';
+  if(data.ai_generated && data.ai_tip){
+    h+=`<div class="weekly-tip">
+      <div class="weekly-tip-label">🤖 AI-Generated Tip · This Week</div>
+      <div class="weekly-tip-text">${data.ai_tip}</div>
+    </div>`;
+    if(data.ai_india){
+      h+=`<div class="india-example">
+        <div class="india-example-label">🇮🇳 India Context</div>
+        <div class="india-example-text">${data.ai_india}</div>
+      </div>`;
+    }
+    h+=`<div class="weekly-prompt-box">
+      <div class="weekly-prompt-label">⚡ This Week's Ready Prompt <button class="wk-copy-btn" onclick="copyWeeklyPrompt(this)">Copy</button></div>
+      <div class="weekly-prompt-text">${data.ai_prompt}</div>
+    </div>`;
+  } else {
+    h+=`<div class="weekly-tip">
+      <div class="weekly-tip-label">💡 This Week's Tip</div>
+      <div class="weekly-tip-text">${data.tip}</div>
+    </div>
+    <div class="weekly-prompt-box">
+      <div class="weekly-prompt-label">⚡ Ready-to-Use Prompt <button class="wk-copy-btn" onclick="copyWeeklyPrompt(this)">Copy</button></div>
+      <div class="weekly-prompt-text">${data.prompt}</div>
+    </div>`;
+    if(data.india_example){
+      h+=`<div class="india-example">
+        <div class="india-example-label">🇮🇳 Real India Example</div>
+        <div class="india-example-text">${data.india_example}</div>
+      </div>`;
+    }
+  }
+  container.innerHTML=h;
+}
+
+function copyWeeklyPrompt(btn){
+  const text=btn.closest('.weekly-prompt-box').querySelector('.weekly-prompt-text').innerText;
+  navigator.clipboard.writeText(text).then(()=>toast('Prompt copied! 📋','ok'));
+}
+
+/* ── Static weekly content pools (rotated by week mod 8) ── */
+function getWeeklyPool(cat, mi, weekNum){
+  const w = weekNum % 8;
+  const pools = {
+    student:[
+      [{tip:'Use ChatGPT to create flashcards from any paragraph. Paste text → "Convert this into 10 Q&A flashcards I can memorise."',prompt:'Convert this paragraph into 10 Q&A flashcards: <em>[paste paragraph]</em>. Make questions concise and answers under 2 lines.',india_example:'Engineering students in Chennai use this to memorise VTU important questions in 30 minutes instead of 3 hours.'},
+       {tip:'Generate 5 different explanations of a concept — pick the one that clicks for your brain style.',prompt:'Explain <em>[concept]</em> in 5 different ways: as a story, as a list, as an analogy, as a diagram description, and as a simple 2-line definition.',india_example:'A student in Coimbatore memorised the OSI model by asking ChatGPT to explain it as a post office story.'},
+       {tip:'Use AI to predict exam questions. Paste your syllabus → "What are the most likely 10 questions from this syllabus?"',prompt:'Here is my exam syllabus: <em>[paste syllabus]</em>. Predict the <em>10 most likely exam questions</em> with model answers. Prioritise high-weightage topics.',india_example:'JEE aspirants in Kota use this technique every week — it aligns with PYQ patterns surprisingly well.'},
+       {tip:'Turn any boring topic into a 2-minute story so you can explain it in viva or interviews naturally.',prompt:'Explain <em>[topic]</em> as a short 2-minute story a 16-year-old would find interesting. Include a surprising fact.',india_example:'Medical students use this to memorise drug mechanisms — converting pharmacology into villain-hero stories.'},
+       {tip:'Use AI to write your college club announcements, event descriptions, and committee emails in seconds.',prompt:'Write a professional college event announcement for <em>[event name]</em> happening on <em>[date]</em> at <em>[venue]</em>. Under 80 words, enthusiastic but clear.',india_example:'Fest committees at NITs use ChatGPT to draft sponsorship emails — cutting 2-hour work down to 10 minutes.'},
+       {tip:'Ask AI to review your solved assignment before submission — it will spot logic gaps you missed.',prompt:'Review my assignment answer below and tell me: <em>what is strong, what is missing, and what would score full marks.</em> Here is my answer: <em>[paste answer]</em>.',india_example:'Students scoring 8+ CGPA at BITS Pilani routinely use Claude to review solutions before submission.'},
+       {tip:'Create a personalised study schedule using AI — smarter than any app because it knows your weak areas.',prompt:'I have exams in <em>[X days]</em>. My subjects are <em>[list]</em>. My weakest is <em>[subject]</em>. Create a daily schedule with exact time slots and which topics to cover each day.',india_example:'UPSC aspirants use this to build month-wise revision calendars that rival ₹50,000 coaching schedules.'},
+       {tip:'Use AI to generate an entire project abstract, conclusion, and bibliography framework in one prompt.',prompt:'I have a college project on <em>[topic]</em> for <em>[department]</em>. Write a 200-word abstract, 3-point conclusion, and list 5 credible reference sources I should cite.',india_example:'Final year B.Tech students across Tamil Nadu use this to complete capstone project paperwork in one evening.'}
+      ],
+      [{tip:'Use AI to write professional work experience bullet points — even from internships and part-time jobs.',prompt:'I worked as a <em>[role]</em> at <em>[company/type]</em> for <em>[duration]</em>. My main tasks were <em>[list]</em>. Write 4 powerful resume bullet points with action verbs and measurable outcomes.',india_example:'IT interns at Infosys and TCS use this to convert "I did testing" into "Executed 200+ test cases reducing defect rate by 30%."'},
+       {tip:'Create a one-page study cheatsheet for any subject — perfect for last-minute revision.',prompt:'Create a one-page cheatsheet for <em>[subject/topic]</em>. Include: key formulas, important definitions, common mistakes, and 3 memory tricks. Format it as a clean reference card.',india_example:'CA Foundation students compress entire accounts chapters into one-page AI cheatsheets the night before exams.'},
+       {tip:'Use AI to translate difficult English academic papers into simple Tamil-flavoured explanations.',prompt:'Explain this research paper section in very simple English that an Indian undergraduate would understand. Avoid jargon: <em>[paste section]</em>.',india_example:'Research scholars at Anna University use Claude to simplify IEEE papers from 2-hour reads to 15-minute understanding.'},
+       {tip:'Ask AI to role-play as your professor and give tough viva questions on your project topic.',prompt:'Act as a strict professor conducting my project viva on <em>[topic]</em>. Ask me 5 tough questions one at a time. After each answer, tell me if it is correct and what the ideal answer is.',india_example:'Engineering students preparing for semester viva use this technique to predict and prepare for tough faculty questions.'},
+       {tip:'Use AI to compare two topics side by side — perfect for "compare and contrast" exam questions.',prompt:'Create a comparison table between <em>[topic A]</em> and <em>[topic B]</em> with 8 parameters. Include examples for each. Format it so I can use it directly in an exam answer.',india_example:'Law students use ChatGPT comparison tables to answer "distinguish between" questions that commonly appear in bar exams.'},
+       {tip:'Generate 10 commonly confused concepts in your subject with clear explanations of each.',prompt:'List 10 concepts in <em>[subject]</em> that students commonly confuse or get wrong. For each, explain what it actually means and what mistake students typically make.',india_example:'Chemistry students preparing for NEET use this to fix conceptual errors in organic mechanisms before exam week.'},
+       {tip:'Use AI to improve your handwriting-style summaries into polished structured notes.',prompt:'I made these rough notes during a lecture: <em>[paste notes]</em>. Reorganise them into a clean, structured format with headings, bullet points, and highlight the 3 most important points.',india_example:'Management students at IIMs use this to convert scribbled case study notes into presentation-ready insights overnight.'},
+       {tip:'Practice MCQ-style questions for 10 minutes daily using AI — transforms retention dramatically.',prompt:'Give me 10 MCQ questions on <em>[topic]</em> at exam difficulty level. After I answer each, tell me if I am correct and explain why the right answer is correct. Start with question 1.',india_example:'Government exam aspirants (TNPSC, SSC) use this daily MCQ practice to score 15-20% higher than classmates.'}
+      ]
+    ],
+    business:[
+      [{tip:'Use AI to write 30 days of Instagram content in one 2-hour session every month.',prompt:'I run a <em>[business type]</em> in India. Create a 30-day Instagram content calendar with post themes, caption ideas, and hashtag groups. Mix educational, promotional, and engaging content.',india_example:'A saree shop in Coimbatore grew from 500 to 8,000 followers in 4 months using AI-batched content posted consistently.'},
+       {tip:'Create a WhatsApp broadcast message that gets replies — not ignored like most business messages.',prompt:'Write a WhatsApp broadcast message for my <em>[business]</em> announcing <em>[offer/update]</em>. Under 60 words. Start with a hook line. Sound personal, not like a flyer.',india_example:'A home bakery in Chennai gets 40% reply rates on AI-written WhatsApp messages vs 5% on generic flyers.'},
+       {tip:'Use AI to generate 5 versions of your business elevator pitch — for different audiences.',prompt:'I run a <em>[business]</em>. Write 5 elevator pitches: one for an investor, one for a customer, one for a partner, one for a college crowd, one for WhatsApp status. Each under 40 words.',india_example:'Startup founders at NASSCOM events use multi-version pitches — different words for VCs vs customers wins every time.'},
+       {tip:'Turn your best customer testimonial into 3 different marketing formats using AI.',prompt:'Here is a customer testimonial: <em>[paste testimonial]</em>. Transform it into: 1) a 2-line WhatsApp caption, 2) a 60-word Instagram caption, 3) a 3-line website quote with a call to action.',india_example:'Coaches and trainers in Bangalore triple their social proof impact by repurposing one good review into multiple formats.'},
+       {tip:'Use AI to write your Google Business profile description — it directly affects search ranking.',prompt:'Write a Google Business Profile description for my <em>[business]</em> in <em>[city]</em>. Under 750 characters. Include: what we offer, who we serve, our USP, and a call to action. Keyword-rich for local search.',india_example:'A dental clinic in Madurai increased Google Map calls by 60% after updating their profile with an AI-written description.'},
+       {tip:'Create your FAQ page using AI — addresses objections before customers even ask.',prompt:'I run a <em>[business]</em>. Create a 10-question FAQ covering: price, delivery, quality, returns, booking process, what makes us different, payment methods, timings, first-time buyer info, and after-sales support.',india_example:'An online tailoring business in Tirupur reduced customer support messages by 40% after publishing an AI-written FAQ.'},
+       {tip:'Use AI to write follow-up messages for leads who went cold — reactivate them professionally.',prompt:'Write 3 follow-up messages for a potential customer who showed interest in <em>[product/service]</em> but has not responded in <em>[X days]</em>. Each under 60 words. Tone: warm, not pushy. Space them 3 days apart.',india_example:'A real estate agent in Hyderabad reactivated 23% of cold leads using a 3-message AI follow-up sequence.'},
+       {tip:'Use AI to write your business bio for Instagram, LinkedIn, and your website in one go.',prompt:'Write my business bio for 3 platforms: Instagram (under 150 chars), LinkedIn (under 300 chars), and website About section (under 100 words). My business: <em>[describe]</em>. Tone: professional but approachable.',india_example:'A freelance photographer in Pondicherry doubled inquiry messages after updating all 3 bios with AI-written versions.'}
+      ],
+      [{tip:'Use AI to create a monthly business report for your own tracking — clarity beats guesswork.',prompt:'Create a monthly business performance template for a <em>[business type]</em>. Include sections for: revenue vs target, top-selling products, customer feedback themes, next month goals, and key challenges.',india_example:'Small retail owners in Tamil Nadu who track monthly use this template — 3 months of tracking reveals surprising patterns.'},
+       {tip:'Generate 10 upsell phrases that increase average order value without sounding pushy.',prompt:'I sell <em>[products/services]</em>. Create 10 upsell and cross-sell phrases I can use at checkout or on WhatsApp. Natural, helpful, not salesy. Each under 20 words.',india_example:'A sweet shop in Salem increased average order from ₹200 to ₹380 using AI-generated upsell phrases at the counter.'},
+       {tip:'Use AI to write a job description for your first hire — attracts the right candidate.',prompt:'Write a job description for a <em>[role]</em> at my <em>[business]</em> in <em>[city]</em>. Include: role overview, daily tasks, skills needed, what they will gain, and how to apply. Under 300 words, warm but clear.',india_example:'A home services startup in Pune hired their first 3 field executives using an AI-written description posted on Apna app.'},
+       {tip:'Use AI to plan your Diwali, Pongal, or festive season sales campaign in one session.',prompt:'Create a <em>[festive season]</em> sales campaign for my <em>[business]</em>. Include: offer ideas, countdown timeline (2 weeks), social media post schedule, WhatsApp message drafts, and a flash sale day plan.',india_example:'A clothing store in Coimbatore generates ₹3L+ in festive season sales using AI-planned campaigns started 2 weeks early.'},
+       {tip:'Ask AI to identify gaps in your current pricing strategy and suggest improvements.',prompt:'My current pricing: <em>[list products/services and prices]</em>. My competitors charge around <em>[range]</em>. Analyse my pricing and suggest: what to increase, what to bundle, and what pricing psychology tactics to add.',india_example:'A tuition centre in Chennai increased monthly revenue by 35% after an AI pricing audit revealed underpriced batch options.'},
+       {tip:'Create a referral program script using AI — word-of-mouth is the most profitable channel.',prompt:'Design a referral program for my <em>[business]</em>. Include: how it works, reward structure, the message to send existing customers asking for referrals, and follow-up if they refer someone.',india_example:'A gym in Madurai grew from 80 to 200 members purely through a referral program designed with ChatGPT in 30 minutes.'},
+       {tip:'Use AI to write your vendor negotiation script — save 10-20% on every purchase.',prompt:'Help me negotiate with a supplier for <em>[product/material]</em>. I currently pay <em>[price]</em>. Write a professional WhatsApp message requesting a discount for bulk order, and a counter-offer strategy if they decline.',india_example:'A restaurant owner in Trichy saves ₹8,000/month on ingredients by using AI-written vendor negotiation messages consistently.'},
+       {tip:'Turn your most asked question on WhatsApp into a lead magnet mini-guide.',prompt:'The most common question my customers ask is: <em>[question]</em>. Create a 5-point mini-guide answering this comprehensively. Format it as a free PDF/WhatsApp forward. Under 300 words, practical.',india_example:'A nutrition consultant in Bangalore got 600+ WhatsApp forwards and 40 new clients from one AI-written free guide in 2 weeks.'}
+      ]
+    ],
+    unemployed:[
+      [{tip:'Use AI to research a company before every interview — know their recent news, values, and challenges.',prompt:'Tell me everything I need to know about <em>[company name]</em> before an interview. Include: what they do, recent news, company culture, common interview questions they ask, and how I should position myself.',india_example:'A candidate in Chennai got an Infosys offer partly because she mentioned a recent company CSR initiative she had AI-researched.'},
+       {tip:'Generate 10 strong answer openers for interview questions — stop starting with "So basically…"',prompt:'Give me 10 strong opening phrases to start interview answers confidently — for an Indian fresher/experienced candidate targeting <em>[role]</em>. Avoid "So basically", "I think", or filler phrases.',india_example:'Freshers who practise structured openers consistently get better feedback in TCS iON, Accenture, and Wipro campus drives.'},
+       {tip:'Use AI to write a 30-second self-introduction that actually impresses — not the typical boring one.',prompt:'Write a powerful 30-second self-introduction for a <em>[fresher / X years experience]</em> in <em>[field]</em> targeting <em>[role]</em>. No clichés, no "I am a hardworking person." Start with a value statement.',india_example:'A fresher in Madurai got 3 interview calls in one week after replacing his boring intro with an AI-written value-first version.'},
+       {tip:'Use AI to research salary benchmarks for your exact role and city before negotiating.',prompt:'What is the current market salary range for a <em>[role]</em> with <em>[X years experience]</em> in <em>[city]</em>? Provide range for freshers, 2-year, and 5-year experience. Include top companies and their typical packages.',india_example:'A software engineer in Pune negotiated from ₹5.5L to ₹7.2L using AI-researched market data as a concrete reference.'},
+       {tip:'Convert your project descriptions into powerful STAR-format interview stories.',prompt:'I worked on a project: <em>[brief description]</em>. Convert this into a STAR answer (Situation, Task, Action, Result) for an interview question about my biggest achievement. Under 200 words.',india_example:'IT candidates at Cognizant and HCL interviews use STAR stories from AI — structured answers score 30% better in competency interviews.'},
+       {tip:'Use AI to write a personalised cold email to a hiring manager — not just HR.',prompt:'Write a cold email to the hiring manager at <em>[company]</em> for a <em>[role]</em> opening. I found their name on LinkedIn: <em>[name/title]</em>. My key strength: <em>[strength]</em>. Under 120 words, specific, professional.',india_example:'A marketing candidate in Bangalore bypassed HR and got a direct interview call after sending an AI-personalised cold email.'},
+       {tip:'Create a "brag document" using AI — a private record of all your wins to use in performance reviews and interviews.',prompt:'Help me create a professional achievement tracker. I want to document my work wins. Take this task I completed: <em>[describe task]</em> and write it as a measurable achievement with impact for my resume/interview.',india_example:'Employees at mid-level companies in India use brag documents to negotiate salary hikes of 20-40% during appraisal season.'},
+       {tip:'Use AI to practise answering "Tell me about a failure" — the question most candidates fear.',prompt:'Coach me to answer "Tell me about a time you failed" for a <em>[role]</em> interview. Give me: what interviewers are actually testing, 3 example answer frameworks, and one mistake to avoid.',india_example:'HR rounds at Deloitte, PwC, and EY specifically test failure-handling. Candidates who prepare this question get offers at 2x the rate.'}
+      ],
+      [{tip:'Use AI to write LinkedIn connection messages that have a 50%+ acceptance rate.',prompt:'Write a LinkedIn connection request to a <em>[role]</em> at <em>[company]</em> who I do not know personally. Reference something specific about their profile or company. Under 300 characters, warm and specific.',india_example:'A fresher in Hyderabad built a 500+ LinkedIn network in 45 days using AI-written connection messages with a 65% acceptance rate.'},
+       {tip:'Generate a personalised 7-day job search action plan — structured and manageable.',prompt:'Create a 7-day job search plan for someone targeting <em>[role]</em> in <em>[industry]</em>. Include daily tasks: applications to send, networking actions, skills to showcase, and profile updates. Realistic, not overwhelming.',india_example:'Job seekers using structured weekly plans apply to 3x more roles with 2x the tailoring compared to those who apply randomly.'},
+       {tip:'Use AI to identify transferable skills from unrelated experience — makes your background more versatile.',prompt:'I have experience in <em>[unrelated field/job]</em>. I am now targeting <em>[new role/field]</em>. List my transferable skills and show me how to frame them on my resume for the new field.',india_example:'A teacher in Trichy successfully transitioned to corporate L&D after using AI to identify and reframe her transferable skills.'},
+       {tip:'Ask AI to critique your LinkedIn About section and rewrite it — most profiles have weak Abouts.',prompt:'Here is my LinkedIn About section: <em>[paste yours]</em>. Rate it out of 10. Tell me what is weak and rewrite it to be more compelling for a recruiter scanning profiles for <em>[role]</em>.',india_example:'A finance professional in Mumbai got 4 recruiter messages in the first week after rewriting her About section using AI feedback.'},
+       {tip:'Create a portfolio deck using Canva + AI descriptions — even without a website.',prompt:'Help me create a PDF portfolio for a <em>[role]</em> job application. I have these projects: <em>[list 3]</em>. For each, write a 50-word description highlighting: what I did, the tools used, and the outcome.',india_example:'UI/UX designers in Bangalore send AI-written PDF portfolios via email — 70% report getting more callbacks than before.'},
+       {tip:'Practise "Why should we hire you?" until your answer is genuinely impressive.',prompt:'Coach me on answering "Why should we hire you?" for a <em>[job title]</em> at a <em>[company type]</em>. Give me: what they are really asking, a strong answer framework, and an example answer under 100 words.',india_example:'Candidates who prepare this question at Bangalore and Pune MNC drives routinely outperform others in final round panels.'},
+       {tip:'Use AI to write a professional "checking in on my application" email that does not sound desperate.',prompt:'Write a polite follow-up email to <em>[company HR]</em> for a <em>[role]</em> I applied for <em>[X days ago]</em> and have not heard back. Under 80 words, professional, reaffirm interest without sounding desperate.',india_example:'Candidates who follow up professionally within 1 week get responses 35% more often than those who wait silently.'},
+       {tip:'Ask AI to review your entire job search strategy and suggest what you are missing.',prompt:'Here is my current job search strategy: <em>[describe what you are doing — platforms, how many applications, follow-ups etc]</em>. Give me 5 specific improvements to increase my interview rate.',india_example:'A marketing fresher in Chennai restructured her job search based on AI feedback and went from 0 to 3 interviews in 2 weeks.'}
+      ]
+    ]
+  };
+
+  const catPool = pools[cat] || pools['student'];
+  const modPool = catPool[Math.min(mi, catPool.length-1)] || catPool[0];
+  return modPool[w % modPool.length];
 }
 
 function markDone(key,mi,li){
@@ -1701,12 +2044,14 @@ function getFemaleVoice(){
     || voices[0]||null;
 }
 
-function startVoice(script,mi,li){
+function startVoice(mi,li){
+  const script=(MODULES[curCat]&&MODULES[curCat][mi]&&MODULES[curCat][mi].lessons[li]&&MODULES[curCat][mi].lessons[li].voice)||'';
+  if(!script){toast('No voice content for this lesson','err');return;}
   if(!window.speechSynthesis){ toast('Voice not supported in this browser','err'); return; }
   try{ window.speechSynthesis.cancel(); }catch(e){}
   clearInterval(vTimer);
   if(window.speechSynthesis.getVoices().length===0){
-    window.speechSynthesis.onvoiceschanged=()=>startVoice(script,mi,li);
+    window.speechSynthesis.onvoiceschanged=()=>startVoice(mi,li);
     return;
   }
   const scEl=document.getElementById('vs'+mi+li);if(!scEl)return;
@@ -1763,7 +2108,7 @@ function renderCoach(){
       <div class="pb ${hasAcc?'':'locked-blur'}">${hasAcc?p.b:'Premium AI coaching prompt. Purchase this plan to unlock instantly.'}</div>
       ${!hasAcc?`<div class="p-lock" onclick="openPayGate()">🔒 Unlock for ${CATS[cat].new}</div>`:''}</div>`).join('')}
     </div>`;
-  if(photoSrc){const av=document.getElementById('ciAva');if(av){av.innerHTML='';const img=document.createElement('img');img.src=photoSrc;av.appendChild(img);}}
+  if(userPhotoSrc){const av=document.getElementById('ciAva');if(av){av.innerHTML='';const img=document.createElement('img');img.src=userPhotoSrc;av.appendChild(img);}}
 }
 
 function pickTrend(t,el){
@@ -1903,6 +2248,12 @@ function doSignup(){
 
 function setLoggedIn(u,p){
   user=u;purchases=p||[];
+  /* ── ADMIN: Full free access ── */
+  if(u.email==='m82931905@gmail.com'){
+    purchases=['student','business','unemployed'];
+    localStorage.setItem('ak_purchases',JSON.stringify(purchases));
+    if(u.email) localStorage.setItem('ak_purch_'+u.email,JSON.stringify(purchases));
+  }
   document.getElementById('navUser').classList.add('show');
   document.getElementById('navAuth').style.display='none';
   document.getElementById('navName').textContent=u.name.split(' ')[0];
@@ -2066,7 +2417,100 @@ function toast(msg,type){
   toastTimer=setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-/* ── PHOTO ── */
+/* ══ FORGOT PASSWORD ══ */
+function openForgotPassword(){
+  fpStep=0; fpEmail=''; fpCode='';
+  closeOv('authOverlay');
+  document.getElementById('forgotOverlay').classList.add('show');
+  renderForgotStep();
+}
+
+function renderForgotStep(){
+  const c=document.getElementById('forgotContent');
+  const titles=['Reset Password','Enter Verification Code','Set New Password'];
+  document.getElementById('forgotTitle').textContent=titles[fpStep]||'Reset Password';
+  if(fpStep===0){
+    c.innerHTML=`
+      <p style="font-size:.76rem;color:var(--gray1);margin-bottom:18px;line-height:1.7;">Enter the email you registered with. We'll send a 6-digit verification code.</p>
+      <div class="field"><label>Registered Email</label><input type="email" id="fpEmailInp" placeholder="you@email.com"></div>
+      <button class="submit-btn" onclick="sendResetCode()">Send Code →</button>`;
+  } else if(fpStep===1){
+    c.innerHTML=`
+      <div style="background:var(--aqua-dim);border:1px solid rgba(220,20,60,.2);border-radius:10px;padding:14px;margin-bottom:18px;">
+        <div style="font-size:.68rem;font-weight:700;color:var(--aqua);margin-bottom:4px;">📧 CODE SENT TO</div>
+        <div style="font-size:.8rem;color:var(--white);font-weight:600;">${fpEmail}</div>
+        <div style="font-size:.68rem;color:var(--gray2);margin-top:6px;">Check your email inbox. Code expires in 10 minutes.</div>
+        <div id="fpCodeDisplay" style="display:none;margin-top:10px;padding:8px;background:rgba(220,20,60,.1);border-radius:6px;font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--aqua);text-align:center;letter-spacing:4px;"></div>
+      </div>
+      <div class="field"><label>6-Digit Code</label><input type="text" id="fpCodeInp" placeholder="123456" maxlength="6" style="letter-spacing:4px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;text-align:center;"></div>
+      <button class="submit-btn" onclick="verifyResetCode()">Verify Code →</button>
+      <div style="text-align:center;margin-top:10px;"><span onclick="sendResetCode()" style="font-size:.72rem;color:var(--aqua);cursor:pointer;font-weight:600;">Resend Code</span></div>`;
+  } else if(fpStep===2){
+    c.innerHTML=`
+      <div style="background:rgba(0,200,100,.08);border:1px solid rgba(0,200,100,.25);border-radius:10px;padding:12px;margin-bottom:18px;font-size:.75rem;color:#2d8a5e;font-weight:600;">✅ Code verified! Now set your new password.</div>
+      <div class="field"><label>New Password</label><input type="password" id="fpNewPass" placeholder="Min 6 characters"></div>
+      <div class="field"><label>Confirm Password</label><input type="password" id="fpConfPass" placeholder="Confirm new password"></div>
+      <button class="submit-btn" onclick="doResetPassword()">Update Password ✓</button>`;
+  }
+}
+
+function sendResetCode(){
+  const emailInp=document.getElementById('fpEmailInp');
+  const em=(emailInp?emailInp.value:fpEmail).trim().toLowerCase();
+  if(!em||!em.includes('@')){toast('Enter a valid email','err');return;}
+  const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
+  const found=stored.find(u=>u.email===em);
+  if(!found){toast('No account found with this email','err');return;}
+  fpEmail=em;
+  fpCode=Math.floor(100000+Math.random()*900000).toString();
+  const expiry=Date.now()+(10*60*1000); // 10 mins
+  localStorage.setItem('ak_reset_'+em,JSON.stringify({code:fpCode,expiry}));
+  fpStep=1;
+  renderForgotStep();
+  /* Show code on screen (demo mode — replace with EmailJS for real emails) */
+  const disp=document.getElementById('fpCodeDisplay');
+  if(disp){disp.style.display='block';disp.textContent=fpCode;}
+  toast('Code generated! ✅','ok');
+  /* ── EmailJS (optional — add your keys below to send real emails) ──
+  emailjs.send('YOUR_SERVICE_ID','YOUR_TEMPLATE_ID',{
+    to_email:em, to_name:found.name, reset_code:fpCode
+  }).catch(()=>{}); */
+}
+
+function verifyResetCode(){
+  const inp=document.getElementById('fpCodeInp');
+  const entered=(inp?inp.value:'').trim();
+  if(!entered||entered.length!==6){toast('Enter the 6-digit code','err');return;}
+  const saved=JSON.parse(localStorage.getItem('ak_reset_'+fpEmail)||'null');
+  if(!saved){toast('No reset code found. Resend.','err');return;}
+  if(Date.now()>saved.expiry){toast('Code expired. Please resend.','err');return;}
+  if(entered!==saved.code){toast('Wrong code. Try again!','err');return;}
+  fpStep=2;
+  renderForgotStep();
+}
+
+function doResetPassword(){
+  const np=document.getElementById('fpNewPass').value;
+  const cp=document.getElementById('fpConfPass').value;
+  if(!np||np.length<6){toast('Password must be at least 6 characters','err');return;}
+  if(np!==cp){toast('Passwords do not match','err');return;}
+  const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
+  const idx=stored.findIndex(u=>u.email===fpEmail);
+  if(idx<0){toast('Account not found','err');return;}
+  stored[idx].pass=np;
+  localStorage.setItem('ak_users',JSON.stringify(stored));
+  /* If this is the currently logged-in user, update their session */
+  if(user&&user.email===fpEmail){
+    user.pass=np;
+    localStorage.setItem('ak_user',JSON.stringify(user));
+  }
+  localStorage.removeItem('ak_reset_'+fpEmail);
+  closeOv('forgotOverlay');
+  fpStep=0; fpEmail=''; fpCode='';
+  toast('Password updated! Please login. 🎉','ok');
+  setTimeout(()=>openAuth('login'),800);
+}
+
 function openPhotoModal(){document.getElementById('photoOverlay').classList.add('show');}
 const HOST_PHOTO_INIT="data:image/jpeg;base64,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";
 let newPhoto=null;
@@ -2079,11 +2523,18 @@ function handlePhoto(e){
 }
 function savePhoto(){
   if(!newPhoto)return;
-  localStorage.setItem('ak_photo',newPhoto);photoSrc=newPhoto;
+  localStorage.setItem('ak_photo',newPhoto);
+  userPhotoSrc=newPhoto;
+  photoSrc=newPhoto;
   setLoggedIn(user,purchases);
-  updateHeroAvatarPhoto(photoSrc);
   closeOv('photoOverlay');
-  toast('Photo updated!','ok');
+  toast('Photo updated! ✅','ok');
+  /* Refresh profile avatar if open */
+  const av=document.getElementById('profAvatar');
+  if(av){av.innerHTML='<img src="'+userPhotoSrc+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">';}
+  /* Update AI coach avatar */
+  const ciAv=document.getElementById('ciAva');
+  if(ciAv&&photoSrc){ciAv.innerHTML='';const img2=document.createElement('img');img2.src=photoSrc;ciAv.appendChild(img2);}
   newPhoto=null;
 }
 
@@ -2101,8 +2552,9 @@ function updateHeroAvatarPhoto(src){
 window.addEventListener('load',()=>{
   const saved=localStorage.getItem('ak_user');
   const savedPhoto=localStorage.getItem('ak_photo');
-  if(savedPhoto){photoSrc=savedPhoto;updateHeroAvatarPhoto(savedPhoto);}
-  else{updateHeroAvatarPhoto(HOST_PHOTO_INIT);}
+  /* Hero always shows instructor photo (Pooja). User photo is separate. */
+  updateHeroAvatarPhoto(HOST_PHOTO_INIT);
+  if(savedPhoto){ userPhotoSrc=savedPhoto; photoSrc=savedPhoto; }
   if(saved){
     const u=JSON.parse(saved);
     const p=JSON.parse(localStorage.getItem('ak_purchases')||'[]');
@@ -2115,6 +2567,10 @@ function setLoggedInSilent(u,p){
   // Always load latest purchases from per-email store (catches post-payment state)
   const freshPurch=JSON.parse(localStorage.getItem('ak_purch_'+u.email)||'[]');
   purchases=freshPurch.length ? freshPurch : (p||[]);
+  /* ── ADMIN: Full free access ── */
+  if(u.email==='m82931905@gmail.com'){
+    purchases=['student','business','unemployed'];
+  }
   localStorage.setItem('ak_purchases',JSON.stringify(purchases));
   document.getElementById('navUser').classList.add('show');
   document.getElementById('navAuth').style.display='none';
@@ -2143,14 +2599,282 @@ function goLesson(offset){
   const next=cur+offset;
   if(next<0||next>=list.length) return;
   const {mi,li}=list[next];
-  // Open the module if needed
   const modBlock=document.getElementById('modBlock'+mi);
-  if(modBlock&&!modBlock.classList.contains('open')){
-    toggleMod(mi);
-  }
-  openLesson(mi, li);
+  if(modBlock&&!modBlock.classList.contains('open')) toggleMod(mi);
+  openLesson(mi,li);
 }
 
+/* == PROFILE OVERLAY == */
+const CATS_INFO={student:{label:'Students',icon:'\u{1F393}'},business:{label:'Business',icon:'\u{1F4BC}'},unemployed:{label:'Job Seekers',icon:'\u{1F680}'}};
+const CATS_TOTAL={student:12,business:12,unemployed:12};
+const STATIC_MODULES=(()=>{
+  const wk=Math.ceil(((new Date()-new Date(new Date().getFullYear(),0,1))/86400000+new Date(new Date().getFullYear(),0,1).getDay()+1)/7)%6;
+  const pools=[
+    [{t:'🤖 GPT-4o Vision for Work',d:'Use AI image reading to extract data from receipts, charts, and documents automatically.',n:true},
+     {t:'📊 AI Data Analysis with Claude',d:'Turn raw CSV into insights using prompts only — no coding required.',n:true},
+     {t:'🏙️ Generative AI for Local Businesses',d:'Create ads, menus, and promotions in Tamil & English using free AI tools.',n:false},
+     {t:'🔍 Perplexity for Deep Research',d:'Replace Google for research — get cited answers with sources in seconds.',n:false}],
+    [{t:'🎙️ ElevenLabs Voice AI — Free Tier',d:'Convert your lesson notes or scripts into professional voiceovers for reels and ads.',n:true},
+     {t:'🖼️ Canva AI Magic Studio',d:'Generate social media graphics, logos, and presentations with one text prompt.',n:true},
+     {t:'📱 WhatsApp AI Automation',d:'Use AI to write broadcast messages, quick replies, and catalog descriptions.',n:false},
+     {t:'📈 AI for Google Ads & Meta Ads',d:'Write converting ad copy for any budget using ChatGPT prompts.',n:false}],
+    [{t:'🧠 NotebookLM by Google — Free',d:'Upload any PDF or notes and have AI answer questions about it like a tutor.',n:true},
+     {t:'⚡ Claude Projects for Study',d:'Create a persistent AI assistant trained on your course material — free.',n:true},
+     {t:'🎯 AI for UPSC & TNPSC Prep',d:'Generate practice questions, topic summaries, and current affairs briefs instantly.',n:false},
+     {t:'💬 AI-Powered LinkedIn DMs',d:'Write personalised recruiter outreach messages that get replies using AI.',n:false}],
+    [{t:'🔥 Sora Video AI — What You Need to Know',d:'OpenAI\'s video generation tool is now accessible — here\'s how to use it for business.',n:true},
+     {t:'🛒 AI for Meesho & Flipkart Sellers',d:'Write product listings, SEO titles, and reply to reviews automatically with AI.',n:true},
+     {t:'📚 AI Study Partner — Gemini Advanced',d:'Upload your entire syllabus and ask Gemini to quiz you on any chapter.',n:false},
+     {t:'🏆 Interview Prep with AI Role Play',d:'Practice HR, technical, and managerial rounds with AI that gives harsh honest feedback.',n:false}],
+    [{t:'🤝 AI for Client Onboarding',d:'Automate welcome emails, onboarding checklists, and first-meeting agendas with AI.',n:true},
+     {t:'📦 AI Product Description Generator',d:'Write 10 product descriptions in 10 minutes — for any platform or marketplace.',n:true},
+     {t:'🎓 AI for Competitive Exam MCQs',d:'Generate 50 practice MCQs on any topic with explanations in under 2 minutes.',n:false},
+     {t:'💡 Perplexity Deep Research Mode',d:'Get fully cited, 2000-word research reports on any topic — completely free.',n:false}],
+    [{t:'📲 AI for Instagram Reels Scripts',d:'Write engaging 30-second reel scripts for any topic or product using one prompt.',n:true},
+     {t:'🗓️ AI Weekly Planner for Students',d:'Generate a personalised study plan with daily targets based on your exam date.',n:true},
+     {t:'💼 Resume Gap Explainer with AI',d:'Turn employment gaps into confident interview answers using AI coaching.',n:false},
+     {t:'🌐 AI Translation for Tamil Businesses',d:'Create bilingual Tamil-English content for customers who prefer Tamil communication.',n:false}]
+  ];
+  return pools[wk]||pools[0];
+})();
+
+function openProfile(){
+  if(!user){openAuth('login');return;}
+  document.getElementById('profileOverlay').classList.add('show');
+  renderProfileContent();
+  genProfilePrompt();
+  renderNewModuleFeed();
+}
+
+function renderProfileContent(){
+  const av=document.getElementById('profAvatar');
+  if(av){av.innerHTML=userPhotoSrc?'<img src="'+userPhotoSrc+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">':'\u{1F464}';}
+  document.getElementById('profName').textContent=user.name||'-';
+  document.getElementById('profEmail').textContent=user.email||'-';
+  document.getElementById('profEditName').value=user.name||'';
+  document.getElementById('profEditEmail').value=user.email||'';
+  const owned=purchases.filter(p=>CATS_INFO[p]);
+  const badge=document.getElementById('profBadge');
+  badge.innerHTML=owned.length>0?'\u2705 '+owned.map(p=>CATS_INFO[p].icon+' '+CATS_INFO[p].label).join(' \u00B7 ')+' Access':'\u{1F393} Free Member';
+
+  // courses grid
+  let g='';
+  ['student','business','unemployed'].forEach(cat=>{
+    const info=CATS_INFO[cat];
+    const has=purchases.includes(cat);
+    const total=CATS_TOTAL[cat]||12;
+    const done=Object.keys(completed).filter(k=>k.startsWith(cat+'_')).length;
+    g+='<div class="cs-card'+(has?' owned':'')+'">'+
+      '<div style="font-size:1.2rem">'+info.icon+'</div>'+
+      '<div class="cs-num">'+done+'<span style="font-size:.8rem;font-weight:400">/'+total+'</span></div>'+
+      '<div class="cs-lbl">'+info.label+'</div>'+
+      (has?'<div class="cs-badge">\u2713 Unlocked</div>':'<div style="font-size:.58rem;color:var(--gray2);margin-top:4px">Free M1</div>')+
+    '</div>';
+  });
+  document.getElementById('profCourseGrid').innerHTML=g;
+
+  // progress bars
+  let pr='';
+  ['student','business','unemployed'].forEach(cat=>{
+    const info=CATS_INFO[cat];
+    const total=CATS_TOTAL[cat]||12;
+    const done=Object.keys(completed).filter(k=>k.startsWith(cat+'_')).length;
+    const pct=Math.round((done/total)*100);
+    pr+='<div class="lp-row">'+
+      '<span class="lp-label">'+info.icon+' '+info.label+'</span>'+
+      '<div class="lp-bar-wrap"><div class="lp-bar" style="width:'+pct+'%"></div></div>'+
+      '<span class="lp-count">'+done+'/'+total+'</span>'+
+    '</div>';
+  });
+  document.getElementById('profLessonProg').innerHTML=pr;
+}
+
+function saveProfileDetails(){
+  const n=document.getElementById('profEditName').value.trim();
+  if(!n){toast('Name cannot be empty','err');return;}
+  user.name=n;
+  const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
+  const i=stored.findIndex(u=>u.email===user.email);
+  if(i>-1){stored[i].name=n;localStorage.setItem('ak_users',JSON.stringify(stored));}
+  localStorage.setItem('ak_user',JSON.stringify(user));
+  document.getElementById('navName').textContent=n.split(' ')[0];
+  document.getElementById('profName').textContent=n;
+  toast('Profile updated! \u2705','ok');
+}
+
+let profPromptCache='';
+async function genProfilePrompt(){
+  const box=document.getElementById('profPromptText');
+  const ttl=document.getElementById('profPromptTitle');
+  if(!box||!ttl)return;
+  box.textContent='\u23F3 Generating a prompt just for you\u2026';
+  const owned=purchases.filter(p=>CATS_INFO[p]);
+  const role=owned.length>0?owned.map(p=>CATS_INFO[p].label).join(' & '):'AI learner';
+  const done=Object.keys(completed).length;
+  const streak=parseInt(localStorage.getItem('ak_streak')||'0');
+  ttl.textContent='AI Prompt \u2014 Made for '+(user.name||'You');
+  try{
+    const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:'Generate 1 practical ready-to-use AI prompt for a '+role+' in India who has completed '+done+' lessons with a '+streak+'-day streak. Under 60 words, specific, actionable. Return ONLY the prompt text, no quotes or labels.'}]}],generationConfig:{temperature:0.85,maxOutputTokens:200}})});
+    if(!r.ok)throw new Error('api');
+    const d=await r.json();
+    profPromptCache=d.candidates[0].content.parts[0].text.trim();
+    box.textContent=profPromptCache;
+  }catch(e){
+    const fb={'Students':'Act as my study coach. I am studying [subject]. Create a 7-day revision plan with 3 AI-powered study techniques per day to help me score above 80%.','Business':'Act as a business strategist for a [type] business in India. Write 5 specific ways I can use AI tools this week to save 2 hours daily.','Job Seekers':'Act as my career coach. I am applying for [role] jobs. Write a tailored 150-word cover letter and 5 likely interview questions with ideal answers.'};
+    const k=Object.keys(fb).find(k=>role.includes(k))||'Students';
+    profPromptCache=fb[k];
+    box.textContent=profPromptCache;
+  }
+}
+
+function copyProfilePrompt(){
+  navigator.clipboard.writeText(document.getElementById('profPromptText').textContent)
+    .then(()=>toast('Prompt copied! \u{1F4CB}','ok'));
+}
+
+function renderNewModuleFeed(){
+  const feed=document.getElementById('profModuleFeed');
+  if(!feed)return;
+  let h='';
+  STATIC_MODULES.forEach(m=>{
+    h+='<div class="aim-card'+(m.n?' aim-new':'')+'">'+
+      '<div class="aim-title">'+m.t+'</div>'+
+      '<div class="aim-desc">'+m.d+'</div>'+
+    '</div>';
+  });
+  feed.innerHTML=h;
+  // Live AI trend module
+  fetchTrendModule(feed);
+}
+
+async function fetchTrendModule(feed){
+  try{
+    const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:'What is the single most important new AI tool or trend in 2025 in India right now for students, job seekers, or business owners? Return ONLY valid JSON (no markdown): {"title":"emoji + module title under 8 words","desc":"one sentence under 25 words"}'}]}],generationConfig:{temperature:0.7,maxOutputTokens:120}})});
+    if(!r.ok)return;
+    const d=await r.json();
+    const raw=d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
+    const p=JSON.parse(raw);
+    if(p.title&&p.desc){
+      const card=document.createElement('div');
+      card.className='aim-card aim-new';
+      card.innerHTML='<div style="font-size:.52rem;font-weight:800;color:var(--aqua);margin-bottom:4px;">AI GENERATED \u00B7 JUST NOW</div><div class="aim-title">'+p.title+'</div><div class="aim-desc">'+p.desc+'</div>';
+      feed.insertBefore(card,feed.firstChild);
+    }
+  }catch(e){}
+}
+
+/* ══ HOMEPAGE WEEKLY TIPS ══ */
+function initHomeWeeklyTips(){
+  const grid=document.getElementById('homeWeeklyGrid');
+  const loader=document.getElementById('homeWeeklyLoading');
+  if(!grid) return;
+
+  const weekNum=getWeekNumber();
+  const w=weekNum%8;
+
+  const homeTips=[
+    {cat:'student',icon:'🎓',label:'For Students',
+     tip:'Generate personalised study notes: Paste any paragraph → "Summarise in 5 bullet points and give me 3 likely exam questions."',
+     prompt:'Summarise this for my exam: <em>[paste notes/text]</em>. Give me: 5 bullet points I can memorise, 3 likely exam questions with model answers.',
+     india:'Used by JEE & NEET aspirants across Tamil Nadu to compress 10-page chapters into 1-page revision sheets overnight.'},
+    {cat:'business',icon:'💼',label:'For Business',
+     tip:'Write a week\'s worth of WhatsApp broadcast messages in 10 minutes using a single prompt.',
+     prompt:'I run a <em>[business type]</em>. Write 5 WhatsApp broadcast messages for this week — Monday to Friday. Mix offers, tips, and engagement. Each under 60 words.',
+     india:'Shops and services in Coimbatore using weekly AI-broadcast messages report 3x more repeat customer visits compared to those who don\'t communicate regularly.'},
+    {cat:'unemployed',icon:'🚀',label:'For Job Seekers',
+     tip:'Run a free 10-minute mock interview with ChatGPT right now — the most underused job search tool in India.',
+     prompt:'Act as a strict but fair interviewer for a <em>[job title]</em>. Ask me one question at a time. After each answer: what was strong, what was weak, and give a model answer. Start with "Tell me about yourself."',
+     india:'Freshers at Wipro, Cognizant & HCL drives who practice 3 mock interviews before the real one get offers at 2x the rate of those who don\'t.'}
+  ];
+
+  // Rotate the tip text based on week for freshness
+  const weeklyVariants=[
+    ['Batch your Instagram captions for the entire week in one Sunday session.','Use AI to practise salary negotiation before your next offer.','Ask AI to list the top 10 keywords from any job description.'],
+    ['Use AI to turn your WhatsApp testimonials into professional case studies.','AI can write your Google Business profile description to rank better.','Use Jobscan to score your resume match for each application.'],
+    ['Ask AI to explain any concept "like I am 15" for instant clarity.','Generate 10 customer FAQ answers for your website in 20 minutes.','Use STAR format for every behavioral interview answer — AI can help.'],
+    ['Create AI flashcards from textbook paragraphs — 10 at a time.','AI can draft your first vendor negotiation message professionally.','Ask AI to write your post-interview thank you email within 24 hours.'],
+    ['Use Gemini to summarise YouTube lectures you missed.','Create a 30-day content calendar for any platform in one session.','Use AI to research the company before every single interview.'],
+    ['Build your personal brand: post once a week using AI captions.','AI can generate 5 versions of your elevator pitch for different audiences.','Convert any project into a powerful STAR-format interview story with AI.'],
+    ['Ask AI to predict your exam questions from your syllabus.','Write your first SOP for your most repeated business task — free your time.','AI can identify your transferable skills from any previous experience.'],
+    ['Use AI to write your LinkedIn About section — most profiles are weak.','Create a referral program script — word-of-mouth is the most profitable channel.','Practice "Why should we hire you?" until your answer is genuinely impressive.']
+  ];
+
+  const varRow=weeklyVariants[w]||weeklyVariants[0];
+  let html='';
+  homeTips.forEach((item,i)=>{
+    const altTip=varRow[i]||item.tip;
+    html+=`<div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;transition:all .2s;" onmouseenter="this.style.borderColor='var(--aqua)';this.style.boxShadow='var(--aqua-glow)'" onmouseleave="this.style.borderColor='var(--border)';this.style.boxShadow='none'">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:var(--aqua-dim);display:flex;align-items:center;justify-content:center;font-size:1rem;">${item.icon}</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;color:var(--white);">${item.label}</div>
+        </div>
+        <span style="font-size:.55rem;font-weight:800;padding:2px 7px;border-radius:100px;background:var(--aqua);color:#fff;">WEEK ${weekNum}</span>
+      </div>
+      <div style="font-size:.76rem;color:var(--gray1);line-height:1.7;">${altTip}</div>
+      <div style="background:var(--bg-main);border:1px solid var(--border);border-radius:9px;padding:11px 13px;">
+        <div style="font-size:.58rem;font-weight:800;color:var(--aqua);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;">
+          ⚡ Try This Prompt
+          <button onclick="navigator.clipboard.writeText(this.closest('div').nextElementSibling.innerText).then(()=>toast('Copied! 📋','ok'))" style="padding:2px 8px;border-radius:5px;background:var(--aqua-dim);border:1px solid rgba(220,20,60,0.2);color:var(--aqua);font-size:.55rem;font-weight:700;cursor:pointer;">Copy</button>
+        </div>
+        <div style="font-size:.74rem;color:var(--gray1);line-height:1.65;">${item.prompt}</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(255,153,0,0.06),rgba(19,136,8,0.04));border:1px solid rgba(255,153,0,0.2);border-radius:8px;padding:9px 11px;">
+        <div style="font-size:.55rem;font-weight:800;color:#b8600a;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">🇮🇳 India Context</div>
+        <div style="font-size:.72rem;color:var(--gray1);line-height:1.65;">${item.india}</div>
+      </div>
+    </div>`;
+  });
+  grid.innerHTML=html;
+  if(loader) loader.style.display='none';
+
+  // Try to inject a live AI tip as a 4th card
+  fetchHomeLiveWeeklyTip(grid, weekNum);
+}
+
+async function fetchHomeLiveWeeklyTip(grid, weekNum){
+  const cacheKey=`ak_home_weekly_w${weekNum}`;
+  const cached=localStorage.getItem(cacheKey);
+  if(cached){
+    try{ appendHomeLiveTip(grid, JSON.parse(cached)); return; }catch(e){}
+  }
+  try{
+    const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:`Generate a fresh AI tip for an Indian learner for week ${weekNum} of ${new Date().getFullYear()}. It should be practical and usable today. Return ONLY valid JSON: {"headline":"emoji + title under 8 words","tip":"one actionable sentence under 30 words","prompt":"ready-to-use ChatGPT prompt under 40 words with [placeholders]","india_note":"India-specific context under 20 words"}`}]}],generationConfig:{temperature:0.9,maxOutputTokens:220}})});
+    if(!r.ok) return;
+    const d=await r.json();
+    const raw=d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
+    const p=JSON.parse(raw);
+    if(p.headline&&p.tip){
+      localStorage.setItem(cacheKey, JSON.stringify(p));
+      appendHomeLiveTip(grid, p);
+    }
+  }catch(e){}
+}
+
+function appendHomeLiveTip(grid, p){
+  const card=document.createElement('div');
+  card.style.cssText='background:linear-gradient(135deg,rgba(220,20,60,0.05),#fff);border:1.5px solid rgba(220,20,60,0.3);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;';
+  card.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;">
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;color:var(--white);">${p.headline||'🤖 AI Tip'}</div>
+    <span style="font-size:.52rem;font-weight:800;padding:2px 8px;border-radius:100px;background:var(--aqua);color:#fff;">AI LIVE</span>
+  </div>
+  <div style="font-size:.76rem;color:var(--gray1);line-height:1.7;">${p.tip}</div>
+  ${p.prompt?`<div style="background:var(--bg-main);border:1px solid var(--border);border-radius:9px;padding:11px 13px;">
+    <div style="font-size:.58rem;font-weight:800;color:var(--aqua);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;">⚡ This Week's Live Prompt</div>
+    <div style="font-size:.74rem;color:var(--gray1);line-height:1.65;">${p.prompt}</div>
+  </div>`:''}
+  ${p.india_note?`<div style="font-size:.68rem;color:#b8600a;background:rgba(255,153,0,0.07);border-radius:7px;padding:7px 10px;">🇮🇳 ${p.india_note}</div>`:''}`;
+  grid.appendChild(card);
+}
+
+/* ── Auto-init homepage weekly tips on page load ── */
+document.addEventListener('DOMContentLoaded', ()=>{ initHomeWeeklyTips(); });
 </script>
 </body>
 </html>
