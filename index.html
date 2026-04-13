@@ -1728,7 +1728,9 @@ function pick(cat){
   document.getElementById('bcCat').textContent=C.label;
   document.getElementById('phIcon').textContent=C.icon;
   document.getElementById('phTitle').textContent='AI for '+C.label;
-  document.getElementById('phSub').textContent='4 Modules · 12 Lessons · Voice Guided';
+  const merged = getMergedModules(cat);
+  const totalLessons = merged.reduce((s, m) => s + m.lessons.length, 0);
+  document.getElementById('phSub').textContent=`${merged.length} Modules · ${totalLessons} Lessons · Voice Guided`;
   const hasAcc=purchases.includes(cat);
   document.getElementById('phAcc').innerHTML=hasAcc?
     `<div style="display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--aqua);font-weight:700;">✓ Full Access</div>`:
@@ -1784,6 +1786,8 @@ function toggleMod(mi){
 }
 
 function openLesson(mi,li){
+  // Redirect to merged version which handles both base + weekly lessons
+  if(typeof openLessonMerged === 'function'){ openLessonMerged(mi,li); return; }
   curMod=mi; curLes=li;
   const cat=curCat, les=MODULES[cat][mi].lessons[li];
   const isFree=mi===0, hasAcc=purchases.includes(cat), canAccess=isFree||hasAcc;
@@ -2932,7 +2936,315 @@ function appendHomeLiveTip(grid, p){
 }
 
 /* ── Auto-init homepage weekly tips on page load ── */
-document.addEventListener('DOMContentLoaded', ()=>{ initHomeWeeklyTips(); });
+document.addEventListener('DOMContentLoaded', ()=>{ initHomeWeeklyTips(); initWeeklyLessonDrip(); });
+
+/* ══════════════════════════════════════════════
+   WEEKLY LESSON DRIP SYSTEM
+   — Every week, 1 new AI-generated lesson adds to each category
+   — Every time a module gets 3 extra lessons (6 total), auto-splits into new module
+══════════════════════════════════════════════ */
+
+/* Site launch date — stored on first visit, never changes */
+function getSiteLaunchDate(){
+  let d = localStorage.getItem('ak_launch_date');
+  if(!d){
+    d = new Date().toISOString().split('T')[0];
+    localStorage.setItem('ak_launch_date', d);
+  }
+  return new Date(d);
+}
+
+/* How many full weeks since launch (week 0 = first week, no new lesson yet) */
+function getWeeksSinceLaunch(){
+  const launch = getSiteLaunchDate();
+  const now = new Date();
+  const diffMs = now - launch;
+  return Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000));
+}
+
+/* Get stored weekly lessons for a category */
+function getWeeklyLessons(cat){
+  try{ return JSON.parse(localStorage.getItem(`ak_wdrip_${cat}`) || '[]'); }catch(e){ return []; }
+}
+function saveWeeklyLessons(cat, arr){
+  localStorage.setItem(`ak_wdrip_${cat}`, JSON.stringify(arr));
+}
+
+/* Merge base MODULES with weekly drip lessons, auto-splitting into new modules every 3 extra */
+function getMergedModules(cat){
+  const base = MODULES[cat].map(mod => ({
+    title: mod.title,
+    lessons: [...mod.lessons]
+  }));
+  const weekly = getWeeklyLessons(cat);
+  if(!weekly.length) return base;
+
+  // Append weekly lessons to last base module, then split when >= 6
+  weekly.forEach(wl => {
+    const lastMod = base[base.length - 1];
+    if(lastMod.lessons.length >= 6){
+      // Split: move last 3 into new module
+      const extras = lastMod.lessons.splice(3);
+      const newModNum = base.length + 1;
+      base.push({
+        title: `Module ${newModNum} — ${wl.moduleTitle || 'Advanced AI Skills'}`,
+        lessons: extras
+      });
+    }
+    base[base.length - 1].lessons.push(wl);
+  });
+
+  return base;
+}
+
+/* Override getLessonList to use merged modules */
+const _origGetLessonList = getLessonList;
+function getLessonList(){
+  if(!curCat) return [];
+  const merged = getMergedModules(curCat);
+  const list = [];
+  merged.forEach((mod, mi) => mod.lessons.forEach((_, li) => list.push({mi, li})));
+  return list;
+}
+
+/* Override renderMods to use merged modules */
+const _origRenderMods = renderMods;
+function renderMods(){
+  const cat = curCat;
+  const mods = getMergedModules(cat);
+  const hasAcc = purchases.includes(cat);
+  const weeklyCount = getWeeklyLessons(cat).length;
+
+  let html = '<div class="mod-grid">';
+  mods.forEach((mod, mi) => {
+    const isOpen = mi === 0;
+    const isFree = mi === 0;
+    html += `<div class="mod-block ${isOpen?'open':''}" id="modBlock${mi}">
+      <div class="mod-header" onclick="toggleMod(${mi})">
+        <div>
+          <div class="mod-title">${mod.title}</div>
+          <div class="mod-info">${mod.lessons.length} lessons ${isFree ? '· Module 1 Free' : '· Requires Purchase'}${mi >= 4 ? ' · <span style="color:var(--aqua);font-weight:700;">NEW</span>' : ''}</div>
+        </div>
+        <div class="mod-toggle">${isOpen ? '−' : '+'}</div>
+      </div>
+      <div class="mod-lessons">`;
+    mod.lessons.forEach((les, li) => {
+      const doneKey = `${cat}_${mi}_${li}`;
+      const isDone = completed[doneKey];
+      const canAccess = isFree || hasAcc;
+      const isWeeklyNew = les._weekly === true;
+      html += `<div class="lesson-row ${isDone?'done':''}" onclick="openLessonMerged(${mi},${li})" id="lesRow${mi}_${li}">
+        <div class="lesson-num">${isDone ? '✓' : li + 1}</div>
+        <div class="lesson-title">${les.icon || '📘'} ${les.title}${isWeeklyNew ? ' <span style="font-size:.52rem;font-weight:800;padding:1px 5px;border-radius:100px;background:var(--aqua);color:#fff;margin-left:4px;">NEW</span>' : ''}</div>
+        <div class="lesson-lock ${canAccess?'free':''}">${isFree ? '<span style="color:var(--aqua);font-size:.6rem;font-weight:800;">FREE</span>' : (hasAcc ? '<span style="color:var(--aqua);font-size:.6rem;font-weight:800;">✓</span>' : '<span style="font-size:.75rem;">🔒</span>')}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  html += '</div>';
+
+  // Weekly drip status bar
+  const weeksLeft = getWeeksSinceLaunch();
+  html += `<div style="margin-top:16px;padding:14px 16px;background:linear-gradient(135deg,rgba(220,20,60,0.06),#fff);border:1px solid rgba(220,20,60,0.2);border-radius:12px;display:flex;align-items:center;gap:12px;">
+    <div style="font-size:1.2rem;">📅</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.76rem;color:var(--white);">Weekly New Lessons</div>
+      <div style="font-size:.68rem;color:var(--gray1);margin-top:2px;">${weeklyCount} new lesson${weeklyCount !== 1 ? 's' : ''} added so far · New lesson every Monday</div>
+    </div>
+    <span style="margin-left:auto;font-size:.6rem;font-weight:800;padding:3px 9px;border-radius:100px;background:var(--aqua);color:#fff;">Week ${weeksLeft + 1}</span>
+  </div>`;
+
+  html += '<div id="lessonPanel"></div>';
+  document.getElementById('tab-modules').innerHTML = html;
+}
+
+/* Open lesson using merged module data */
+function openLessonMerged(mi, li){
+  curMod = mi; curLes = li;
+  const cat = curCat;
+  const mods = getMergedModules(cat);
+  const les = mods[mi].lessons[li];
+  const isFree = mi === 0, hasAcc = purchases.includes(cat), canAccess = isFree || hasAcc;
+
+  document.querySelectorAll('.lesson-row').forEach(r => r.classList.remove('active'));
+  const row = document.getElementById(`lesRow${mi}_${li}`);
+  if(row) row.classList.add('active');
+
+  const doneKey = `${cat}_${mi}_${li}`;
+  const quizId = `${cat}${mi}${li}`;
+  const qd = les.quiz;
+
+  let panel = `<div class="lesson-panel">
+    <div class="lp-header">
+      <div class="lp-title">${les.icon || '📘'} ${les.title}</div>`;
+  if(canAccess){
+    panel += `<button onclick="markDone('${doneKey}',${mi},${li})" style="padding:6px 14px;border-radius:6px;background:var(--aqua-dim);border:1px solid rgba(0,212,200,0.3);color:var(--aqua);font-size:.7rem;font-weight:700;">Mark Complete ✓</button>`;
+  }
+  panel += `</div>`;
+
+  if(canAccess){
+    panel += `<div class="voice-bar">
+      <button class="v-play" id="vP${mi}${li}" onclick="startVoiceMerged(${mi},${li})">🎙️ Play Lesson</button>
+      <button class="v-stop" id="vS${mi}${li}" onclick="stopVoice(${mi},${li})">⏹ Stop</button>
+      <div class="v-prog-wrap"><div class="v-prog" id="vf${mi}${li}"></div></div>
+      <select class="v-speed" id="vSp${mi}${li}"><option value="0.75">0.75x</option><option value="0.88" selected>0.88x</option><option value="1">1x</option><option value="1.25">1.25x</option></select>
+    </div>
+    <div class="lesson-content"><div id="vs${mi}${li}">${les.content || '<div class="lc-body">'+les.title+'</div>'}</div></div>`;
+    if(qd){
+      panel += `<div class="quiz-wrap">
+        <div class="quiz-q">🎯 Quick Check: ${qd.q}</div>
+        <div class="quiz-opts">
+          ${qd.opts.map((o,i) => `<button class="quiz-opt" onclick="ansQ('${quizId}',${i},${qd.ans},'${(qd.exp||'').replace(/'/g,"\\'")}',this)">${o}</button>`).join('')}
+        </div>
+        <div class="quiz-fb ok" id="${quizId}-ok">✅ ${qd.exp}</div>
+        <div class="quiz-fb no" id="${quizId}-no">❌ Not quite. ${qd.exp}</div>
+      </div>`;
+    }
+  } else {
+    panel += `<div style="text-align:center;padding:40px 20px;">
+      <div style="font-size:2.5rem;margin-bottom:14px;">🔒</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--white);margin-bottom:8px;">Unlock Full Access</div>
+      <div style="font-size:.78rem;color:var(--gray1);margin-bottom:20px;">This lesson is part of Modules 2+. Get full access for ${CATS[cat].new} — lifetime, no subscription.</div>
+      <button class="nb nb-p" style="padding:13px 28px;font-size:.85rem;" onclick="openPayModal()">Get Full Access — ${CATS[cat].new} →</button>
+    </div>`;
+  }
+
+  // Prev / Next
+  const _list = getLessonList();
+  const _cur = _list.findIndex(x => x.mi === mi && x.li === li);
+  const _total = _list.length;
+  const hasPrev = _cur > 0, hasNext = _cur < _total - 1;
+  panel += `<div class="lesson-nav-bar">
+    <button class="ln-btn" onclick="goLesson(-1)" ${!hasPrev?'disabled':''}>&#8592; Previous</button>
+    <div class="ln-progress">Lesson ${_cur+1} of ${_total}</div>
+    <button class="ln-btn primary" onclick="goLesson(1)" ${!hasNext?'disabled':''}>Next &#8594;</button>
+  </div>`;
+
+  if(canAccess){
+    const weekNum = getWeekNumber();
+    panel += `<div class="weekly-widget" id="weeklyWidget${mi}${li}">
+      <div class="weekly-widget-head">
+        <div class="weekly-widget-title">🗓️ This Week's Fresh Content</div>
+        <span class="weekly-week-badge">Week ${weekNum}</span>
+      </div>
+      <div class="weekly-widget-body" id="weeklyBody${mi}${li}">
+        <div class="weekly-ai-loading"><div class="dots"><span></span><span></span><span></span></div> Generating weekly tips just for you…</div>
+      </div>
+    </div>`;
+  }
+  panel += `</div>`;
+  document.getElementById('lessonPanel').innerHTML = panel;
+  document.getElementById('lessonPanel').scrollIntoView({behavior:'smooth', block:'start'});
+  if(canAccess) loadWeeklyContent(mi, li, cat);
+}
+
+/* Voice for merged lesson */
+function startVoiceMerged(mi, li){
+  const mods = getMergedModules(curCat);
+  const les = mods[mi].lessons[li];
+  if(!synth || !les.voice) return;
+  stopVoice();
+  vWords = les.voice.split(' ');
+  vIdx = 0;
+  const speed = parseFloat(document.getElementById(`vSp${mi}${li}`)?.value || '0.88');
+  const prog = document.getElementById(`vf${mi}${li}`);
+  function speakNext(){
+    if(vIdx >= vWords.length){ if(prog) prog.style.width='100%'; return; }
+    const utt = new SpeechSynthesisUtterance(vWords.slice(vIdx, vIdx+8).join(' '));
+    utt.rate = speed; utt.lang = 'en-IN';
+    utt.onend = () => { vIdx += 8; if(prog) prog.style.width = Math.min(100,(vIdx/vWords.length*100))+'%'; speakNext(); };
+    synth.speak(utt);
+  }
+  speakNext();
+}
+
+/* goLesson now works with merged modules */
+function goLesson(offset){
+  const list = getLessonList();
+  const cur = list.findIndex(x => x.mi === curMod && x.li === curLes);
+  const next = cur + offset;
+  if(next < 0 || next >= list.length) return;
+  const {mi, li} = list[next];
+  const modBlock = document.getElementById('modBlock' + mi);
+  if(modBlock && !modBlock.classList.contains('open')) toggleMod(mi);
+  openLessonMerged(mi, li);
+}
+
+/* ── Init drip: generate weekly lessons if not yet stored ── */
+async function initWeeklyLessonDrip(){
+  const weeks = getWeeksSinceLaunch();
+  if(weeks < 1) return; // First week — no extra lessons yet
+
+  for(const cat of ['student','business','unemployed']){
+    const stored = getWeeklyLessons(cat);
+    const needed = weeks; // 1 lesson per week since launch
+    if(stored.length >= needed) continue; // Already up to date
+
+    // Generate missing lessons
+    for(let w = stored.length; w < needed; w++){
+      const lesson = await generateWeeklyLesson(cat, w + 1);
+      if(lesson){
+        stored.push(lesson);
+        saveWeeklyLessons(cat, stored);
+      }
+    }
+  }
+}
+
+/* Generate a new weekly lesson via Gemini */
+async function generateWeeklyLesson(cat, weekNum){
+  // Check cache first
+  const cacheKey = `ak_wdrip_lesson_${cat}_w${weekNum}`;
+  const cached = localStorage.getItem(cacheKey);
+  if(cached){ try{ return JSON.parse(cached); }catch(e){} }
+
+  const catLabel = cat === 'student' ? 'students' : cat === 'business' ? 'small business owners' : 'job seekers';
+  const moduleTopics = {
+    student: ['AI productivity hacks','prompt engineering for study','AI for career preparation','AI creativity tools','advanced AI workflows'],
+    business: ['AI for sales & growth','AI customer engagement','AI for finance & accounting','AI automation deep dive','AI for hiring & HR'],
+    unemployed: ['AI networking strategies','AI for freelancing','AI skill building','AI portfolio creation','AI salary negotiation']
+  };
+  const topicPool = moduleTopics[cat] || moduleTopics.student;
+  const topic = topicPool[(weekNum - 1) % topicPool.length];
+  const moduleNum = Math.floor((weekNum - 1) / 3) + 5; // Week 1-3 → Module 5, Week 4-6 → Module 6, etc.
+
+  try{
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY;
+    const prompt = `Create a complete AI learning lesson for Indian ${catLabel} about "${topic}" (Week ${weekNum} of the course). Return ONLY valid JSON (no markdown): {
+  "title": "lesson title under 8 words",
+  "icon": "one relevant emoji",
+  "moduleTitle": "module name for grouping these lessons (under 5 words, topic-based)",
+  "voice": "2-paragraph spoken lesson script (150-180 words total, conversational, by Pooja the AI coach, India context)",
+  "content": "HTML lesson content using these classes: lc-title, lc-body, example-box with ex-label/ex-text, tip-card, india-example with india-example-label/india-example-text, do-now-box with do-now-label/do-now-text. Include a practical prompt template.",
+  "quiz": {"q": "question", "opts": ["option1","option2","option3"], "ans": 0, "exp": "explanation under 20 words"}
+}`;
+    const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.8, maxOutputTokens:800}})});
+    if(!r.ok) return null;
+    const d = await r.json();
+    const raw = d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
+    const p = JSON.parse(raw);
+    if(p.title && p.content){
+      p._weekly = true;
+      p._week = weekNum;
+      p.free = false;
+      localStorage.setItem(cacheKey, JSON.stringify(p));
+      return p;
+    }
+  }catch(e){ console.error('Weekly lesson gen error:', e); }
+  return null;
+}
+
+/* ── Admin helper: simulate weeks passing (for testing) ── */
+/* Call simulateWeeks(3) in console to test 3 weeks ahead */
+window.simulateWeeks = function(n){
+  const launch = new Date();
+  launch.setDate(launch.getDate() - n * 7);
+  localStorage.setItem('ak_launch_date', launch.toISOString().split('T')[0]);
+  // Clear stored lessons to regenerate
+  ['student','business','unemployed'].forEach(cat => localStorage.removeItem(`ak_wdrip_${cat}`));
+  toast(`Simulated ${n} week${n>1?'s':''} ahead. Reload to see new lessons.`, 'ok');
+};
 </script>
 </body>
 </html>
