@@ -5,6 +5,66 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Katrukko — Your AI Learning Buddy</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<!-- ══ FIREBASE SDK ══ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ══════════════════════════════════════════════
+  // ⚠️  REPLACE THESE WITH YOUR FIREBASE PROJECT VALUES
+  // Go to: console.firebase.google.com → Your Project → Project Settings → Web App
+  // ══════════════════════════════════════════════
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // ── Expose to global scope ──
+  window._fbAuth = auth;
+  window._fbDb = db;
+  window._fbCreateUser = createUserWithEmailAndPassword;
+  window._fbSignIn = signInWithEmailAndPassword;
+  window._fbSignOut = signOut;
+  window._fbOnAuth = onAuthStateChanged;
+  window._fbUpdateProfile = updateProfile;
+  window._fbDoc = doc;
+  window._fbSetDoc = setDoc;
+  window._fbGetDoc = getDoc;
+  window._fbUpdateDoc = updateDoc;
+
+  // ── Listen for auth state changes ──
+  onAuthStateChanged(auth, async (fbUser) => {
+    if (fbUser) {
+      // User logged in — fetch their data from Firestore
+      try {
+        const snap = await getDoc(doc(db, 'users', fbUser.uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          window._fbCurrentUser = { name: data.name, email: fbUser.email, uid: fbUser.uid };
+          window._fbCurrentPurch = data.purchases || [];
+        } else {
+          window._fbCurrentUser = { name: fbUser.displayName || fbUser.email.split('@')[0], email: fbUser.email, uid: fbUser.uid };
+          window._fbCurrentPurch = [];
+        }
+        // Trigger UI update if app is ready
+        if (typeof window._fbAuthReady === 'function') window._fbAuthReady(window._fbCurrentUser, window._fbCurrentPurch);
+      } catch(e) { console.error('Firestore fetch error:', e); }
+    } else {
+      window._fbCurrentUser = null;
+      window._fbCurrentPurch = [];
+      if (typeof window._fbAuthReady === 'function') window._fbAuthReady(null, []);
+    }
+  });
+</script>
 <style>
 /* ══════════════════════════════════════════════
    PALETTE: Black · White · Aqua Blue ONLY
@@ -865,6 +925,94 @@ footer{
 </head>
 <body>
 
+<!-- ══ UPGRADE BANNER (shown after login) ══ -->
+<div id="upgradeBanner" style="display:none;background:linear-gradient(90deg,#0f172a,#0e7490,#0f172a);background-size:200% 100%;animation:bannerShift 4s linear infinite;overflow:hidden;position:relative;z-index:999;">
+  <div style="display:flex;align-items:center;white-space:nowrap;animation:bannerScroll 22s linear infinite;padding:10px 0;gap:0;">
+    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; 5000+ VIP Prompts &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
+    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; 5000+ VIP Prompts &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
+    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; 5000+ VIP Prompts &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
+  </div>
+</div>
+<style>
+@keyframes bannerScroll{0%{transform:translateX(0)}100%{transform:translateX(-33.333%)}}
+@keyframes bannerShift{0%{background-position:0% 0}100%{background-position:200% 0}}
+</style>
+
+<!-- ══ PRICING POPUP OVERLAY ══ -->
+<div id="pricingPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;padding:16px;" onclick="closePricingPopup(event)">
+  <div style="background:#fff;border-radius:20px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:32px 24px;position:relative;" onclick="event.stopPropagation()">
+    <button onclick="closePricingPopup()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#64748b;">✕</button>
+    <div style="text-align:center;margin-bottom:8px;font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--aqua);text-transform:uppercase;">🔒 Unlock This Feature</div>
+    <h2 style="text-align:center;font-size:1.2rem;font-weight:800;color:#1a202c;margin-bottom:4px;">Master Prompt Library</h2>
+    <p style="text-align:center;font-size:.78rem;color:#64748b;margin-bottom:24px;">Choose a plan to get instant access to 1000+ or 5000+ curated AI prompts.</p>
+
+    <!-- 3 plan mini-cards -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
+
+      <!-- Starter -->
+      <div style="border:1.5px solid #e2e8f0;border-radius:14px;padding:16px 12px;text-align:center;">
+        <div style="font-size:1.4rem;">🌱</div>
+        <div style="font-weight:800;font-size:.85rem;margin:6px 0 2px;">Starter</div>
+        <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Students</div>
+        <div style="font-size:1.2rem;font-weight:900;color:#1a202c;margin-bottom:4px;">₹399</div>
+        <div style="font-size:.62rem;color:#94a3b8;margin-bottom:10px;">Limited Prompts</div>
+        <button onclick="curCat='student';closePricingPopup();openPayModal();" style="width:100%;background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:8px;font-size:.7rem;font-weight:700;cursor:pointer;">Choose →</button>
+      </div>
+
+      <!-- Professional -->
+      <div style="border:2px solid var(--aqua);border-radius:14px;padding:16px 12px;text-align:center;background:linear-gradient(135deg,#f0fdff,#fff);position:relative;">
+        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--aqua);color:#fff;font-size:.58rem;font-weight:800;padding:3px 12px;border-radius:100px;white-space:nowrap;">⭐ BEST SELLER</div>
+        <div style="font-size:1.4rem;">🚀</div>
+        <div style="font-weight:800;font-size:.85rem;margin:6px 0 2px;">Professional</div>
+        <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Job Seekers</div>
+        <div style="font-size:1.2rem;font-weight:900;color:#1a202c;margin-bottom:4px;">₹999</div>
+        <div style="font-size:.62rem;color:#0891b2;font-weight:600;margin-bottom:10px;">1000+ Master Prompts</div>
+        <button onclick="curCat='business';closePricingPopup();openPayModal();" style="width:100%;background:var(--aqua);color:#fff;border:none;border-radius:8px;padding:8px;font-size:.7rem;font-weight:700;cursor:pointer;">Choose →</button>
+      </div>
+
+      <!-- Elite -->
+      <div style="border:1.5px solid #fbbf24;border-radius:14px;padding:16px 12px;text-align:center;background:linear-gradient(135deg,#fffbeb,#fff);">
+        <div style="font-size:1.4rem;">👑</div>
+        <div style="font-weight:800;font-size:.85rem;margin:6px 0 2px;">Elite Mastery</div>
+        <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Entrepreneurs</div>
+        <div style="font-size:1.2rem;font-weight:900;color:#1a202c;margin-bottom:4px;">₹2,499</div>
+        <div style="font-size:.62rem;color:#d97706;font-weight:600;margin-bottom:10px;">5000+ VIP Prompt Bank</div>
+        <button onclick="curCat='unemployed';closePricingPopup();openPayModal();" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:8px;padding:8px;font-size:.7rem;font-weight:700;cursor:pointer;">Choose →</button>
+      </div>
+
+    </div>
+
+    <!-- Comparison table -->
+    <table style="width:100%;border-collapse:collapse;font-size:.7rem;">
+      <tr style="background:#f8fafc;">
+        <td style="padding:8px 12px;color:#64748b;font-weight:600;">Prompt Library</td>
+        <td style="padding:8px;text-align:center;color:#94a3b8;">Limited</td>
+        <td style="padding:8px;text-align:center;color:#0891b2;font-weight:700;">1000+ Prompts</td>
+        <td style="padding:8px;text-align:center;color:#d97706;font-weight:700;">5000+ VIP Bank</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;color:#64748b;font-weight:600;">Community</td>
+        <td style="padding:8px;text-align:center;">❌</td>
+        <td style="padding:8px;text-align:center;">✅ WhatsApp</td>
+        <td style="padding:8px;text-align:center;">✅ VIP Discord</td>
+      </tr>
+      <tr style="background:#f8fafc;">
+        <td style="padding:8px 12px;color:#64748b;font-weight:600;">Certificate</td>
+        <td style="padding:8px;text-align:center;">❌</td>
+        <td style="padding:8px;text-align:center;">✅ Professional</td>
+        <td style="padding:8px;text-align:center;">✅ Gold-Tier</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 12px;color:#64748b;font-weight:600;">Future Courses</td>
+        <td style="padding:8px;text-align:center;">❌</td>
+        <td style="padding:8px;text-align:center;">❌</td>
+        <td style="padding:8px;text-align:center;">✅ Free Forever</td>
+      </tr>
+    </table>
+    <p style="text-align:center;font-size:.65rem;color:#94a3b8;margin-top:16px;">One-time payment · No subscription · Lifetime access</p>
+  </div>
+</div>
+
 <!-- ══ NAV ══ -->
 <nav>
   <div class="logo" onclick="goHome()">
@@ -879,8 +1027,12 @@ footer{
   <div class="nav-r">
     <div class="nav-user" id="navUser">
       <span class="nav-name" id="navName" onclick="openProfile()" style="cursor:pointer;" title="My Profile"></span>
+      <div id="navDeviceBadge" style="display:none;align-items:center;gap:4px;font-size:.6rem;font-weight:700;color:var(--aqua);background:var(--aqua-dim);border:1px solid rgba(220,20,60,.2);border-radius:100px;padding:3px 9px;" title="Session active on this device">
+        <span style="width:5px;height:5px;border-radius:50%;background:var(--aqua);animation:blink 1.8s infinite;display:inline-block;"></span>
+        ACTIVE
+      </div>
       <button class="nb nb-o" onclick="openProfile()" style="padding:6px 10px;font-size:.7rem;">👤 Profile</button>
-      <button class="nb nb-o" onclick="logout()">Logout</button>
+      <button class="nb nb-o" onclick="logout()" title="Logout — you can log back in anytime">Logout</button>
     </div>
     <div id="navAuth" style="display:flex;gap:8px;">
       <button class="nb nb-o" onclick="openAuth('login')">Login</button>
@@ -929,19 +1081,19 @@ footer{
       </div>
       <div class="h-cats">
         <div class="h-cat" onclick="pick('student')">
-          <div class="h-cat-ic">🎓</div>
-          <div class="h-cat-inf"><div class="h-cat-nm">Students</div><div class="h-cat-dc">Study smarter with AI</div></div>
-          <div class="h-cat-pr"><div class="h-cat-nw">₹199</div></div>
+          <div class="h-cat-ic">🌱</div>
+          <div class="h-cat-inf"><div class="h-cat-nm">Starter</div><div class="h-cat-dc">AI basics for beginners</div></div>
+          <div class="h-cat-pr"><div class="h-cat-nw">₹399</div></div>
         </div>
         <div class="h-cat" onclick="pick('business')">
-          <div class="h-cat-ic">💼</div>
-          <div class="h-cat-inf"><div class="h-cat-nm">Business</div><div class="h-cat-dc">Grow with AI</div></div>
-          <div class="h-cat-pr"><div class="h-cat-nw">₹699</div></div>
+          <div class="h-cat-ic">🚀</div>
+          <div class="h-cat-inf"><div class="h-cat-nm">Professional <span style="background:var(--aqua);color:#fff;font-size:.55rem;padding:2px 7px;border-radius:100px;font-weight:800;vertical-align:middle;">BEST SELLER</span></div><div class="h-cat-dc">Full course for job seekers & pros</div></div>
+          <div class="h-cat-pr"><div class="h-cat-nw">₹999</div></div>
         </div>
         <div class="h-cat" onclick="pick('unemployed')">
-          <div class="h-cat-ic">🚀</div>
-          <div class="h-cat-inf"><div class="h-cat-nm">Job Seekers</div><div class="h-cat-dc">Get hired with AI</div></div>
-          <div class="h-cat-pr"><div class="h-cat-nw">₹399</div></div>
+          <div class="h-cat-ic">👑</div>
+          <div class="h-cat-inf"><div class="h-cat-nm">Elite Mastery</div><div class="h-cat-dc">Lifetime all access for entrepreneurs</div></div>
+          <div class="h-cat-pr"><div class="h-cat-nw">₹2,499</div></div>
         </div>
       </div>
     </div>
@@ -975,7 +1127,7 @@ footer{
       <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
         <div style="font-size:1.3rem;margin-bottom:6px;">💳</div>
         <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--white);margin-bottom:4px;">Pay Once, Own Forever</div>
-        <div style="font-size:.7rem;color:var(--gray1);line-height:1.6;">Starting at ₹199 — one-time lifetime access. No subscriptions, no renewals, no surprises.</div>
+        <div style="font-size:.7rem;color:var(--gray1);line-height:1.6;">Starting at ₹399 — one-time lifetime access. No subscriptions, no renewals, no surprises.</div>
       </div>
     </div>
   </div>
@@ -1011,7 +1163,7 @@ footer{
       <div class="feat-card" style="border:1px solid rgba(220,20,60,0.18);background:#fff;box-shadow:0 4px 0 0 rgba(220,20,60,0.18),0 6px 16px rgba(220,20,60,0.07);transform:translateY(0);transition:all .25s;">
         <div class="feat-ic" style="background:rgba(220,20,60,0.08);color:var(--aqua);">💳</div>
         <div class="feat-ttl">One-Time Payment</div>
-        <div class="feat-dsc">Pay once, access forever. No subscriptions, no renewals, no hidden charges. Starts at just ₹199.</div>
+        <div class="feat-dsc">Pay once, access forever. No subscriptions, no renewals, no hidden charges. Starts at just ₹399.</div>
       </div>
       <div class="feat-card" style="border:1px solid rgba(220,20,60,0.18);background:#fff;box-shadow:0 4px 0 0 rgba(220,20,60,0.18),0 6px 16px rgba(220,20,60,0.07);transform:translateY(0);transition:all .25s;">
         <div class="feat-ic" style="background:rgba(220,20,60,0.08);color:var(--aqua);">🔓</div>
@@ -1042,54 +1194,138 @@ footer{
   <div class="sec-in">
     <div class="sec-eye">Choose Your Plan</div>
     <div class="sec-title">Pick Your Learning Path</div>
-    <div class="sec-sub">All plans include voice lessons, live AI prompts, quizzes, and lifetime access.</div>
-    <div class="cats-grid">
-      <div class="cat-card" onclick="pick('student')">
+    <div class="sec-sub">One-time payment. Lifetime access. No subscriptions, no renewals.</div>
+
+    <!-- PLAN CARDS -->
+    <div class="cats-grid" style="align-items:stretch;">
+
+      <!-- STARTER -->
+      <div class="cat-card" onclick="pick('student')" style="display:flex;flex-direction:column;">
         <div class="unlock-badge" id="badge-student">✓ Unlocked</div>
-        <div class="cat-ic">🎓</div>
-        <div class="cat-title">Students</div>
-        <div class="cat-desc">Study smarter, write better assignments, and build career-ready AI skills — all while in college or school.</div>
-        <div class="cat-pr-row"><span class="cat-new">₹199</span><span class="cat-period">/ lifetime</span></div>
-        
-        <div class="cat-feats">
-          <div class="cat-feat"><div class="cat-feat-dot"></div>4 modules · 12 lessons with voice</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>Resume + LinkedIn AI builder</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>Interview prep system</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>Live AI prompts — always updated</div>
-        </div>
-        <button class="cat-cta">Start Learning — ₹199 →</button>
-      </div>
-      <div class="cat-card" onclick="pick('business')">
-        <div class="unlock-badge" id="badge-business">✓ Unlocked</div>
-        <div class="cat-ic">💼</div>
-        <div class="cat-title">Business</div>
-        <div class="cat-desc">Grow your brand, create content at scale, and run your business like a team of one — powered by AI.</div>
-        <div class="cat-pr-row"><span class="cat-new">₹699</span><span class="cat-period">/ lifetime</span></div>
-        
-        <div class="cat-feats">
-          <div class="cat-feat"><div class="cat-feat-dot"></div>4 modules · 12 lessons with voice</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>Content & marketing AI system</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>Client proposals + SOP templates</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>Live AI prompts — always updated</div>
-        </div>
-        <button class="cat-cta">Start Learning — ₹699 →</button>
-      </div>
-      <div class="cat-card" onclick="pick('unemployed')">
-        <div class="unlock-badge" id="badge-unemployed">✓ Unlocked</div>
-        <div class="cat-ic">🚀</div>
-        <div class="cat-title">Job Seekers</div>
-        <div class="cat-desc">Get hired faster with AI — ATS resumes, interview coaching, salary negotiation, LinkedIn optimization.</div>
+        <div class="cat-ic">🌱</div>
+        <div class="cat-title">Starter</div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.5px;color:var(--aqua);text-transform:uppercase;margin-bottom:6px;">Entry</div>
+        <div class="cat-desc">Perfect for Students & Beginners taking their first step into AI.</div>
         <div class="cat-pr-row"><span class="cat-new">₹399</span><span class="cat-period">/ lifetime</span></div>
-        
-        <div class="cat-feats">
-          <div class="cat-feat"><div class="cat-feat-dot"></div>4 modules · 12 lessons with voice</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>ATS resume + cover letter system</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>Mock interview coaching prompts</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>Live AI prompts — always updated</div>
+        <div class="cat-feats" style="flex:1;">
+          <div class="cat-feat"><div class="cat-feat-dot"></div>Module 1 — AI Foundations (3 lessons)</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>Voice-guided lessons by Pooja</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>50 Starter AI Prompts</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>Quiz after every lesson</div>
+          <div class="cat-feat" style="color:#aaa;"><span style="margin-right:6px;">❌</span>Certificate</div>
+          <div class="cat-feat" style="color:#aaa;"><span style="margin-right:6px;">❌</span>Community & Support Group</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>Email Support (48hr reply)</div>
         </div>
-        <button class="cat-cta">Start Learning — ₹399 →</button>
+        <button class="cat-cta" style="margin-top:auto;">Get Started — ₹399 →</button>
       </div>
+
+      <!-- PROFESSIONAL -->
+      <div class="cat-card featured" onclick="pick('business')" style="display:flex;flex-direction:column;border-color:var(--aqua);box-shadow:var(--aqua-glow);position:relative;">
+        <div class="unlock-badge" id="badge-business">✓ Unlocked</div>
+        <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--aqua);color:#fff;font-size:.65rem;font-weight:800;padding:4px 16px;border-radius:100px;letter-spacing:.8px;white-space:nowrap;">⭐ BEST SELLER</div>
+        <div class="cat-ic">🚀</div>
+        <div class="cat-title">Professional</div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.5px;color:var(--aqua);text-transform:uppercase;margin-bottom:6px;">Best Seller</div>
+        <div class="cat-desc">Ideal for Job Seekers & Professionals ready to level up with AI.</div>
+        <div class="cat-pr-row"><span class="cat-new">₹999</span><span class="cat-period">/ lifetime</span></div>
+        <div class="cat-feats" style="flex:1;">
+          <div class="cat-feat"><div class="cat-feat-dot"></div>All 4 Modules · 12 Full Lessons</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>Voice + Quiz + AI Coach every lesson</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>1000+ Master Prompt Library</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Weekly Live AI Trend Updates</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Professional Certificate</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ WhatsApp Community Access</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>Priority Support (24hr reply)</div>
+        </div>
+        <button class="cat-cta" style="margin-top:auto;">Get Professional — ₹999 →</button>
+      </div>
+
+      <!-- ELITE MASTERY -->
+      <div class="cat-card" onclick="pick('unemployed')" style="display:flex;flex-direction:column;background:linear-gradient(135deg,#fff5f7,#fff);">
+        <div class="unlock-badge" id="badge-unemployed">✓ Unlocked</div>
+        <div class="cat-ic">👑</div>
+        <div class="cat-title">Elite Mastery</div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.5px;color:var(--aqua);text-transform:uppercase;margin-bottom:6px;">Lifetime</div>
+        <div class="cat-desc">For Entrepreneurs & VIPs who want the ultimate AI edge — forever.</div>
+        <div class="cat-pr-row"><span class="cat-new">₹2,499</span><span class="cat-period">/ lifetime</span></div>
+        <div class="cat-feats" style="flex:1;">
+          <div class="cat-feat"><div class="cat-feat-dot"></div>ALL 3 Courses · 36 Lessons Lifetime</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>5000+ VIP Prompt Bank</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Daily Priority AI Trend Updates</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Gold-Tier Certificate</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ VIP Private Discord Community</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ All Future Courses — Free Forever</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>1-on-1 Direct Support with Pooja</div>
+        </div>
+        <button class="cat-cta" style="margin-top:auto;background:linear-gradient(135deg,var(--aqua),var(--aqua2));">Get Elite Access — ₹2,499 →</button>
+      </div>
+
     </div>
+
+    <!-- COMPARISON TABLE -->
+    <div style="margin-top:48px;overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:.78rem;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,0.06);">
+        <thead>
+          <tr style="background:var(--aqua);color:#fff;">
+            <th style="padding:14px 18px;text-align:left;font-weight:700;">Features</th>
+            <th style="padding:14px 12px;text-align:center;">🌱 Starter<br><span style="font-size:.85em;font-weight:400;">₹399</span></th>
+            <th style="padding:14px 12px;text-align:center;background:rgba(0,0,0,0.15);">🚀 Professional<br><span style="font-size:.85em;font-weight:400;">₹999</span></th>
+            <th style="padding:14px 12px;text-align:center;">👑 Elite Mastery<br><span style="font-size:.85em;font-weight:400;">₹2,499</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #f0f4f8;">
+            <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Target</td>
+            <td style="padding:12px;text-align:center;color:#718096;">Students / Beginners</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;color:#4a5568;font-weight:600;">Job Seekers / Professionals</td>
+            <td style="padding:12px;text-align:center;color:#718096;">Entrepreneurs / VIPs</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f4f8;background:#fafafa;">
+            <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Course Access</td>
+            <td style="padding:12px;text-align:center;color:#718096;">Basic Modules Only</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;color:#4a5568;font-weight:600;">Full Course Library</td>
+            <td style="padding:12px;text-align:center;color:#4a5568;font-weight:600;">Lifetime All Access</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f4f8;">
+            <td style="padding:12px 18px;color:#4a5568;font-weight:500;">AI Live Trends</td>
+            <td style="padding:12px;text-align:center;">❌</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;">✅ Weekly Updates</td>
+            <td style="padding:12px;text-align:center;">✅ Daily Priority</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f4f8;background:#fafafa;">
+            <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Certification</td>
+            <td style="padding:12px;text-align:center;">❌</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;">✅ Professional Cert</td>
+            <td style="padding:12px;text-align:center;">✅ Gold-Tier Cert</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f4f8;">
+            <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Prompt Library</td>
+            <td style="padding:12px;text-align:center;color:#718096;">Limited Access</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;color:#4a5568;font-weight:600;">1000+ Master Prompts</td>
+            <td style="padding:12px;text-align:center;color:#4a5568;font-weight:600;">5000+ VIP Prompt Bank</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f4f8;background:#fafafa;">
+            <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Community</td>
+            <td style="padding:12px;text-align:center;">❌</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;">✅ WhatsApp Group</td>
+            <td style="padding:12px;text-align:center;">✅ VIP Private Discord</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f4f8;">
+            <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Future Courses</td>
+            <td style="padding:12px;text-align:center;">❌</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;">❌</td>
+            <td style="padding:12px;text-align:center;">✅ Free Forever</td>
+          </tr>
+          <tr>
+            <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Support</td>
+            <td style="padding:12px;text-align:center;color:#718096;">Email Support</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;color:#4a5568;font-weight:600;">Priority Support</td>
+            <td style="padding:12px;text-align:center;color:#4a5568;font-weight:600;">1-on-1 Direct Support</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>
 
@@ -1210,7 +1446,7 @@ footer{
   <div class="breadcrumb">
     <span onclick="goHome()">← All Categories</span>
     <span class="bc-sep">/</span>
-    <span id="bcCat">Students</span>
+    <span id="bcCat">Starter</span>
   </div>
   <div class="platform-head">
     <div style="background:var(--card-bg);border-bottom:1px solid var(--border);padding:10px 40px;">
@@ -1224,9 +1460,9 @@ footer{
 </div>
 <div class="ph-inner">
       <div class="ph-left">
-        <div class="ph-icon" id="phIcon">🎓</div>
+        <div class="ph-icon" id="phIcon">🌱</div>
         <div>
-          <div class="ph-title" id="phTitle">AI for Students</div>
+          <div class="ph-title" id="phTitle">AI Starter</div>
           <div class="ph-sub" id="phSub">4 Modules · 12 Lessons · Voice Guided</div>
           <div class="ph-badge">🎙️ Voice Included · 🤖 Live AI Prompts · 🎯 Quizzes</div>
         </div>
@@ -1342,12 +1578,12 @@ footer{
       <div class="pay-cat">
         <div class="pay-cat-ic" id="pyCatIc">🎓</div>
         <div>
-          <div class="pay-cat-nm" id="pyCatNm">Students Plan</div>
-          <div class="pay-cat-dc">12 lessons · Lifetime access · Voice + AI Prompts</div>
+          <div class="pay-cat-nm" id="pyCatNm">Starter Plan</div>
+          <div class="pay-cat-dc">Lifetime access · Voice + AI Prompts</div>
         </div>
       </div>
       <div class="pay-pr-row">
-        <div><div class="pay-new" id="pyNew">₹199</div></div>
+        <div><div class="pay-new" id="pyNew">₹399</div></div>
       </div>
     </div>
 
@@ -1410,12 +1646,12 @@ footer{
    DATA — 12 LESSONS PER CATEGORY (4 modules × 3)
 ══════════════════════════════════════════════ */
 const CATS = {
-  student:{label:'Students',icon:'🎓',old:'₹499',new:'₹199',save:'Save ₹300',off:'60% OFF',
-    sub:'AI for Students — Study Smarter, Build Your Future'},
-  business:{label:'Business',icon:'💼',old:'₹1999',new:'₹699',save:'Save ₹1300',off:'65% OFF',
-    sub:'AI for Business — Grow Faster With a Team of One'},
-  unemployed:{label:'Job Seekers',icon:'🚀',old:'₹999',new:'₹399',save:'Save ₹600',off:'60% OFF',
-    sub:'AI for Job Seekers — Get Hired Faster With AI'}
+  student:{label:'Starter',icon:'🌱',old:'₹799',new:'₹399',save:'Save ₹400',off:'50% OFF',
+    sub:'AI Starter — Basic Modules for Students & Beginners'},
+  business:{label:'Professional',icon:'🚀',old:'₹1999',new:'₹999',save:'Save ₹1000',off:'50% OFF',
+    sub:'AI Professional — Full Course for Job Seekers & Professionals'},
+  unemployed:{label:'Elite Mastery',icon:'👑',old:'₹4999',new:'₹2499',save:'Save ₹2500',off:'50% OFF',
+    sub:'AI Elite Mastery — Lifetime All Access for Entrepreneurs & VIPs'}
 };
 
 const MODULES = {
@@ -1671,20 +1907,105 @@ const API_BASE = 'https://aikatrukko-api.onrender.com';
 
 
 /* ══════════════════════════════════════════════
+   MULTI-DEVICE SESSION MANAGER
+   - Persists login across devices via backend token
+   - Falls back to localStorage if backend offline
+   - Smooth logout + re-login without page refresh
+══════════════════════════════════════════════ */
+
+/* ── Session Token Storage (cross-tab sync) ── */
+const SESSION_KEY = 'ak_session_token';
+const USER_KEY    = 'ak_user';
+const PURCH_KEY   = 'ak_purchases';
+
+/* Generate a device fingerprint for session tracking */
+function getDeviceId(){
+  let did = localStorage.getItem('ak_device_id');
+  if(!did){
+    did = 'dev_' + Math.random().toString(36).substr(2,12) + '_' + Date.now();
+    localStorage.setItem('ak_device_id', did);
+  }
+  return did;
+}
+
+/* Save session — works across tabs & refreshes */
+function saveSession(userData, purchData, token){
+  localStorage.setItem(USER_KEY, JSON.stringify(userData));
+  localStorage.setItem(PURCH_KEY, JSON.stringify(purchData||[]));
+  if(token) localStorage.setItem(SESSION_KEY, token);
+  /* Per-email purchase backup for multi-device restore */
+  if(userData?.email){
+    const existing = JSON.parse(localStorage.getItem('ak_purch_'+userData.email)||'[]');
+    const merged = [...new Set([...existing, ...(purchData||[])])];
+    localStorage.setItem('ak_purch_'+userData.email, JSON.stringify(merged));
+  }
+}
+
+/* Clear only auth session — keep learned content (completed lessons, XP) */
+function clearSession(){
+  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(PURCH_KEY);
+  localStorage.removeItem(SESSION_KEY);
+}
+
+/* On load — restore session from localStorage (works on all devices if same browser) */
+function restoreSessionFromStorage(){
+  const u = JSON.parse(localStorage.getItem(USER_KEY)||'null');
+  if(!u) return null;
+  const p = JSON.parse(localStorage.getItem(PURCH_KEY)||'[]');
+  return { user: u, purchases: p };
+}
+
+/* ── Cross-tab session sync (if user logs in on another tab) ── */
+window.addEventListener('storage', (e) => {
+  if(e.key === USER_KEY){
+    if(e.newValue){
+      const u = JSON.parse(e.newValue);
+      const p = JSON.parse(localStorage.getItem(PURCH_KEY)||'[]');
+      if(!user){
+        user = u; purchases = p;
+        setLoggedIn(u, p);
+        toast('Logged in from another tab 👋', 'ok');
+      }
+    } else {
+      /* Logged out from another tab */
+      if(user){
+        user = null; purchases = [];
+        document.getElementById('navUser').classList.remove('show');
+        document.getElementById('navAuth').style.display = 'flex';
+        updateBadges();
+        toast('Session ended from another tab', 'info');
+      }
+    }
+  }
+  if(e.key === PURCH_KEY && user){
+    const p = JSON.parse(e.newValue||'[]');
+    purchases = p;
+    updateBadges();
+  }
+});
+
+/* ══════════════════════════════════════════════
    APP STATE — 100% Self-Contained, No Backend Needed
 ══════════════════════════════════════════════ */
-let user = JSON.parse(localStorage.getItem('ak_user')||'null');
-let purchases = JSON.parse(localStorage.getItem('ak_purchases')||'[]');
+let user = null;
+let purchases = [];
+let authToken = null;
+/* Restore session on page load */
+(function initSession(){
+  const stored = restoreSessionFromStorage();
+  if(stored){ user = stored.user; purchases = stored.purchases; }
+})();
+
 let completed = JSON.parse(localStorage.getItem('ak_done')||'{}');
-let userPhotoSrc = localStorage.getItem('ak_photo')||null;  /* user's own uploaded photo */
-let photoSrc = null; /* kept for hero/coach avatar — set by savePhoto */
+let userPhotoSrc = localStorage.getItem('ak_photo')||null;
+let photoSrc = null;
 let curCat = null, selGateway = 'razorpay';
 let curMod = 0, curLes = 0;
 let synth = null; try{ synth = window.speechSynthesis||null; }catch(e){}
 let vTimer = null, vWords = [], vIdx = 0;
 let curActiveMod = null, curActiveLesson = null;
 let activeTrend = null;
-/* ── Forgot password state ── */
 let fpStep = 0, fpEmail = '', fpCode = '';
 
 /* ══ RAZORPAY + ANTHROPIC CONFIG ════════════════
@@ -2110,7 +2431,7 @@ function renderCoach(){
     <div class="prompts">${pr.locked.map(p=>`<div class="pc">
       <div class="ph"><span class="pt">${p.t}</span>${hasAcc?'<button class="cpbtn" onclick="cpP(this)">Copy</button>':''}</div>
       <div class="pb ${hasAcc?'':'locked-blur'}">${hasAcc?p.b:'Premium AI coaching prompt. Purchase this plan to unlock instantly.'}</div>
-      ${!hasAcc?`<div class="p-lock" onclick="openPayGate()">🔒 Unlock for ${CATS[cat].new}</div>`:''}</div>`).join('')}
+      ${!hasAcc?`<div class="p-lock" onclick="openPricingPopup()">🔒 Unlock for ${CATS[cat].new}</div>`:''}</div>`).join('')}
     </div>`;
   if(userPhotoSrc){const av=document.getElementById('ciAva');if(av){av.innerHTML='';const img=document.createElement('img');img.src=userPhotoSrc;av.appendChild(img);}}
 }
@@ -2162,30 +2483,66 @@ Each prompt max 70 words. Make them immediately actionable and specific to India
 
 /* ── PRICING TAB ── */
 function renderPricing(){
+  const planFeats = {
+    student:[
+      '📖 Module 1 — AI Foundations (3 lessons)',
+      '🎙️ Voice-guided lessons by Pooja',
+      '💡 50 Starter AI Prompts',
+      '✅ Quiz after every lesson',
+      '📧 Email Support (48hr reply)',
+      '❌ No Certificate',
+      '❌ No Community Access'
+    ],
+    business:[
+      '📚 All 4 Modules · 12 Full Lessons',
+      '🎙️ Voice + Quiz + AI Coach every lesson',
+      '💡 1000+ Master Prompt Library',
+      '📈 Weekly Live AI Trend Updates',
+      '🏆 Professional Certificate',
+      '💬 WhatsApp Community Access',
+      '⚡ Priority Support (24hr reply)'
+    ],
+    unemployed:[
+      '🌟 ALL 3 Courses · 36 Lessons Lifetime',
+      '💡 5000+ VIP Prompt Bank',
+      '📈 Daily Priority AI Trend Updates',
+      '🥇 Gold-Tier Certificate',
+      '👑 VIP Private Discord Community',
+      '🎁 All Future Courses — Free Forever',
+      '🤝 1-on-1 Direct Support with Pooja'
+    ]
+  };
+  const planLabel = {
+    student:'Most Affordable',
+    business:'⭐ Best Seller',
+    unemployed:'👑 Ultimate Value'
+  };
   let html='<div class="pricing-grid">';
   ['student','business','unemployed'].forEach(cat=>{
-    const C=CATS[cat], hasAcc=purchases.includes(cat), pop=cat==='unemployed';
+    const C=CATS[cat], hasAcc=purchases.includes(cat), pop=cat==='business';
     html+=`<div class="price-card ${pop?'featured':''}">
-      ${pop?'<div class="feat-badge">MOST POPULAR</div>':''}
+      ${pop?'<div class="feat-badge">BEST SELLER</div>':''}
       <div class="pc-icon">${C.icon}</div>
       <div class="pc-name">${C.label}</div>
+      <div style="font-size:.65rem;font-weight:700;color:${pop?'var(--aqua)':'#94a3b8'};margin-bottom:6px;letter-spacing:.5px;">${planLabel[cat]}</div>
       <div class="pc-new">${C.new}</div>
+      <div class="pc-old" style="text-decoration:line-through;color:#94a3b8;font-size:.75rem;">${C.old}</div>
+      <div style="display:inline-block;background:rgba(0,212,200,0.1);color:var(--aqua);font-size:.6rem;font-weight:800;padding:3px 10px;border-radius:100px;margin:4px 0 10px;">${C.off} · ${C.save}</div>
       <div class="pc-period">/ lifetime · No renewals</div>
       <div class="pc-feats">
-        <div class="pc-feat"><span>✓</span><span>12 lessons (4 modules × 3)</span></div>
-        <div class="pc-feat"><span>✓</span><span>Voice narration every lesson</span></div>
-        <div class="pc-feat"><span>✓</span><span>Live AI prompts — trend updated</span></div>
-        <div class="pc-feat"><span>✓</span><span>Interactive quizzes with feedback</span></div>
-        <div class="pc-feat"><span>✓</span><span>Power prompt library (5+)</span></div>
-        <div class="pc-feat"><span>✓</span><span>Lifetime access — no expiry</span></div>
+        ${planFeats[cat].map(f=>`<div class="pc-feat"><span>${f.startsWith('❌')?'':'✓'}</span><span style="${f.startsWith('❌')?'color:#94a3b8;':''}">${f.replace('❌ ','').replace('✅ ','')}</span></div>`).join('')}
       </div>
       ${hasAcc?
-        `<button class="buy-btn" style="background:rgba(0,212,200,0.1);color:var(--aqua);border:1px solid var(--aqua);cursor:default;" disabled>✓ You have full access</button>`:
-        `<button class="buy-btn" onclick="curCat='${cat}';openPayModal()">Get Access — ${C.new} →</button>`
+        `<button class="buy-btn" style="background:rgba(0,212,200,0.1);color:var(--aqua);border:1px solid var(--aqua);cursor:default;" disabled>✓ You have access</button>`:
+        `<button class="buy-btn" onclick="curCat='${cat}';openPayModal()">${cat==='unemployed'?'Get Elite Access':'Get Access'} — ${C.new} →</button>`
       }
     </div>`;
   });
   html+=`</div>
+  <div style="background:linear-gradient(135deg,#fff5f7,#fff);border:1.5px solid rgba(220,20,60,0.15);border-radius:14px;padding:20px 24px;margin-top:24px;text-align:center;">
+    <div style="font-weight:800;font-size:.85rem;color:#1a202c;margin-bottom:6px;">🚀 Most serious learners upgrade to Elite within 2 weeks.</div>
+    <div style="font-size:.75rem;color:#64748b;">Save the hassle — get Elite now and access everything from day one. <span onclick="curCat='unemployed';openPayModal();" style="color:var(--aqua);font-weight:700;cursor:pointer;">Upgrade to Elite →</span></div>
+  </div>
   <div class="refund-box">
     <div class="refund-title">🛡️ Refund Policy</div>
     <div class="refund-body">
@@ -2224,37 +2581,45 @@ async function doLogin(){
   if(!e.includes('@')){toast('Please enter a valid email','err');return;}
   const btn=document.querySelector('#loginForm .submit-btn');
   if(btn){btn.textContent='Logging in…';btn.disabled=true;}
-  let found=null, purch=[];
+
   try{
-    // ── Try backend first (multi-device login) ──
-    const r=await fetch(API_BASE+'/api/login',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({email:e,password:p})
-    });
-    const d=await r.json();
-    if(r.ok&&d.user){
-      found=d.user; purch=d.purchases||[];
-      const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
-      const idx=stored.findIndex(u=>u.email===e);
-      if(idx>=0) stored[idx]={...stored[idx],...found}; else stored.push({...found,pass:p});
-      localStorage.setItem('ak_users',JSON.stringify(stored));
-      localStorage.setItem('ak_purch_'+e,JSON.stringify(purch));
-    } else {
-      toast(d.error||'Invalid email or password. New here? Sign Up!','err');
-      if(btn){btn.textContent='Login →';btn.disabled=false;} return;
-    }
+    /* ── Firebase Login (works on ALL devices) ── */
+    const cred = await window._fbSignIn(window._fbAuth, e, p);
+    const fbUser = cred.user;
+
+    // Fetch user data + purchases from Firestore
+    let found = { name: fbUser.displayName || e.split('@')[0], email: e, uid: fbUser.uid };
+    let purch = [];
+    try{
+      const snap = await window._fbGetDoc(window._fbDoc(window._fbDb, 'users', fbUser.uid));
+      if(snap.exists()){
+        const data = snap.data();
+        found.name = data.name || found.name;
+        purch = data.purchases || [];
+      }
+    }catch(fe){ console.warn('Firestore read error:', fe); }
+
+    saveSession(found, purch, null);
+    completed = JSON.parse(localStorage.getItem('ak_done')||'{}');
+    userPhotoSrc = localStorage.getItem('ak_photo')||null;
+    photoSrc = userPhotoSrc;
+    setLoggedIn(found, purch);
+    closeOv('authOverlay');
+    document.getElementById('liEmail').value='';
+    document.getElementById('liPass').value='';
+    toast('Welcome back, '+found.name.split(' ')[0]+'! 👋','ok');
+
   }catch(err){
-    // ── Backend offline — fallback to localStorage ──
-    const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
-    found=stored.find(u=>u.email===e&&u.pass===p)||null;
-    if(!found){toast('Invalid email or password. New here? Sign Up!','err');if(btn){btn.textContent='Login →';btn.disabled=false;}return;}
-    purch=JSON.parse(localStorage.getItem('ak_purch_'+e)||'[]');
+    let msg = 'Login failed. Please check your email & password.';
+    const code = err.code || '';
+    if(code==='auth/user-not-found') msg = 'No account found. Please Sign Up first!';
+    else if(code==='auth/wrong-password') msg = 'Wrong password. Try again or use Forgot Password.';
+    else if(code==='auth/invalid-credential' || code==='auth/invalid-email') msg = 'Invalid email or password. Please check and try again.';
+    else if(code==='auth/too-many-requests') msg = 'Too many attempts. Please wait a few minutes.';
+    else if(code==='auth/network-request-failed') msg = 'Network error. Check your internet connection.';
+    toast(msg,'err');
+    console.error('Login error:',err.code, err.message);
   }
-  localStorage.setItem('ak_user',JSON.stringify(found));
-  localStorage.setItem('ak_purchases',JSON.stringify(purch));
-  setLoggedIn(found,purch);
-  closeOv('authOverlay');
-  toast('Welcome back, '+found.name.split(' ')[0]+'! 👋','ok');
   if(btn){btn.textContent='Login →';btn.disabled=false;}
 }
 async function doSignup(){
@@ -2265,58 +2630,104 @@ async function doSignup(){
   if(p.length<6){toast('Password must be at least 6 characters','err');return;}
   const btn=document.querySelector('#signupForm .submit-btn');
   if(btn){btn.textContent='Creating account…';btn.disabled=true;}
-  let newUser={name:n,email:e,pass:p};
+
   try{
-    // ── Try backend first (multi-device signup) ──
-    const r=await fetch(API_BASE+'/api/register',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name:n,email:e,password:p})
+    /* ── Firebase Signup (works on ALL devices) ── */
+    const cred = await window._fbCreateUser(window._fbAuth, e, p);
+    const fbUser = cred.user;
+
+    // Update display name
+    await window._fbUpdateProfile(fbUser, { displayName: n });
+
+    // Save user to Firestore
+    const newUser = { name: n, email: e, uid: fbUser.uid };
+    await window._fbSetDoc(window._fbDoc(window._fbDb, 'users', fbUser.uid), {
+      name: n, email: e, purchases: [], createdAt: new Date().toISOString()
     });
-    const d=await r.json();
-    if(r.ok&&d.user){
-      newUser=d.user;
-    } else {
-      toast(d.error||'Email already registered. Login instead.','err');
-      if(btn){btn.textContent='Sign Up →';btn.disabled=false;} return;
-    }
+
+    saveSession(newUser, [], null);
+    setLoggedIn(newUser, []);
+    closeOv('authOverlay');
+    document.getElementById('suName').value='';
+    document.getElementById('suEmail').value='';
+    document.getElementById('suPass').value='';
+    toast('Account created! Module 1 is free 🎉','ok');
+
   }catch(err){
-    // ── Backend offline — fallback to localStorage ──
-    const stored=JSON.parse(localStorage.getItem('ak_users')||'[]');
-    if(stored.find(u=>u.email===e)){toast('Email already registered. Login instead.','err');if(btn){btn.textContent='Sign Up →';btn.disabled=false;}return;}
-    stored.push(newUser);
-    localStorage.setItem('ak_users',JSON.stringify(stored));
+    let msg = 'Signup failed. Please try again.';
+    const code = err.code || '';
+    if(code==='auth/email-already-in-use'){
+      msg = 'This email is already registered! Please Login instead.';
+      // Auto switch to login tab after 1.5s
+      setTimeout(()=>{ switchAuth('login'); document.getElementById('liEmail').value=document.getElementById('suEmail').value; }, 1500);
+    }
+    else if(code==='auth/invalid-email') msg = 'Please enter a valid email address.';
+    else if(code==='auth/weak-password') msg = 'Password must be at least 6 characters.';
+    else if(code==='auth/network-request-failed') msg = 'Network error. Check your internet connection.';
+    toast(msg,'err');
+    console.error('Signup error:',err.code, err.message);
   }
-  localStorage.setItem('ak_user',JSON.stringify(newUser));
-  localStorage.setItem('ak_purchases','[]');
-  setLoggedIn(newUser,[]);
-  closeOv('authOverlay');
-  toast('Account created! Module 1 is free 🎉','ok');
-  if(btn){btn.textContent='Sign Up →';btn.disabled=false;}
+  if(btn){btn.textContent='Create Free Account →';btn.disabled=false;}
 }
 
 function setLoggedIn(u,p){
-  user=u;purchases=p||[];
+  user=u; purchases=p||[];
   /* ── ADMIN: Full free access ── */
   if(u.email==='m82931905@gmail.com'){
     purchases=['student','business','unemployed'];
-    localStorage.setItem('ak_purchases',JSON.stringify(purchases));
-    if(u.email) localStorage.setItem('ak_purch_'+u.email,JSON.stringify(purchases));
+    saveSession(u, purchases, authToken);
+    /* Save admin purchases to Firestore too */
+    if(u.uid && window._fbDb){
+      try{ window._fbUpdateDoc(window._fbDoc(window._fbDb,'users',u.uid),{purchases:['student','business','unemployed']}).catch(()=>{}); }catch(e){}
+    }
   }
+  /* ── Restore user photo ── */
+  userPhotoSrc = localStorage.getItem('ak_photo')||null;
+  photoSrc = userPhotoSrc;
+  if(userPhotoSrc) setAvatarSrc(userPhotoSrc);
+
+  /* ── Update nav UI ── */
   document.getElementById('navUser').classList.add('show');
   document.getElementById('navAuth').style.display='none';
   document.getElementById('navName').textContent=u.name.split(' ')[0];
+
+  /* ── Show device indicator if multiple sessions possible ── */
+  const deviceBadge = document.getElementById('navDeviceBadge');
+  if(deviceBadge) deviceBadge.style.display='flex';
+
   updateBadges();
+
+  /* ── Show upgrade banner if user doesn't have Elite (unemployed) plan ── */
+  const banner = document.getElementById('upgradeBanner');
+  if(banner){
+    const hasElite = (purchases||[]).includes('unemployed');
+    banner.style.display = hasElite ? 'none' : 'block';
+  }
 }
+
+/* ── Smooth logout: clears session but stays on page ── */
 function logout(){
-  user=null;purchases=[];authToken=null;
-  localStorage.removeItem('ak_user');
-  localStorage.removeItem('ak_purchases');
-  localStorage.removeItem('ak_token');
+  /* Firebase sign out */
+  if(window._fbAuth){
+    window._fbSignOut(window._fbAuth).catch(()=>{});
+  }
+  const wasName = user?.name?.split(' ')[0] || '';
+  user=null; purchases=[]; authToken=null;
+  clearSession();
   document.getElementById('navUser').classList.remove('show');
   document.getElementById('navAuth').style.display='flex';
   updateBadges();
+  const banner=document.getElementById('upgradeBanner');
+  if(banner) banner.style.display='none';
   goHome();
-  toast('Logged out','info');
+  setTimeout(()=>{
+    toast('Logged out. See you soon, '+wasName+'! 👋','info');
+  }, 100);
+}
+
+/* ── Quick re-login: opens login modal smoothly ── */
+function reLogin(){
+  openAuth('login');
 }
 function updateBadges(){
   ['student','business','unemployed'].forEach(c=>{
@@ -2351,6 +2762,14 @@ function markDayStreak(){
 markDayStreak();
 
 /* ── PAYMENT ── */
+function openPricingPopup(){
+  const el = document.getElementById('pricingPopupOverlay');
+  if(el){ el.style.display='flex'; document.body.style.overflow='hidden'; }
+}
+function closePricingPopup(e){
+  const el = document.getElementById('pricingPopupOverlay');
+  if(el){ el.style.display='none'; document.body.style.overflow=''; }
+}
 function openPayGate(){
   if(!user){openAuth('login');toast('Login first to purchase','info');return;}
   if(!curCat){curCat='student';}
@@ -2383,7 +2802,7 @@ function doPayment(){
     return;
   }
 
-  const amounts={student:19900, business:69900, unemployed:39900};
+  const amounts={student:39900, business:99900, unemployed:249900};
   const options={
     key: RZP_KEY,
     amount: amounts[cat]||19900,
@@ -2397,9 +2816,11 @@ function doPayment(){
       grantAccess(cat);
       closeOv('payOverlay');
       toast('🎉 Payment successful! Full access unlocked!','ok');
-      const purch=JSON.parse(localStorage.getItem('ak_purch_'+user.email)||'[]');
+      const purch=JSON.parse(localStorage.getItem('ak_purch_'+(user?.email||''))||'[]');
       if(!purch.includes(cat)) purch.push(cat);
-      localStorage.setItem('ak_purch_'+user.email, JSON.stringify(purch));
+      if(user?.email) localStorage.setItem('ak_purch_'+user.email, JSON.stringify(purch));
+      /* Sync updated purchases to session */
+      saveSession(user, purchases, authToken);
       renderMods();
       if(typeof renderPricing==='function') renderPricing();
       updateBadges();
@@ -2425,12 +2846,13 @@ function doPayment(){
 
 function grantAccess(cat){
   if(!purchases.includes(cat)) purchases.push(cat);
-  localStorage.setItem('ak_purchases',JSON.stringify(purchases));
-  // Also save per-user email so it loads on next login
-  if(user?.email){
-    const purch=JSON.parse(localStorage.getItem('ak_purch_'+user.email)||'[]');
-    if(!purch.includes(cat)) purch.push(cat);
-    localStorage.setItem('ak_purch_'+user.email, JSON.stringify(purch));
+  /* Persist locally */
+  saveSession(user, purchases, authToken);
+  /* ── Save to Firestore so all devices see the purchase ── */
+  if(user?.uid && window._fbDb){
+    try{
+      window._fbUpdateDoc(window._fbDoc(window._fbDb,'users',user.uid),{purchases:[...purchases]}).catch(()=>{});
+    }catch(e){}
   }
   updateBadges();
   if(curCat===cat){renderMods();renderCoach();renderPricing();}
@@ -3234,6 +3656,38 @@ async function generateWeeklyLesson(cat, weekNum){
   }catch(e){ console.error('Weekly lesson gen error:', e); }
   return null;
 }
+
+/* ══════════════════════════════════════════════
+   PAGE INIT — Restore session UI on every load/refresh
+   Works seamlessly on all devices where user is logged in
+══════════════════════════════════════════════ */
+/* ── Firebase Auth Ready: called when Firebase detects logged-in user ── */
+window._fbAuthReady = function(fbUser, fbPurch){
+  if(fbUser && !user){
+    /* Firebase says user is logged in — sync to app state */
+    user = fbUser; purchases = fbPurch || [];
+    saveSession(user, purchases, null);
+    setLoggedIn(user, purchases);
+  } else if(!fbUser && user){
+    /* Firebase says logged out — clear local state */
+    user = null; purchases = [];
+    clearSession();
+    document.getElementById('navUser').classList.remove('show');
+    document.getElementById('navAuth').style.display = 'flex';
+    updateBadges();
+  }
+};
+
+(function onPageReady(){
+  if(user){
+    /* Restore full nav + badges without requiring re-login */
+    setLoggedIn(user, purchases);
+  } else {
+    /* Not logged in — show auth buttons */
+    document.getElementById('navAuth').style.display='flex';
+    document.getElementById('navUser').classList.remove('show');
+  }
+})();
 
 /* ── Admin helper: simulate weeks passing (for testing) ── */
 /* Call simulateWeeks(3) in console to test 3 weeks ahead */
