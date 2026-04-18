@@ -5,79 +5,160 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Katrukko — Your AI Learning Buddy</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<!-- ══ FIREBASE AUTH SYSTEM — Multi-device + Google Sign-In ══ -->
-<!-- Step 1: Set up the ready promise BEFORE the module loads -->
+<!-- ══ FIREBASE AUTH SYSTEM ══ -->
 <script>
-  window._fbLoaded = false;
-  window._fbReady = new Promise(function(res){ window._fbReadyResolve = res; });
-</script>
-<!-- Step 2: Load Firebase as a module -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, sendPasswordResetEmail }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc }
-    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+/* ─── Step 1: Ready promise — set up BEFORE Firebase loads ─── */
+window._fbLoaded = false;
+window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
 
-  const firebaseConfig = {
+/* ─── Step 2: Install a LOCAL-STORAGE fallback immediately ───
+   This runs synchronously so doLogin/doSignup/doGoogleSignIn
+   always have real functions to call, even if Firebase never loads.
+   When Firebase loads successfully it overwrites these stubs.          */
+(function installFallback(){
+  var LS_USERS = 'ak_fb_users'; /* [{uid,email,pw,name,photo,purchases}] */
+
+  function getUsers(){ try{ return JSON.parse(localStorage.getItem(LS_USERS)||'[]'); }catch(e){ return []; } }
+  function saveUsers(arr){ localStorage.setItem(LS_USERS, JSON.stringify(arr)); }
+  function uid(){ return 'local_' + Math.random().toString(36).slice(2) + Date.now(); }
+
+  /* Minimal user-credential shape that mirrors Firebase */
+  function fakeCred(u){ return { user: { uid:u.uid, email:u.email, displayName:u.name||u.email.split('@')[0], photoURL:u.photo||null,
+      updateProfile: function(p){ u.name=p.displayName||u.name; saveUsers(getUsers().map(function(x){ return x.uid===u.uid?Object.assign(x,{name:u.name}):x; })); return Promise.resolve(); }
+    }, additionalUserInfo:{ isNewUser: u._new||false } }; }
+
+  window._fbCreateUser = function(email, pw){
+    var users = getUsers();
+    if(users.find(function(u){ return u.email===email; }))
+      return Promise.reject({code:'auth/email-already-in-use', message:'Email already in use'});
+    var u = { uid:uid(), email:email, pw:pw, name:email.split('@')[0], photo:null, purchases:[], _new:true };
+    users.push(u); saveUsers(users);
+    return Promise.resolve(fakeCred(u));
+  };
+
+  window._fbSignIn = function(email, pw){
+    var users = getUsers();
+    var u = users.find(function(x){ return x.email===email; });
+    if(!u) return Promise.reject({code:'auth/user-not-found', message:'No user found'});
+    if(u.pw !== pw) return Promise.reject({code:'auth/wrong-password', message:'Wrong password'});
+    return Promise.resolve(fakeCred(u));
+  };
+
+  window._fbSignOut    = function(){ return Promise.resolve(); };
+  window._fbUpdateProfile = function(u, p){
+    return (u && typeof u.updateProfile === 'function') ? u.updateProfile(p) : Promise.resolve();
+  };
+  window._fbResetPassword = function(email){
+    alert('Password reset: In offline mode, passwords are stored locally. Check localStorage key "ak_fb_users" to reset.');
+    return Promise.resolve();
+  };
+  window._fbSignInPopup    = function(){ return Promise.reject({code:'auth/popup-blocked', message:'Firebase not loaded — Google Sign-In unavailable offline.'}); };
+  window._fbSignInRedirect = function(){ return Promise.reject({code:'auth/popup-blocked', message:'Firebase not loaded'}); };
+  window._fbRedirectResult = function(){ return Promise.resolve(null); };
+
+  /* Firestore stubs — localStorage-backed */
+  var LS_DB = 'ak_fb_db';
+  function getDb(){ try{ return JSON.parse(localStorage.getItem(LS_DB)||'{}'); }catch(e){ return {}; } }
+  function saveDb(o){ localStorage.setItem(LS_DB, JSON.stringify(o)); }
+
+  function fakeDoc(col, id){
+    return {
+      _col:col, _id:id,
+      get: function(){
+        var db2=getDb(), key=col+'/'+id, data=db2[key]||null;
+        return Promise.resolve({ exists: !!data, data: function(){ return data; } });
+      },
+      set: function(data, opts){
+        var db2=getDb(), key=col+'/'+id;
+        db2[key] = (opts&&opts.merge) ? Object.assign({}, db2[key]||{}, data) : data;
+        saveDb(db2); return Promise.resolve();
+      },
+      update: function(data){
+        var db2=getDb(), key=col+'/'+id;
+        db2[key] = Object.assign({}, db2[key]||{}, data);
+        saveDb(db2); return Promise.resolve();
+      }
+    };
+  }
+  window._fbDoc       = fakeDoc;
+  window._fbSetDoc    = function(ref, data){ return ref.set(data, {merge:true}); };
+  window._fbGetDoc    = function(ref){ return ref.get(); };
+  window._fbUpdateDoc = function(ref, data){ return ref.update(data); };
+
+  window._fbFallbackActive = true;
+  console.info('Auth: local-storage fallback active — attempting to load Firebase…');
+})();
+
+/* ─── Step 3: Dynamically load Firebase ES modules ─── */
+(async function loadFirebase(){
+  var FB = 'https://www.gstatic.com/firebasejs/10.12.0/';
+  var config = {
     apiKey: "AIzaSyAF-FUEXFxBNMCyNLErnTGoW8aEq8nNxMU",
     authDomain: "aikatrukko-e49f9.firebaseapp.com",
     projectId: "aikatrukko-e49f9",
     storageBucket: "aikatrukko-e49f9.firebasestorage.app",
     messagingSenderId: "467227648026",
-    appId: "1:467227648026:web:0397af7f404a6e4cbfb1a3",
-    measurementId: "G-C5VVXEZ9W4"
+    appId: "1:467227648026:web:0397af7f404a6e4cbfb1a3"
   };
 
-  const app  = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-  const gProvider = new GoogleAuthProvider();
-  gProvider.setCustomParameters({ prompt: 'select_account' });
+  try {
+    var appMod  = await import(FB + 'firebase-app.js');
+    var authMod = await import(FB + 'firebase-auth.js');
+    var fsMod   = await import(FB + 'firebase-firestore.js');
 
-  // ── Expose everything to global scope ──
-  window._fbAuth = auth;
-  window._fbDb   = db;
+    var app  = appMod.initializeApp(config);
+    var auth = authMod.getAuth(app);
+    var db   = fsMod.getFirestore(app);
+    var gProv = new authMod.GoogleAuthProvider();
+    gProv.setCustomParameters({ prompt: 'select_account' });
 
-  window._fbCreateUser     = (a, email, pw) => createUserWithEmailAndPassword(a, email, pw);
-  window._fbSignIn         = (a, email, pw) => signInWithEmailAndPassword(a, email, pw);
-  window._fbSignOut        = (a) => signOut(a);
-  window._fbUpdateProfile  = (u, p) => updateProfile(u, p);
-  window._fbSignInGoogle        = () => signInWithPopup(auth, gProvider);
-  window._fbSignInGoogleRedirect = () => signInWithRedirect(auth, gProvider);
-  window._fbGetRedirectResult    = () => getRedirectResult(auth);
-  window._fbResetPassword  = (email) => sendPasswordResetEmail(auth, email);
-  window._fbDoc            = (d, col, id) => doc(d, col, id);
-  window._fbSetDoc         = (ref, data) => setDoc(ref, data, {merge:true});
-  window._fbGetDoc         = (ref) => getDoc(ref);
-  window._fbUpdateDoc      = (ref, data) => updateDoc(ref, data);
-  window._localRegister    = () => {};
+    /* ── Overwrite stubs with real Firebase functions ── */
+    window._fbAuth = auth;
+    window._fbDb   = db;
+    window._fbCreateUser    = function(e,pw){ return authMod.createUserWithEmailAndPassword(auth,e,pw); };
+    window._fbSignIn        = function(e,pw){ return authMod.signInWithEmailAndPassword(auth,e,pw); };
+    window._fbSignOut       = function(){     return authMod.signOut(auth); };
+    window._fbUpdateProfile = function(u,p){  return authMod.updateProfile(u,p); };
+    window._fbResetPassword = function(e){    return authMod.sendPasswordResetEmail(auth,e); };
+    window._fbSignInPopup   = function(){     return authMod.signInWithPopup(auth,gProv); };
+    window._fbSignInRedirect= function(){     return authMod.signInWithRedirect(auth,gProv); };
+    window._fbRedirectResult= function(){     return authMod.getRedirectResult(auth); };
+    window._fbDoc    = function(col,id){      return fsMod.doc(db,col,id); };
+    window._fbSetDoc = function(ref,data){    return fsMod.setDoc(ref,data,{merge:true}); };
+    window._fbGetDoc = function(ref){         return fsMod.getDoc(ref); };
+    window._fbUpdateDoc = function(ref,data){ return fsMod.updateDoc(ref,data); };
+    window._fbFallbackActive = false;
 
-  // ── Signal Firebase is fully ready — resolves the promise ──
-  window._fbLoaded = true;
-  window._fbReadyResolve();
+    /* ── Auth state listener ── */
+    var _firstFire = true;
+    authMod.onAuthStateChanged(auth, async function(fbUser){
+      if(fbUser){
+        var purch = [];
+        try{
+          var snap = await fsMod.getDoc(fsMod.doc(db,'users',fbUser.uid));
+          if(snap.exists()) purch = snap.data().purchases || [];
+        }catch(e){}
+        var u = { uid:fbUser.uid, email:fbUser.email,
+          name: fbUser.displayName || fbUser.email.split('@')[0],
+          photo: fbUser.photoURL || null };
+        if(window._onAuthChange) window._onAuthChange(u, purch);
+      } else {
+        if(!_firstFire && window._onAuthChange) window._onAuthChange(null,[]);
+      }
+      _firstFire = false;
+    });
 
-  // ── Auth state listener — fires after login/logout ──
-  let _authListenerFired = false;
-  onAuthStateChanged(auth, async (fbUser) => {
-    if(fbUser){
-      let purch = [];
-      try {
-        const snap = await getDoc(doc(db,'users',fbUser.uid));
-        if(snap.exists()) purch = snap.data().purchases || [];
-      } catch(e){}
-      const u = {
-        uid: fbUser.uid,
-        email: fbUser.email,
-        name: fbUser.displayName || fbUser.email.split('@')[0],
-        photo: fbUser.photoURL || null
-      };
-      if(window._fbAuthReady) window._fbAuthReady(u, purch);
-    } else {
-      if(_authListenerFired && window._fbAuthReady) window._fbAuthReady(null, []);
-    }
-    _authListenerFired = true;
-  });
+    window._fbLoaded = true;
+    window._fbReadyResolve();
+    console.info('Firebase loaded successfully ✓');
+
+  } catch(err) {
+    /* Firebase failed to load (sandbox / network / CSP) — fallback stays active */
+    console.warn('Firebase unavailable — using local fallback. Auth works locally only.', err.message);
+    window._fbLoaded = false;
+    window._fbReadyResolve(); /* unblock auth UI so buttons work */
+  }
+})();
 </script>
 <style>
 /* ══════════════════════════════════════════════
@@ -1313,7 +1394,7 @@ footer{
 </div>
 
 <!-- ══ RUNNING ANNOUNCEMENT BANNER ══ -->
-<div style="background:linear-gradient(90deg,#0f0c29,#2d0060,#5a0fbf,#7b2fff,#9d4fff,#7b2fff,#5a0fbf,#2d0060,#0f0c29);background-size:300% 100%;animation:bannerGradShift 8s ease infinite;overflow:hidden;height:38px;display:flex;align-items:center;position:relative;z-index:201;box-shadow:0 3px 16px rgba(123,47,255,0.5);">
+<div id="announcementBanner" style="background:linear-gradient(90deg,#0f0c29,#2d0060,#5a0fbf,#7b2fff,#9d4fff,#7b2fff,#5a0fbf,#2d0060,#0f0c29);background-size:300% 100%;animation:bannerGradShift 8s ease infinite;overflow:hidden;height:38px;display:flex;align-items:center;position:relative;z-index:201;box-shadow:0 3px 16px rgba(123,47,255,0.5);">
   <div style="display:flex;animation:marqueeScroll 32s linear infinite;white-space:nowrap;will-change:transform;">
     <span style="display:inline-flex;align-items:center;gap:32px;padding-right:60px;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:#fff;letter-spacing:.4px;">
       <span>🚀 Welcome to AI Katrukko — Your AI Learning Buddy!</span>
@@ -1892,6 +1973,16 @@ footer{
         <div class="prof-sec-title">&#127919; Lesson Completion</div>
         <div class="lesson-prog-list" id="profLessonProg"></div>
       </div>
+      <!-- Certificate section — visible only for Elite users who completed all lessons -->
+      <div class="prof-section" id="profCertSection" style="display:none;">
+        <div class="prof-sec-title">🏅 Your Gold Certificate</div>
+        <div style="background:linear-gradient(135deg,#0f0c29,#302b63);border:1.5px solid #FFD700;border-radius:14px;padding:20px;text-align:center;">
+          <div style="font-size:2.5rem;margin-bottom:8px;">🏅</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#FFD700;margin-bottom:4px;">Gold-Tier Certificate</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,0.6);margin-bottom:16px;" id="profCertMsg">Complete all 36 lessons to unlock your certificate.</div>
+          <button id="profCertBtn" onclick="const tier=this.getAttribute('data-tier')||'elite';closeOv('profileOverlay');showCertificate(tier);" style="background:#FFD700;color:#0f0c29;border:none;border-radius:8px;padding:11px 28px;font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;display:none;">View &amp; Download Certificate →</button>
+        </div>
+      </div>
       <div class="prof-section">
         <div class="prof-sec-title">&#129302; Live AI Prompt &#8212; Just For You</div>
         <div class="prof-prompt-box">
@@ -1933,7 +2024,7 @@ footer{
       <div style="flex:1;height:1px;background:#e2e8f0;"></div>
     </div>
     <div id="loginForm">
-      <div class="field"><label>Email</label><input type="email" id="liEmail" placeholder="you@email.com" oninput="clrErr(this)" autocomplete="email"></div>
+      <div class="field"><label>Email</label><input type="email" id="liEmail" placeholder="you@email.com" oninput="clrErr(this);this.value=this.value.replace(/^www\./gi,'').replace(/^https?:\/\//gi,'')" onblur="this.value=this.value.trim().toLowerCase().replace(/^(https?:\/\/|www\.)/i,'')" autocomplete="email"></div>
       <div class="field" style="position:relative;"><label>Password</label><input type="password" id="liPass" placeholder="Your password" oninput="clrErr(this)" autocomplete="current-password" style="padding-right:44px;"><span onclick="var f=document.getElementById('liPass');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'👁':'🙈';" style="position:absolute;right:12px;bottom:10px;cursor:pointer;font-size:.9rem;user-select:none;" title="Show/hide password">👁</span></div>
       <button class="submit-btn" onclick="doLogin()">Login to AI Katrukko</button>
       <div style="text-align:center;margin-top:10px;">
@@ -1942,7 +2033,7 @@ footer{
     </div>
     <div id="signupForm" style="display:none;">
       <div class="field"><label>Full Name</label><input type="text" id="suName" placeholder="Your name" oninput="clrErr(this)" autocomplete="name"></div>
-      <div class="field"><label>Email</label><input type="email" id="suEmail" placeholder="you@email.com" oninput="clrErr(this)" autocomplete="email"></div>
+      <div class="field"><label>Email</label><input type="email" id="suEmail" placeholder="you@email.com" oninput="clrErr(this);this.value=this.value.replace(/^www\./gi,'').replace(/^https?:\/\//gi,'')" onblur="this.value=this.value.trim().toLowerCase().replace(/^(https?:\/\/|www\.)/i,'')" autocomplete="email"></div>
       <div class="field" style="position:relative;"><label>Password</label><input type="password" id="suPass" placeholder="Min 6 characters" oninput="clrErr(this)" autocomplete="new-password" style="padding-right:44px;"><span onclick="var f=document.getElementById('suPass');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'👁':'🙈';" style="position:absolute;right:12px;bottom:10px;cursor:pointer;font-size:.9rem;user-select:none;" title="Show/hide password">👁</span></div>
       <button class="submit-btn" onclick="doSignup()">Create Free Account →</button>
     </div>
@@ -2502,11 +2593,18 @@ let curActiveMod = null, curActiveLesson = null;
 let activeTrend = null;
 let fpStep = 0, fpEmail = '', fpCode = '';
 
-/* ══ RAZORPAY + ANTHROPIC CONFIG ════════════════
+/* ══ RAZORPAY + AI CONFIG ════════════════════════
    ⚠️  Add your keys here before going live!
+   
+   STEP 1: Get FREE Gemini key → aistudio.google.com → "Get API Key"
+   STEP 2: Paste it below (replaces 'YOUR-GEMINI-KEY-HERE')
+   STEP 3: Optionally add Anthropic key too (console.anthropic.com)
+   
+   If BOTH keys are missing → AI chat shows friendly setup message.
 ══════════════════════════════════════════════ */
 const RZP_KEY  = 'rzp_live_ScX1xgIfmOwmP8';  // ⚠️ Replace with your Razorpay Live/Test key
-const GEMINI_KEY = 'AIzaSy-YOUR-GEMINI-KEY-HERE'; // aistudio.google.com → Get API Key
+const WORKER_URL = 'https://ai-proxy.www-poojapoovi3.workers.dev'; // ✅ Cloudflare Worker proxy — API key safe on server
+
 
 
 function setAvatarSrc(src){
@@ -2705,7 +2803,7 @@ async function loadWeeklyContent(mi,li,cat){
 
   // Also try AI to get a fresh generated tip (non-blocking)
   try{
-    const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+    const url=WORKER_URL;
     const prompt=`Generate a weekly fresh AI tip for an Indian ${cat==='student'?'student':cat==='business'?'business owner':'job seeker'} learning about "${les.title}". Week ${weekNum} of ${new Date().getFullYear()}. Return ONLY valid JSON: {"tip":"one specific actionable tip under 30 words related to this lesson","prompt":"a ready-to-use ChatGPT prompt under 40 words with placeholders in [brackets]","india_example":"a real Indian context example under 25 words"}`;
     const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.8,maxOutputTokens:200}})});
@@ -2839,6 +2937,258 @@ function markDone(key,mi,li){
   const row=document.getElementById('lesRow'+mi+'_'+li);
   if(row){row.classList.add('done');row.querySelector('.lesson-num').textContent='✓';}
   toast('Lesson marked complete! ✓','ok');
+  /* ── Check if Elite user has completed ALL lessons → show certificate ── */
+  if(purchases.includes('unemployed')){
+    checkAndShowCertificate();
+  }
+}
+
+/* ══ GOLD CERTIFICATE ══ */
+function checkAndShowCertificate(){
+  const total = Object.values(CATS_TOTAL).reduce((a,b)=>a+b,0); /* 36 total */
+  const done  = Object.keys(completed).length;
+  if(done >= total){
+    /* Small delay so the "lesson complete" toast shows first */
+    setTimeout(()=> showCertificate(), 800);
+  }
+}
+
+function showCertificate(tier){
+  tier = tier || 'elite';
+  const name = (user && user.name) ? user.name : (tier==='professional' ? 'Professional Learner' : 'Elite Learner');
+  const date = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+  const overlay = document.getElementById('certOverlay');
+  if(overlay){
+    document.getElementById('certName').textContent = name;
+    document.getElementById('certDate').textContent = date;
+    /* Update overlay appearance for tier */
+    const wrap = overlay.querySelector('.cert-wrap');
+    const badge = overlay.querySelector('.cert-badge');
+    const dlBtn = overlay.querySelector('.cert-btn-dl');
+    if(tier === 'professional'){
+      wrap.style.background = 'linear-gradient(135deg,#ffffff,#f4f6f8,#e8ecf0)';
+      wrap.style.borderColor = '#9ca3af';
+      wrap.style.boxShadow = '0 0 60px rgba(156,163,175,0.25), 0 20px 60px rgba(0,0,0,0.2)';
+      badge.innerHTML = '🎓 Professional Certificate';
+      badge.style.background = '#4b5563';
+      badge.style.color = '#ffffff';
+      overlay.querySelector('.cert-org').style.color = '#374151';
+      overlay.querySelector('.cert-name').style.color = '#374151';
+      overlay.querySelector('.cert-name').style.borderBottomColor = 'rgba(107,114,128,0.35)';
+      overlay.querySelector('.cert-courses').style.color = '#4b5563';
+      overlay.querySelector('.cert-inner-border').style.borderColor = 'rgba(107,114,128,0.2)';
+      overlay.querySelector('.cert-divider').style.background = 'linear-gradient(90deg,transparent,#9ca3af,transparent)';
+      overlay.querySelector('.cert-footer').style.borderTopColor = 'rgba(107,114,128,0.2)';
+      overlay.querySelector('.cert-seal').textContent = '🎓';
+      overlay.querySelector('.cert-presents').style.color = 'rgba(55,65,81,0.6)';
+      overlay.querySelector('.cert-certifies').style.color = 'rgba(55,65,81,0.7)';
+      overlay.querySelectorAll('.cert-desc').forEach(el=>el.style.color='rgba(55,65,81,0.8)');
+      overlay.querySelector('.cert-org-sub').style.color = 'rgba(55,65,81,0.5)';
+      overlay.querySelector('.cert-date').style.color = 'rgba(55,65,81,0.45)';
+      overlay.querySelector('.cert-sig-name').style.color = 'rgba(55,65,81,0.75)';
+      overlay.querySelector('.cert-sig-title').style.color = 'rgba(55,65,81,0.45)';
+      overlay.querySelectorAll('.cert-corner').forEach(el=>el.style.color='#9ca3af');
+      dlBtn.style.background = '#4b5563';
+      dlBtn.style.color = '#ffffff';
+      document.getElementById('certDesc1').innerHTML = 'has successfully completed all <strong style="color:#374151;">12 lessons</strong> in';
+      document.getElementById('certCourseName').textContent = 'AI for Business Professionals';
+      document.querySelector('.cert-btn-dl').onclick = function(){ downloadCertificate('professional'); };
+    } else {
+      /* Elite / Gold — white background */
+      wrap.style.background = 'linear-gradient(135deg,#ffffff,#fffdf0,#fdf8e1)';
+      wrap.style.borderColor = '#b8860b';
+      wrap.style.boxShadow = '0 0 60px rgba(184,134,11,0.15), 0 20px 60px rgba(0,0,0,0.15)';
+      badge.innerHTML = '&#x1F451; Gold-Tier Certificate';
+      badge.style.background = '#b8860b';
+      badge.style.color = '#ffffff';
+      overlay.querySelector('.cert-org').style.color = '#7a5c00';
+      overlay.querySelector('.cert-name').style.color = '#7a5c00';
+      overlay.querySelector('.cert-name').style.borderBottomColor = 'rgba(184,134,11,0.3)';
+      overlay.querySelector('.cert-courses').style.color = '#7a5c00';
+      overlay.querySelector('.cert-inner-border').style.borderColor = 'rgba(184,134,11,0.2)';
+      overlay.querySelector('.cert-divider').style.background = 'linear-gradient(90deg,transparent,#b8860b,transparent)';
+      overlay.querySelector('.cert-footer').style.borderTopColor = 'rgba(184,134,11,0.2)';
+      overlay.querySelector('.cert-seal').textContent = '\uD83C\uDFC5';
+      overlay.querySelector('.cert-presents').style.color = 'rgba(15,23,42,0.55)';
+      overlay.querySelector('.cert-certifies').style.color = 'rgba(15,23,42,0.65)';
+      overlay.querySelectorAll('.cert-desc').forEach(el=>el.style.color='rgba(15,23,42,0.75)');
+      overlay.querySelector('.cert-org-sub').style.color = 'rgba(15,23,42,0.45)';
+      overlay.querySelector('.cert-date').style.color = 'rgba(15,23,42,0.4)';
+      overlay.querySelector('.cert-sig-name').style.color = 'rgba(15,23,42,0.7)';
+      overlay.querySelector('.cert-sig-title').style.color = 'rgba(15,23,42,0.4)';
+      overlay.querySelectorAll('.cert-corner').forEach(el=>el.style.color='#b8860b');
+      dlBtn.style.background = '#b8860b';
+      dlBtn.style.color = '#ffffff';
+      document.getElementById('certDesc1').innerHTML = 'has successfully completed all <strong style="color:#7a5c00;">36 lessons</strong> across';
+      document.getElementById('certCourseName').textContent = 'AI for Students \u00B7 AI for Business \u00B7 AI for Job Seekers';
+      document.querySelector('.cert-btn-dl').onclick = function(){ downloadCertificate('elite'); };
+    }
+    overlay.classList.add('show');
+  }
+}
+
+function closeCertificate(){
+  document.getElementById('certOverlay').classList.remove('show');
+}
+
+function downloadCertificate(tier){
+  tier = tier || 'elite';
+  const isPro = tier === 'professional';
+  const name = (user && user.name) ? user.name : (isPro ? 'Professional Learner' : 'Elite Learner');
+  const date = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+
+  /* ── Colour palette per tier ── */
+  const C = isPro ? {
+    bg0:'#ffffff', bg1:'#f4f6f8', bg2:'#e8ecf0',
+    gold:'#6b7280', goldDim:'rgba(107,114,128,0.3)',
+    badgeBg:'#4b5563', badgeFg:'#ffffff',
+    badgeText:'\uD83C\uDF93  PROFESSIONAL CERTIFICATE',
+    titleColor:'#374151',
+    lessonCount:'12 lessons', courseLine:'AI for Business Professionals',
+    sealEmoji:'\uD83C\uDF93', certIdSuffix:'PRO'
+  } : {
+    bg0:'#ffffff', bg1:'#fffdf0', bg2:'#fdf8e1',
+    gold:'#b8860b', goldDim:'rgba(184,134,11,0.3)',
+    badgeBg:'#b8860b', badgeFg:'#ffffff',
+    badgeText:'\uD83D\uDC51  GOLD-TIER CERTIFICATE',
+    titleColor:'#7a5c00',
+    lessonCount:'36 lessons', courseLine:'AI for Students  \u00B7  AI for Business  \u00B7  AI for Job Seekers',
+    sealEmoji:'\uD83C\uDFC5', certIdSuffix:'ELITE'
+  };
+
+  const canvas = document.createElement('canvas');
+  canvas.width  = 1200;
+  canvas.height = 850;
+  const ctx = canvas.getContext('2d');
+
+  /* ── Background ── */
+  const bg = ctx.createLinearGradient(0,0,1200,850);
+  bg.addColorStop(0,  C.bg0);
+  bg.addColorStop(0.4,C.bg1);
+  bg.addColorStop(1,  C.bg2);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,1200,850);
+
+  /* ── Outer border ── */
+  ctx.strokeStyle = C.gold;
+  ctx.lineWidth   = 8;
+  ctx.strokeRect(24,24,1152,802);
+
+  /* ── Inner border ── */
+  ctx.strokeStyle = C.goldDim;
+  ctx.lineWidth   = 2;
+  ctx.strokeRect(40,40,1120,770);
+
+  /* ── Corner ornaments ── */
+  [[50,50],[1150,50],[50,800],[1150,800]].forEach(([x,y])=>{
+    ctx.fillStyle=C.gold;
+    ctx.font='bold 28px serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('✦',x,y);
+  });
+
+  /* ── Header badge ── */
+  ctx.fillStyle=C.badgeBg;
+  ctx.beginPath();
+  ctx.roundRect(420,65,360,44,22);
+  ctx.fill();
+  ctx.fillStyle=C.badgeFg;
+  ctx.font='bold 15px "Arial",sans-serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText(C.badgeText, 600, 87);
+
+  /* ── AI KATRUKKO title ── */
+  ctx.fillStyle=C.titleColor;
+  ctx.font='bold 52px "Georgia",serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='alphabetic';
+  ctx.fillText('AI KATRUKKO', 600, 185);
+
+  /* ── Subtitle ── */
+  ctx.fillStyle='rgba(255,255,255,0.7)';
+  ctx.font='18px "Arial",sans-serif';
+  ctx.fillText('LEARN AI THE SMART WAY  ·  aikatrukko.in', 600, 218);
+
+  /* ── Divider ── */
+  const grad = ctx.createLinearGradient(200,0,1000,0);
+  grad.addColorStop(0,'transparent');
+  grad.addColorStop(0.3,C.gold);
+  grad.addColorStop(0.7,C.gold);
+  grad.addColorStop(1,'transparent');
+  ctx.strokeStyle=grad; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(200,240); ctx.lineTo(1000,240); ctx.stroke();
+
+  /* ── "Certificate of Completion" ── */
+  ctx.fillStyle = isPro ? 'rgba(15,23,42,0.55)' : 'rgba(255,255,255,0.55)';
+  ctx.font='italic 22px "Georgia",serif';
+  ctx.fillText('Certificate of Completion', 600, 295);
+
+  /* ── "This certifies that" ── */
+  ctx.fillStyle = isPro ? 'rgba(15,23,42,0.7)' : 'rgba(255,255,255,0.7)';
+  ctx.font='20px "Arial",sans-serif';
+  ctx.fillText('This is to certify that', 600, 360);
+
+  /* ── Recipient Name ── */
+  ctx.fillStyle=C.titleColor;
+  ctx.font='bold 62px "Georgia",serif';
+  ctx.fillText(name, 600, 450);
+
+  /* ── Name underline ── */
+  const nameW = ctx.measureText(name).width;
+  ctx.strokeStyle=C.goldDim; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(600-nameW/2, 462); ctx.lineTo(600+nameW/2, 462);
+  ctx.stroke();
+
+  /* ── Completion text ── */
+  ctx.fillStyle = isPro ? 'rgba(15,23,42,0.85)' : 'rgba(255,255,255,0.85)';
+  ctx.font='20px "Arial",sans-serif';
+  ctx.fillText('has successfully completed all ' + C.lessonCount + (isPro ? ' in' : ' across'), 600, 515);
+  ctx.fillStyle=C.titleColor;
+  ctx.font='bold 22px "Arial",sans-serif';
+  ctx.fillText(C.courseLine, 600, 548);
+  ctx.fillStyle = isPro ? 'rgba(15,23,42,0.85)' : 'rgba(255,255,255,0.85)';
+  ctx.font='20px "Arial",sans-serif';
+  ctx.fillText('demonstrating mastery of AI skills for the modern Indian workforce.', 600, 582);
+
+  /* ── Date ── */
+  ctx.fillStyle = isPro ? 'rgba(15,23,42,0.55)' : 'rgba(255,255,255,0.55)';
+  ctx.font='16px "Arial",sans-serif';
+  ctx.fillText('Issued on  ' + date, 600, 630);
+
+  /* ── Divider 2 ── */
+  ctx.strokeStyle=grad; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(200,658); ctx.lineTo(1000,658); ctx.stroke();
+
+  /* ── Signature area ── */
+  ctx.fillStyle = isPro ? 'rgba(15,23,42,0.6)' : 'rgba(255,255,255,0.5)';
+  ctx.font='italic 20px "Georgia",serif';
+  ctx.textAlign='left';
+  ctx.fillText('Pooja Gunasekaran', 260, 715);
+  ctx.font='14px "Arial",sans-serif';
+  ctx.fillStyle = isPro ? 'rgba(15,23,42,0.4)' : 'rgba(255,255,255,0.35)';
+  ctx.fillText('Founder & AI Educator, AI Katrukko', 260, 738);
+
+  /* ── Seal ── */
+  ctx.textAlign='center';
+  ctx.font='56px serif';
+  ctx.fillText(C.sealEmoji, 600, 730);
+
+  /* ── Certificate ID ── */
+  ctx.fillStyle = isPro ? 'rgba(15,23,42,0.3)' : 'rgba(255,255,255,0.25)';
+  ctx.font='11px monospace';
+  ctx.textAlign='right';
+  ctx.fillText('Cert ID: AK-' + (user&&user.uid?user.uid.slice(-8).toUpperCase():C.certIdSuffix) + '-' + new Date().getFullYear(), 1140, 800);
+
+  /* ── Download ── */
+  const tierLabel = isPro ? 'Professional' : 'GoldElite';
+  const link = document.createElement('a');
+  link.download = 'AIKatrukko_' + tierLabel + 'Certificate_' + name.replace(/\s+/g,'_') + '.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  toast('Certificate downloaded! 🎓','ok');
 }
 
 function ansQ(qId,chosen,correct,exp,el){
@@ -2945,7 +3295,7 @@ async function genLive(trend){
   res.innerHTML=`<div class="ai-loading">🤖 Generating fresh prompts for "<strong>${t}</strong>"...<div class="dots"><span>.</span><span>.</span><span>.</span></div></div>`;
   try{
     const catLabel={student:'students',business:'business owners',unemployed:'job seekers'}[curCat];
-    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+    const url=WORKER_URL;
     const r=await fetch(url,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -3105,31 +3455,39 @@ function switchAuth(mode){
 
 /* ── LOGIN ── */
 async function doLogin(){
+  if(_authBusy) return;
   await window._fbReady;
   clrAllErrs();
-  const e = document.getElementById('liEmail').value.trim().toLowerCase();
+  // Clean email — strip www. or http(s):// typos
+  let e = document.getElementById('liEmail').value.trim().toLowerCase().replace(/^(https?:\/\/|www\.)/i,'');
+  document.getElementById('liEmail').value = e;
   const p = document.getElementById('liPass').value;
-  if(!e)             { fldErr('liEmail','Please enter your email'); return; }
-  if(!e.includes('@')){ fldErr('liEmail','Please enter a valid email address'); return; }
-  if(!p)             { fldErr('liPass','Please enter your password'); return; }
+  if(!e){ fldErr('liEmail','Please enter your email'); return; }
+  if(!e.includes('@')){ fldErr('liEmail','Please enter a valid email'); return; }
+  if(!p){ fldErr('liPass','Please enter your password'); return; }
 
   const btn = document.querySelector('#loginForm .submit-btn');
   if(btn){ btn.textContent='Logging in…'; btn.disabled=true; }
+  _authBusy = true;
   try{
-    _authBusy = true;
-    const cred = await window._fbSignIn(window._fbAuth, e, p);
+    const cred = await window._fbSignIn(e, p);
     const fu = cred.user;
     let purch = [];
     try{
-      const s = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',fu.uid));
-      if(s.exists()) purch = s.data().purchases || [];
+      const snap = await window._fbGetDoc(window._fbDoc('users', fu.uid));
+      if(snap.exists()) purch = snap.data().purchases || [];
     }catch(x){}
-    const found = { name: fu.displayName || e.split('@')[0], email: e, uid: fu.uid, photo: fu.photoURL || null };
+    const found = {
+      uid:   fu.uid,
+      email: fu.email,
+      name:  fu.displayName || e.split('@')[0],
+      photo: fu.photoURL || null
+    };
+    _authBusy = false;
     saveSession(found, purch, null);
     completed = JSON.parse(localStorage.getItem('ak_done') || '{}');
     userPhotoSrc = fu.photoURL || localStorage.getItem('ak_photo') || null;
     photoSrc = userPhotoSrc;
-    _authBusy = false;
     setLoggedIn(found, purch);
     closeOv('authOverlay');
     document.getElementById('liEmail').value = '';
@@ -3139,209 +3497,211 @@ async function doLogin(){
     _authBusy = false;
     const c = err.code || '';
     console.warn('Login error:', c, err.message);
-    /* Map new Firebase error codes to old ones for compatibility */
-    if(c === 'auth/user-not-found'){
-      fldErr('liEmail', 'No account found with this email. Please sign up!');
-    } else if(c === 'auth/wrong-password'){
-      fldErr('liPass', 'Incorrect password. Try again or use Forgot Password.');
-    } else if(c === 'auth/invalid-credential' || c === 'auth/invalid-login-credentials' || c === 'auth/INVALID_LOGIN_CREDENTIALS'){
-      fldErr('liEmail', 'Email or password is incorrect.');
-      fldErr('liPass', 'Please check and try again, or use Forgot Password.');
-    } else if(c === 'auth/invalid-email'){
-      fldErr('liEmail', 'Please enter a valid email address.');
-    } else if(c === 'auth/too-many-requests'){
-      toast('Too many failed attempts. Please wait a few minutes and try again.', 'err');
-    } else if(c === 'auth/network-request-failed'){
-      toast('Network error. Please check your internet connection.', 'err');
-    } else if(c === 'auth/user-disabled'){
-      fldErr('liEmail', 'This account has been disabled. Please contact support.');
+    if(c==='auth/user-not-found'){
+      fldErr('liEmail','No account found. Switching to Sign Up…');
+      setTimeout(()=>{ switchAuth('signup'); document.getElementById('suEmail').value=e; document.getElementById('suName').focus(); toast('Enter your name to create a free account!','info'); },1000);
+    } else if(c==='auth/wrong-password'){
+      fldErr('liPass','Wrong password. Try again or use Forgot Password.');
+    } else if(c==='auth/invalid-credential'||c==='auth/invalid-login-credentials'||c==='auth/INVALID_LOGIN_CREDENTIALS'){
+      fldErr('liEmail','Email or password is incorrect.');
+      fldErr('liPass','Please check and try again.');
+    } else if(c==='auth/invalid-email'){
+      fldErr('liEmail','Please enter a valid email address.');
+    } else if(c==='auth/too-many-requests'){
+      toast('Too many attempts. Wait a few minutes and try again.','err');
+    } else if(c==='auth/network-request-failed'){
+      toast('Network error. Check your internet connection.','err');
+    } else if(c==='auth/user-disabled'){
+      fldErr('liEmail','This account is disabled. Contact support.');
     } else {
-      toast('Login failed (' + c + '). Please try again.', 'err');
+      toast('Login failed: ' + c + '. Please try again.','err');
     }
   }finally{
-    if(btn){ btn.textContent = 'Login to AI Katrukko'; btn.disabled = false; }
-    /* _authBusy already cleared in try/catch — this is just a safety net */
-    setTimeout(()=>{ _authBusy = false; }, 200);
+    if(btn){ btn.textContent='Login to AI Katrukko'; btn.disabled=false; }
+    setTimeout(()=>{ _authBusy=false; }, 300);
   }
 }
-
 /* ── SIGNUP ── */
 async function doSignup(){
+  if(_authBusy) return;
   await window._fbReady;
   clrAllErrs();
   const n = document.getElementById('suName').value.trim();
-  const e = document.getElementById('suEmail').value.trim().toLowerCase();
+  let e   = document.getElementById('suEmail').value.trim().toLowerCase().replace(/^(https?:\/\/|www\.)/i,'');
+  document.getElementById('suEmail').value = e;
   const p = document.getElementById('suPass').value;
-  if(!n)              { fldErr('suName',  'Please enter your full name'); return; }
-  if(!e)              { fldErr('suEmail', 'Please enter your email'); return; }
-  if(!e.includes('@')){ fldErr('suEmail', 'Please enter a valid email address'); return; }
-  if(!p)              { fldErr('suPass',  'Please create a password'); return; }
-  if(p.length < 6)    { fldErr('suPass',  'Password must be at least 6 characters'); return; }
+  if(!n){ fldErr('suName','Please enter your full name'); return; }
+  if(!e){ fldErr('suEmail','Please enter your email'); return; }
+  if(!e.includes('@')){ fldErr('suEmail','Please enter a valid email'); return; }
+  if(!p){ fldErr('suPass','Please create a password'); return; }
+  if(p.length<6){ fldErr('suPass','Password must be at least 6 characters'); return; }
 
   const btn = document.querySelector('#signupForm .submit-btn');
-  if(btn){ btn.textContent = 'Creating…'; btn.disabled = true; }
+  if(btn){ btn.textContent='Creating…'; btn.disabled=true; }
+  _authBusy = true;
   try{
-    _authBusy = true;
-    const cred = await window._fbCreateUser(window._fbAuth, e, p);
+    const cred = await window._fbCreateUser(e, p);
     const fu = cred.user;
     await window._fbUpdateProfile(fu, { displayName: n });
-    const nu = { name: n, email: e, uid: fu.uid, photo: null };
+    const nu = { uid: fu.uid, email: e, name: n, photo: null };
     try{
-      await window._fbSetDoc(window._fbDoc(window._fbDb,'users',fu.uid), {
+      await window._fbSetDoc(window._fbDoc('users', fu.uid), {
         name: n, email: e, purchases: [], createdAt: new Date().toISOString()
       });
     }catch(fe){ console.warn('Firestore write error:', fe); }
-    saveSession(nu, [], null);
     _authBusy = false;
+    saveSession(nu, [], null);
     setLoggedIn(nu, []);
     closeOv('authOverlay');
-    document.getElementById('suName').value = '';
-    document.getElementById('suEmail').value = '';
-    document.getElementById('suPass').value = '';
-    toast('Account created! Module 1 is free — start learning now 🎉', 'ok');
+    document.getElementById('suName').value='';
+    document.getElementById('suEmail').value='';
+    document.getElementById('suPass').value='';
+    toast('Account created! Module 1 is free — start learning 🎉','ok');
   }catch(err){
     _authBusy = false;
     const c = err.code || '';
     console.warn('Signup error:', c, err.message);
-    if(c === 'auth/email-already-in-use'){
-      const em = document.getElementById('suEmail').value.trim().toLowerCase();
-      fldErr('suEmail', 'This email is already registered. Please login instead.');
+    if(c==='auth/email-already-in-use'){
+      fldErr('suEmail','Email already registered. Please login instead.');
       setTimeout(()=>{
         switchAuth('login');
-        document.getElementById('liEmail').value = em;
+        document.getElementById('liEmail').value = e;
         document.getElementById('liPass').focus();
-        toast('Enter your password to login!', 'info');
+        toast('Enter your password to login!','info');
       }, 900);
-    } else if(c === 'auth/invalid-email'){
-      fldErr('suEmail', 'Please enter a valid email address.');
-    } else if(c === 'auth/weak-password'){
-      fldErr('suPass', 'Password must be at least 6 characters.');
-    } else if(c === 'auth/network-request-failed'){
-      toast('Network error. Please check your internet connection.', 'err');
+    } else if(c==='auth/invalid-email'){
+      fldErr('suEmail','Please enter a valid email address.');
+    } else if(c==='auth/weak-password'){
+      fldErr('suPass','Password must be at least 6 characters.');
+    } else if(c==='auth/network-request-failed'){
+      toast('Network error. Check your internet connection.','err');
     } else {
-      toast('Signup failed (' + c + '). Please try again.', 'err');
+      toast('Signup failed: ' + c + '. Please try again.','err');
     }
   }finally{
-    if(btn){ btn.textContent = 'Create Free Account →'; btn.disabled = false; }
-    setTimeout(()=>{ _authBusy = false; }, 200);
+    if(btn){ btn.textContent='Create Free Account →'; btn.disabled=false; }
+    setTimeout(()=>{ _authBusy=false; }, 300);
   }
 }
-
 /* ── GOOGLE SIGN-IN ── */
-/* ── Helper: finish Google login after we have a Firebase result ── */
+/* ── Helper: finish Google login ── */
 async function _finishGoogleLogin(result){
-  if(!result || !result.user) return;
+  if(!result || !result.user) return false;
   const fu = result.user;
   let purch = [];
   try{
-    const s = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',fu.uid));
-    if(s.exists()){
-      purch = s.data().purchases || [];
+    const snap = await window._fbGetDoc(window._fbDoc('users', fu.uid));
+    if(snap.exists()){
+      purch = snap.data().purchases || [];
     } else {
-      await window._fbSetDoc(window._fbDoc(window._fbDb,'users',fu.uid), {
+      await window._fbSetDoc(window._fbDoc('users', fu.uid), {
         name: fu.displayName || fu.email.split('@')[0],
-        email: fu.email,
-        purchases: [],
-        createdAt: new Date().toISOString(),
-        loginMethod: 'google'
+        email: fu.email, purchases: [],
+        createdAt: new Date().toISOString(), loginMethod: 'google'
       });
     }
-  }catch(fe){ console.warn('Firestore error:', fe); }
+  }catch(fe){ console.warn('Firestore:', fe); }
   const u = {
-    uid: fu.uid,
-    email: fu.email,
+    uid: fu.uid, email: fu.email,
     name: fu.displayName || fu.email.split('@')[0],
     photo: fu.photoURL || null
   };
   userPhotoSrc = fu.photoURL || null;
   photoSrc = userPhotoSrc;
-  saveSession(u, purch, null);
   _authBusy = false;
+  saveSession(u, purch, null);
   setLoggedIn(u, purch);
   closeOv('authOverlay');
   clrAllErrs();
   const isNew = result.additionalUserInfo?.isNewUser ?? false;
-  toast(isNew
-    ? 'Welcome to AI Katrukko, ' + u.name.split(' ')[0] + '! 🎉'
-    : 'Welcome back, ' + u.name.split(' ')[0] + '! 👋',
-    'ok');
+  toast(isNew ? 'Welcome to AI Katrukko, '+u.name.split(' ')[0]+'! 🎉' : 'Welcome back, '+u.name.split(' ')[0]+'! 👋', 'ok');
+  return true;
 }
 
+/* ── Google Sign-In: tries popup first, falls back to redirect ── */
 async function doGoogleSignIn(){
+  if(_authBusy) return;
   await window._fbReady;
+  /* If Firebase didn't load, show a clear message instead of a cryptic error */
+  if(window._fbFallbackActive){
+    toast('Google Sign-In requires opening the file on your real website (aikatrukko.in). Email/password login works here.','info');
+    return;
+  }
   const btn = document.getElementById('googleSignInBtn');
-  if(btn){ btn.innerHTML = '⏳ Connecting to Google…'; btn.disabled = true; }
+  if(btn){ btn.innerHTML='⏳ Connecting…'; btn.disabled=true; }
   _authBusy = true;
   try{
-    let result;
-    try{
-      /* Try popup first (works on desktop & most browsers) */
-      result = await window._fbSignInGoogle();
-      await _finishGoogleLogin(result);
-    }catch(pe){
-      const pc = pe.code || '';
-      console.warn('Google popup error:', pc, pe.message);
-      if(pc === 'auth/popup-closed-by-user' || pc === 'auth/cancelled-popup-request'){
-        /* User closed popup — just reset */
-        _authBusy = false;
-        if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
-        return;
-      }
-      if(pc === 'auth/popup-blocked'){
-        /* Popup blocked — fallback to redirect */
-        toast('Popup blocked — redirecting to Google…', 'info');
-        localStorage.setItem('ak_google_redirect', '1');
-        await window._fbSignInGoogleRedirect();
-        return; /* Page will redirect — code below won't run */
-      }
-      if(pc === 'auth/operation-not-allowed'){
-        toast('Google Sign-In not enabled yet. Please use Email & Password below.', 'err');
-        _authBusy = false;
-        if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
-        return;
-      }
-      if(pc === 'auth/account-exists-with-different-credential'){
-        toast('This email is registered with Email/Password. Please use that to login.', 'err');
-        switchAuth('login');
-        _authBusy = false;
-        if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
-        return;
-      }
-      if(pc === 'auth/network-request-failed'){
-        toast('Network error. Check your internet connection.', 'err');
-        _authBusy = false;
-        if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
-        return;
-      }
-      /* Any other error */
-      console.error('Google Sign-In unexpected error:', pe);
-      toast('Google Sign-In failed (' + pc + '). Try Email & Password instead.', 'err');
+    /* TRY POPUP FIRST */
+    const result = await window._fbSignInPopup();
+    await _finishGoogleLogin(result);
+  } catch(err){
+    const c = err.code || '';
+    console.warn('Google popup error:', c);
+    if(c === 'auth/popup-closed-by-user' || c === 'auth/cancelled-popup-request'){
+      /* User closed popup — reset silently */
       _authBusy = false;
-      if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
+      if(btn){ btn.innerHTML=_GBTN; btn.disabled=false; }
+      return;
     }
-  }finally{
-    if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
-    setTimeout(()=>{ _authBusy = false; }, 200);
+    if(c === 'auth/popup-blocked' || c === 'auth/operation-not-supported-in-this-environment'){
+      toast('Redirecting to Google…','info');
+      try{
+        localStorage.setItem('ak_google_redirect','1');
+        await window._fbSignInRedirect();
+        return; /* page navigates — skip finally */
+      }catch(re){
+        localStorage.removeItem('ak_google_redirect');
+        _authBusy = false;
+        toast('Google Sign-In failed. Try Email & Password.','err');
+        if(btn){ btn.innerHTML=_GBTN; btn.disabled=false; }
+      }
+      return;
+    }
+    if(c === 'auth/unauthorized-domain'){
+      _authBusy = false;
+      toast('⚠️ Domain not authorized. Go to Firebase Console → Authentication → Settings → Authorized domains → Add: ailearn-o60u.onrender.com and aikatrukko.in','err');
+      if(btn){ btn.innerHTML=_GBTN; btn.disabled=false; }
+      return;
+    }
+    if(c === 'auth/account-exists-with-different-credential'){
+      _authBusy = false;
+      toast('This email is registered with Email/Password. Please login with that.','err');
+      switchAuth('login');
+      if(btn){ btn.innerHTML=_GBTN; btn.disabled=false; }
+      return;
+    }
+    /* Any other error */
+    _authBusy = false;
+    console.error('Google error:', c, err.message);
+    toast('Google Sign-In error: '+c+'. Try Email & Password instead.','err');
+    if(btn){ btn.innerHTML=_GBTN; btn.disabled=false; }
+  } finally {
+    if(btn){ btn.innerHTML=_GBTN; btn.disabled=false; }
+    setTimeout(()=>{ _authBusy=false; }, 300);
   }
 }
 
-/* ── Handle Google Redirect result on page load (for popup-blocked fallback) ── */
+/* ── Handle redirect result on page load ── */
 async function _checkGoogleRedirect(){
   if(!localStorage.getItem('ak_google_redirect')) return;
   localStorage.removeItem('ak_google_redirect');
   await window._fbReady;
   try{
-    const result = await window._fbGetRedirectResult();
+    const result = await window._fbRedirectResult();
     if(result && result.user){
       _authBusy = true;
       await _finishGoogleLogin(result);
     }
   }catch(e){
     console.warn('Redirect result error:', e.code, e.message);
+    if(e.code==='auth/unauthorized-domain'){
+      toast('Add your domain to Firebase Authorized domains.','err');
+    }
   }
 }
-/* Call on load */
-window.addEventListener('load', ()=>{ setTimeout(_checkGoogleRedirect, 800); });
+window.addEventListener('load', ()=>{ setTimeout(_checkGoogleRedirect, 1000); });
+
+let _bannerShown = false; /* prevent duplicate banner on double setLoggedIn calls */
 
 function setLoggedIn(u,p){
   user=u; purchases=p||[];
@@ -3351,7 +3711,7 @@ function setLoggedIn(u,p){
     saveSession(u, purchases, authToken);
     /* Save admin purchases to Firestore too */
     if(u.uid && window._fbDb){
-      try{ window._fbUpdateDoc(window._fbDoc(window._fbDb,'users',u.uid),{purchases:['student','business','unemployed']}).catch(()=>{}); }catch(e){}
+      try{ window._fbUpdateDoc(window._fbDoc('users',u.uid),{purchases:['student','business','unemployed']}).catch(()=>{}); }catch(e){}
     }
   }
   /* ── Restore user photo ── */
@@ -3370,11 +3730,26 @@ function setLoggedIn(u,p){
 
   updateBadges();
 
-  /* ── Show upgrade banner if user doesn't have Elite (unemployed) plan ── */
+  /* ── Open free trial dashboard after auth if requested ── */
+  if(window._openTrialAfterAuth){
+    window._openTrialAfterAuth = false;
+    setTimeout(()=>showFreeTrialDashboard(), 600);
+  }
+
+  /* ── Show upgrade banner ONCE per session — not on every repeated call ── */
   const banner = document.getElementById('upgradeBanner');
+  const annBanner = document.getElementById('announcementBanner');
   if(banner){
     const hasElite = (purchases||[]).includes('unemployed');
-    banner.style.display = hasElite ? 'none' : 'block';
+    if(hasElite){
+      banner.style.display = 'none';
+      if(annBanner) annBanner.style.display = 'flex'; /* restore announcement if elite */
+      _bannerShown = false;
+    } else if(!_bannerShown){
+      banner.style.display = 'block';
+      if(annBanner) annBanner.style.display = 'none'; /* hide announcement, show upgrade */
+      _bannerShown = true;
+    }
   }
 }
 
@@ -3382,7 +3757,7 @@ function setLoggedIn(u,p){
 function logout(){
   /* Firebase sign out */
   if(window._fbAuth){
-    window._fbSignOut(window._fbAuth).catch(()=>{});
+    window._fbSignOut().catch(()=>{});
   }
   const wasName = user?.name?.split(' ')[0] || '';
   user=null; purchases=[]; authToken=null;
@@ -3392,6 +3767,9 @@ function logout(){
   updateBadges();
   const banner=document.getElementById('upgradeBanner');
   if(banner) banner.style.display='none';
+  const annBanner=document.getElementById('announcementBanner');
+  if(annBanner) annBanner.style.display='flex'; /* restore announcement on logout */
+  _bannerShown = false;
   goHome();
   setTimeout(()=>{
     toast('Logged out. See you soon, '+wasName+'! 👋','info');
@@ -3524,7 +3902,7 @@ function grantAccess(cat){
   /* ── Save to Firestore so all devices see the purchase ── */
   if(user?.uid && window._fbDb){
     try{
-      window._fbSetDoc(window._fbDoc(window._fbDb,'users',user.uid),{purchases:[...purchases]}).catch(()=>{});
+      window._fbSetDoc(window._fbDoc('users',user.uid),{purchases:[...purchases]}).catch(()=>{});
     }catch(e){}
   }
   updateBadges();
@@ -3566,7 +3944,8 @@ function toast(msg,type){
 /* ══ FORGOT PASSWORD — Firebase Reset ══ */
 function openForgotPassword(){
   closeOv('authOverlay');
-  const em = document.getElementById('liEmail').value.trim();
+  let em = document.getElementById('liEmail').value.trim();
+  em = em.replace(/^(https?:\/\/|www\.)/i, '');
   if(!em || !em.includes('@')){
     toast('Enter your email in the field above, then click Forgot Password.','info');
     setTimeout(()=>openAuth('login'),400);
@@ -3729,10 +4108,10 @@ window.addEventListener('load',()=>{
   if(saved){
     const u=JSON.parse(saved);
     const p=JSON.parse(localStorage.getItem('ak_purchases')||'[]');
-    /* Show UI immediately from localStorage (fast) — Firebase _fbAuthReady will confirm & sync silently after */
+    /* Show UI immediately from localStorage (fast) — Firebase _onAuthChange will confirm & sync silently after */
     setLoggedInSilent(u,p);
   }
-  /* NOTE: Firebase onAuthStateChanged fires after this and calls _fbAuthReady for full sync */
+  /* NOTE: Firebase onAuthStateChanged fires after this and calls _onAuthChange for full sync */
 });
 
 function setLoggedInSilent(u,p){
@@ -3860,6 +4239,49 @@ function renderProfileContent(){
     '</div>';
   });
   document.getElementById('profLessonProg').innerHTML=pr;
+
+  /* ── Certificate section ── */
+  const certSection = document.getElementById('profCertSection');
+  const certBtn     = document.getElementById('profCertBtn');
+  const certMsg     = document.getElementById('profCertMsg');
+  const hasElite    = purchases.includes('unemployed');
+  const hasPro      = purchases.includes('business');
+
+  if(certSection && (hasElite || hasPro)){
+    certSection.style.display = 'block';
+
+    if(hasElite){
+      /* Elite: needs all 36 lessons */
+      const totalLessons = Object.values(CATS_TOTAL).reduce((a,b)=>a+b,0);
+      const doneLessons  = Object.keys(completed).length;
+      const remaining    = totalLessons - doneLessons;
+      if(doneLessons >= totalLessons){
+        certMsg.innerHTML = '🏆 Congratulations! You have completed all 36 lessons — your <strong style="color:#FFD700;">Gold-Tier Elite Certificate</strong> is ready!';
+        certBtn.style.display = 'inline-block';
+        certBtn.setAttribute('data-tier','elite');
+        certBtn.textContent = '🏆 View Gold Certificate';
+      } else {
+        certMsg.textContent = `Complete ${remaining} more lesson${remaining===1?'':'s'} to earn your Gold Elite Certificate. (${doneLessons}/${totalLessons} done)`;
+        certBtn.style.display = 'none';
+      }
+    } else if(hasPro){
+      /* Professional: needs only the 12 business lessons */
+      const proTotal = CATS_TOTAL['business'] || 12;
+      const proDone  = Object.keys(completed).filter(k=>k.startsWith('business_')).length;
+      const remaining = proTotal - proDone;
+      if(proDone >= proTotal){
+        certMsg.innerHTML = '🎓 Congratulations! You have completed all 12 Business lessons — your <strong style="color:#3b82f6;">Professional Certificate</strong> is ready!';
+        certBtn.style.display = 'inline-block';
+        certBtn.setAttribute('data-tier','professional');
+        certBtn.textContent = '🎓 View Professional Certificate';
+      } else {
+        certMsg.textContent = `Complete ${remaining} more Business lesson${remaining===1?'':'s'} to earn your Professional Certificate. (${proDone}/${proTotal} done)`;
+        certBtn.style.display = 'none';
+      }
+    }
+  } else if(certSection){
+    certSection.style.display = 'none';
+  }
 }
 
 function saveProfileDetails(){
@@ -3887,7 +4309,7 @@ async function genProfilePrompt(){
   const streak=parseInt(localStorage.getItem('ak_streak')||'0');
   ttl.textContent='AI Prompt \u2014 Made for '+(user.name||'You');
   try{
-    const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+    const url=WORKER_URL;
     const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:[{text:'Generate 1 practical ready-to-use AI prompt for a '+role+' in India who has completed '+done+' lessons with a '+streak+'-day streak. Under 60 words, specific, actionable. Return ONLY the prompt text, no quotes or labels.'}]}],generationConfig:{temperature:0.85,maxOutputTokens:200}})});
     if(!r.ok)throw new Error('api');
@@ -3924,7 +4346,7 @@ function renderNewModuleFeed(){
 
 async function fetchTrendModule(feed){
   try{
-    const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+    const url=WORKER_URL;
     const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:[{text:'What is the single most important new AI tool or trend in 2025 in India right now for students, job seekers, or business owners? Return ONLY valid JSON (no markdown): {"title":"emoji + module title under 8 words","desc":"one sentence under 25 words"}'}]}],generationConfig:{temperature:0.7,maxOutputTokens:120}})});
     if(!r.ok)return;
@@ -4016,7 +4438,7 @@ async function fetchHomeLiveWeeklyTip(grid, weekNum){
     try{ appendHomeLiveTip(grid, JSON.parse(cached)); return; }catch(e){}
   }
   try{
-    const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key='+GEMINI_KEY;
+    const url=WORKER_URL;
     const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({contents:[{parts:[{text:`Generate a fresh AI tip for an Indian learner for week ${weekNum} of ${new Date().getFullYear()}. It should be practical and usable today. Return ONLY valid JSON: {"headline":"emoji + title under 8 words","tip":"one actionable sentence under 30 words","prompt":"ready-to-use ChatGPT prompt under 40 words with [placeholders]","india_note":"India-specific context under 20 words"}`}]}],generationConfig:{temperature:0.9,maxOutputTokens:220}})});
     if(!r.ok) return;
@@ -4334,7 +4756,7 @@ async function generateWeeklyLesson(cat, weekNum){
   const moduleNum = Math.floor((weekNum - 1) / 3) + 5; // Week 1-3 → Module 5, Week 4-6 → Module 6, etc.
 
   try{
-    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' + GEMINI_KEY;
+    const url = WORKER_URL;
     const prompt = `Create a complete AI learning lesson for Indian ${catLabel} about "${topic}" (Week ${weekNum} of the course). Return ONLY valid JSON (no markdown): {
   "title": "lesson title under 8 words",
   "icon": "one relevant emoji",
@@ -4364,36 +4786,27 @@ async function generateWeeklyLesson(cat, weekNum){
    PAGE INIT — Restore session UI on every load/refresh
    Works seamlessly on all devices where user is logged in
 ══════════════════════════════════════════════ */
-/* ── Firebase Auth Ready: Always sync from Firebase — fixes login not persisting & account not remembered ── */
-window._fbAuthReady = function(fbUser, fbPurch){
-  if(_authBusy) return;
-  if(fbUser){
-    /* Always update from Firebase — overrides stale localStorage data */
-    const freshUser = {
-      uid: fbUser.uid,
-      email: fbUser.email,
-      name: fbUser.name || fbUser.email.split('@')[0],
-      photo: fbUser.photo || null
-    };
-    /* Merge purchases: Firebase + locally stored (for multi-device) */
-    const localPurch = JSON.parse(localStorage.getItem('ak_purch_'+fbUser.email)||'[]');
-    const mergedPurch = [...new Set([...(fbPurch||[]), ...localPurch])];
-    user = freshUser;
-    purchases = mergedPurch;
+/* ── Firebase auth state handler — called by onAuthStateChanged ── */
+window._onAuthChange = function(fbUser, fbPurch) {
+  if (_authBusy) return; /* skip if a login is actively in progress */
+  if (fbUser) {
+    /* Merge Firebase purchases with any locally stored ones */
+    const localPurch = JSON.parse(localStorage.getItem('ak_purch_' + fbUser.email) || '[]');
+    const merged = [...new Set([...(fbPurch || []), ...localPurch])];
+    user = fbUser;
+    purchases = merged;
     saveSession(user, purchases, null);
-    /* Only update UI if not already visually logged in (avoid flicker) */
-    if(!document.getElementById('navUser').classList.contains('show')){
+    if (!document.getElementById('navUser').classList.contains('show')) {
       setLoggedIn(user, purchases);
     } else {
-      /* Already showing — just refresh badges & purchases silently */
-      updateBadges();
+      updateBadges(); /* already logged in UI — just refresh purchases */
     }
-  } else if(!fbUser && user){
-    /* Firebase says logged out — clear everything */
-    user=null; purchases=[];
+  } else if (user) {
+    /* Firebase says signed out */
+    user = null; purchases = [];
     clearSession();
     document.getElementById('navUser').classList.remove('show');
-    document.getElementById('navAuth').style.display='flex';
+    document.getElementById('navAuth').style.display = 'flex';
     updateBadges();
   }
 };
@@ -4508,38 +4921,47 @@ async function sendPracticeMessage(){
   practiceMessages.push({role:'ai',text:'<span style="color:#718096;">⏳ Thinking…</span>'});
   renderPracticeMessages();
 
-  try{
-    const resp = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:`You are Pooja's AI Practice Coach for AI Katrukko — a Tamil Nadu-based AI learning platform. 
+  const systemPrompt = `You are Pooja's AI Practice Coach for AI Katrukko — a Tamil Nadu-based AI learning platform. 
 You help Indian students, job seekers, and business owners learn AI skills in a friendly, simple way. 
 Keep answers concise (under 120 words), practical, and India-relevant. 
 Use clear India-English. Add emojis occasionally for warmth.
-You're in a "14-day free trial" limited practice space — mention upgrade perks naturally if relevant.`,
-        messages:[
-          ...practiceMessages.slice(0,-1).filter(m=>m.role!=='ai'||!m.text.includes('Thinking')).map(m=>({
-            role:m.role==='ai'?'assistant':'user',
-            content:m.text.replace(/<[^>]+>/g,'')
-          })),
-          {role:'user',content:msg}
-        ]
+You're in a "14-day free trial" limited practice space — mention upgrade perks naturally if relevant.`;
+
+  const historyMsgs = practiceMessages.slice(0,-1)
+    .filter(m=>m.role!=='ai'||!m.text.includes('Thinking'))
+    .map(m=>({role:m.role==='ai'?'assistant':'user', content:m.text.replace(/<[^>]+>/g,'')}));
+
+  let reply = null;
+
+  /* ── Call Cloudflare Worker proxy (API key is safe on server) ── */
+  try{
+    const geminiHistory = historyMsgs.map(m=>({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts:[{text:m.content}]
+    }));
+    const resp = await fetch(WORKER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        system: systemPrompt,
+        messages:[...geminiHistory, {role:'user',parts:[{text:msg}]}]
       })
     });
-    const data = await resp.json();
-    const reply = data.content?.[0]?.text || 'Sorry, I could not answer that. Please try again!';
-    // Remove thinking bubble, add real reply
-    practiceMessages = practiceMessages.filter(m=>!m.text.includes('Thinking'));
+    if(resp.ok){
+      const data = await resp.json();
+      reply = data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+    }
+  }catch(e){ /* network error */ }
+
+  practiceMessages = practiceMessages.filter(m=>!m.text.includes('Thinking'));
+
+  if(reply){
     practiceMessages.push({role:'ai',text:reply});
-    renderPracticeMessages();
-  }catch(e){
-    practiceMessages = practiceMessages.filter(m=>!m.text.includes('Thinking'));
-    practiceMessages.push({role:'ai',text:'⚠️ Could not connect right now. Please try again in a moment.'});
-    renderPracticeMessages();
+  } else {
+    practiceMessages.push({role:'ai', text:'⚠️ Could not connect right now. Please try again in a moment!'});
   }
+
+  renderPracticeMessages();
   if(btn){ btn.disabled=false; btn.textContent='Send'; }
   updateCreditsBar();
 }
@@ -4616,16 +5038,7 @@ function renderTrialInfo(){
   if(el) el.textContent = '⏳ '+daysLeft+' days left in your free trial';
 }
 
-/* Hook: after signup, open trial dashboard automatically */
-const _origDoSignup = typeof doSignup === 'function' ? doSignup : null;
-const _origSetLoggedIn = setLoggedIn;
-function setLoggedIn(u,p){
-  _origSetLoggedIn(u,p);
-  if(window._openTrialAfterAuth){
-    window._openTrialAfterAuth = false;
-    setTimeout(()=>showFreeTrialDashboard(), 600);
-  }
-}
+/* Trial hook merged into setLoggedIn above */
 
 
 /* ══ DASHBOARD SIDEBAR ══ */
@@ -4784,6 +5197,126 @@ function toggleSbMod(mi){
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ══ GOLD CERTIFICATE OVERLAY ══ -->
+<style>
+#certOverlay{
+  display:none;position:fixed;inset:0;z-index:10000;
+  background:rgba(0,0,0,0.82);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;padding:20px;
+}
+#certOverlay.show{display:flex;}
+.cert-wrap{
+  background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+  border:3px solid #FFD700;border-radius:20px;
+  width:100%;max-width:780px;position:relative;
+  box-shadow:0 0 60px rgba(255,215,0,0.25), 0 20px 60px rgba(0,0,0,0.6);
+  overflow:hidden;
+}
+.cert-inner-border{
+  position:absolute;inset:10px;border:1px solid rgba(255,215,0,0.3);border-radius:12px;pointer-events:none;
+}
+.cert-body{padding:48px 56px;text-align:center;position:relative;}
+.cert-corner{position:absolute;color:#FFD700;font-size:1.3rem;opacity:0.7;}
+.cert-corner.tl{top:18px;left:22px;}
+.cert-corner.tr{top:18px;right:22px;}
+.cert-corner.bl{bottom:18px;left:22px;}
+.cert-corner.br{bottom:18px;right:22px;}
+.cert-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:#FFD700;color:#0f0c29;
+  font-size:.65rem;font-weight:900;padding:5px 18px;border-radius:100px;
+  letter-spacing:1px;margin-bottom:18px;text-transform:uppercase;
+}
+.cert-org{
+  font-family:'Syne',sans-serif;font-weight:900;font-size:2rem;
+  color:#FFD700;letter-spacing:2px;margin-bottom:4px;
+}
+.cert-org-sub{font-size:.72rem;color:rgba(255,255,255,0.5);letter-spacing:2px;margin-bottom:20px;}
+.cert-divider{height:1px;background:linear-gradient(90deg,transparent,#FFD700,transparent);margin:0 60px 20px;}
+.cert-presents{font-size:.85rem;color:rgba(255,255,255,0.55);font-style:italic;margin-bottom:6px;}
+.cert-certifies{font-size:1rem;color:rgba(255,255,255,0.65);margin-bottom:14px;}
+.cert-name{
+  font-family:'Syne',sans-serif;font-weight:900;
+  font-size:2.4rem;color:#FFD700;
+  border-bottom:1.5px solid rgba(255,215,0,0.4);
+  display:inline-block;padding-bottom:6px;margin-bottom:18px;
+  letter-spacing:-0.5px;
+}
+.cert-desc{font-size:.88rem;color:rgba(255,255,255,0.75);line-height:1.8;margin-bottom:6px;}
+.cert-courses{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;
+  color:#FFD700;margin-bottom:16px;
+}
+.cert-date{font-size:.75rem;color:rgba(255,255,255,0.4);margin-bottom:20px;}
+.cert-footer{display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid rgba(255,215,0,0.2);}
+.cert-sig{text-align:left;}
+.cert-sig-name{font-family:'Syne',sans-serif;font-style:italic;font-size:1.05rem;color:rgba(255,255,255,0.7);font-weight:600;}
+.cert-sig-title{font-size:.68rem;color:rgba(255,255,255,0.35);margin-top:2px;}
+.cert-seal{font-size:3rem;line-height:1;}
+.cert-actions{display:flex;gap:10px;justify-content:center;padding:0 56px 32px;}
+.cert-btn-dl{
+  flex:1;padding:13px;border-radius:10px;
+  background:#FFD700;color:#0f0c29;
+  font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;
+  cursor:pointer;border:none;transition:all .2s;
+}
+.cert-btn-dl:hover{background:#ffe34d;transform:translateY(-1px);}
+.cert-btn-cl{
+  padding:13px 24px;border-radius:10px;
+  background:transparent;border:1.5px solid rgba(255,215,0,0.4);
+  color:rgba(255,255,255,0.6);font-size:.82rem;font-weight:600;
+  cursor:pointer;transition:all .2s;
+}
+.cert-btn-cl:hover{border-color:#FFD700;color:#FFD700;}
+@keyframes certIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+#certOverlay.show .cert-wrap{animation:certIn .35s ease;}
+@media(max-width:600px){
+  .cert-body{padding:28px 20px;}
+  .cert-name{font-size:1.6rem;}
+  .cert-org{font-size:1.3rem;}
+  .cert-actions{padding:0 20px 20px;flex-direction:column;}
+}
+</style>
+
+<div id="certOverlay">
+  <div class="cert-wrap">
+    <div class="cert-inner-border"></div>
+    <div class="cert-body">
+      <span class="cert-corner tl">✦</span>
+      <span class="cert-corner tr">✦</span>
+      <span class="cert-corner bl">✦</span>
+      <span class="cert-corner br">✦</span>
+
+      <div class="cert-badge">👑 Gold-Tier Certificate</div>
+      <div class="cert-org">AI KATRUKKO</div>
+      <div class="cert-org-sub">LEARN AI THE SMART WAY  ·  AIKATRUKKO.IN</div>
+      <div class="cert-divider"></div>
+
+      <div class="cert-presents">Certificate of Completion</div>
+      <div class="cert-certifies">This is to certify that</div>
+      <div class="cert-name" id="certName">Your Name</div>
+
+      <div class="cert-desc" id="certDesc1">has successfully completed all <strong style="color:#FFD700;">36 lessons</strong> across</div>
+      <div class="cert-courses" id="certCourseName">AI for Students &nbsp;·&nbsp; AI for Business &nbsp;·&nbsp; AI for Job Seekers</div>
+      <div class="cert-desc" style="font-size:.8rem;color:rgba(255,255,255,0.5);">demonstrating mastery of AI skills for the modern Indian workforce.</div>
+
+      <div class="cert-date" id="certDate" style="margin-top:12px;"></div>
+
+      <div class="cert-footer">
+        <div class="cert-sig">
+          <div class="cert-sig-name">Pooja Gunasekaran</div>
+          <div class="cert-sig-title">Founder & AI Educator, AI Katrukko</div>
+        </div>
+        <div class="cert-seal">🏅</div>
+      </div>
+    </div>
+    <div class="cert-actions">
+      <button class="cert-btn-dl" onclick="downloadCertificate('elite')">⬇ Download Certificate</button>
+      <button class="cert-btn-cl" onclick="closeCertificate()">Close</button>
+    </div>
   </div>
 </div>
 
