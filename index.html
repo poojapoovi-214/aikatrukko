@@ -14,7 +14,7 @@
 <!-- Step 2: Load Firebase as a module -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail }
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, sendPasswordResetEmail }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, updateDoc }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -43,7 +43,9 @@
   window._fbSignIn         = (a, email, pw) => signInWithEmailAndPassword(a, email, pw);
   window._fbSignOut        = (a) => signOut(a);
   window._fbUpdateProfile  = (u, p) => updateProfile(u, p);
-  window._fbSignInGoogle   = () => signInWithPopup(auth, gProvider);
+  window._fbSignInGoogle        = () => signInWithPopup(auth, gProvider);
+  window._fbSignInGoogleRedirect = () => signInWithRedirect(auth, gProvider);
+  window._fbGetRedirectResult    = () => getRedirectResult(auth);
   window._fbResetPassword  = (email) => sendPasswordResetEmail(auth, email);
   window._fbDoc            = (d, col, id) => doc(d, col, id);
   window._fbSetDoc         = (ref, data) => setDoc(ref, data, {merge:true});
@@ -64,7 +66,12 @@
         const snap = await getDoc(doc(db,'users',fbUser.uid));
         if(snap.exists()) purch = snap.data().purchases || [];
       } catch(e){}
-      const u = { uid: fbUser.uid, email: fbUser.email, name: fbUser.displayName || fbUser.email.split('@')[0], photo: fbUser.photoURL || null };
+      const u = {
+        uid: fbUser.uid,
+        email: fbUser.email,
+        name: fbUser.displayName || fbUser.email.split('@')[0],
+        photo: fbUser.photoURL || null
+      };
       if(window._fbAuthReady) window._fbAuthReady(u, purch);
     } else {
       if(_authListenerFired && window._fbAuthReady) window._fbAuthReady(null, []);
@@ -3132,6 +3139,7 @@ async function doLogin(){
     _authBusy = false;
     const c = err.code || '';
     console.warn('Login error:', c, err.message);
+    /* Map new Firebase error codes to old ones for compatibility */
     if(c === 'auth/user-not-found'){
       fldErr('liEmail', 'No account found with this email. Please sign up!');
     } else if(c === 'auth/wrong-password'){
@@ -3152,7 +3160,8 @@ async function doLogin(){
     }
   }finally{
     if(btn){ btn.textContent = 'Login to AI Katrukko'; btn.disabled = false; }
-    setTimeout(()=>{ _authBusy = false; }, 600);
+    /* _authBusy already cleared in try/catch — this is just a safety net */
+    setTimeout(()=>{ _authBusy = false; }, 200);
   }
 }
 
@@ -3214,82 +3223,125 @@ async function doSignup(){
     }
   }finally{
     if(btn){ btn.textContent = 'Create Free Account →'; btn.disabled = false; }
-    setTimeout(()=>{ _authBusy = false; }, 600);
+    setTimeout(()=>{ _authBusy = false; }, 200);
   }
 }
 
 /* ── GOOGLE SIGN-IN ── */
+/* ── Helper: finish Google login after we have a Firebase result ── */
+async function _finishGoogleLogin(result){
+  if(!result || !result.user) return;
+  const fu = result.user;
+  let purch = [];
+  try{
+    const s = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',fu.uid));
+    if(s.exists()){
+      purch = s.data().purchases || [];
+    } else {
+      await window._fbSetDoc(window._fbDoc(window._fbDb,'users',fu.uid), {
+        name: fu.displayName || fu.email.split('@')[0],
+        email: fu.email,
+        purchases: [],
+        createdAt: new Date().toISOString(),
+        loginMethod: 'google'
+      });
+    }
+  }catch(fe){ console.warn('Firestore error:', fe); }
+  const u = {
+    uid: fu.uid,
+    email: fu.email,
+    name: fu.displayName || fu.email.split('@')[0],
+    photo: fu.photoURL || null
+  };
+  userPhotoSrc = fu.photoURL || null;
+  photoSrc = userPhotoSrc;
+  saveSession(u, purch, null);
+  _authBusy = false;
+  setLoggedIn(u, purch);
+  closeOv('authOverlay');
+  clrAllErrs();
+  const isNew = result.additionalUserInfo?.isNewUser ?? false;
+  toast(isNew
+    ? 'Welcome to AI Katrukko, ' + u.name.split(' ')[0] + '! 🎉'
+    : 'Welcome back, ' + u.name.split(' ')[0] + '! 👋',
+    'ok');
+}
+
 async function doGoogleSignIn(){
   await window._fbReady;
   const btn = document.getElementById('googleSignInBtn');
   if(btn){ btn.innerHTML = '⏳ Connecting to Google…'; btn.disabled = true; }
+  _authBusy = true;
   try{
-    _authBusy = true;
     let result;
     try{
+      /* Try popup first (works on desktop & most browsers) */
       result = await window._fbSignInGoogle();
+      await _finishGoogleLogin(result);
     }catch(pe){
       const pc = pe.code || '';
-      if(pc === 'auth/popup-blocked'){
-        toast('Popup was blocked by your browser. Please allow popups for this site and try again.', 'err');
+      console.warn('Google popup error:', pc, pe.message);
+      if(pc === 'auth/popup-closed-by-user' || pc === 'auth/cancelled-popup-request'){
+        /* User closed popup — just reset */
+        _authBusy = false;
+        if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
         return;
       }
-      if(pc === 'auth/popup-closed-by-user' || pc === 'auth/cancelled-popup-request') return;
-      throw pe;
-    }
-    const fu = result.user;
-    let purch = [];
-    try{
-      const s = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',fu.uid));
-      if(s.exists()){
-        purch = s.data().purchases || [];
-      } else {
-        await window._fbSetDoc(window._fbDoc(window._fbDb,'users',fu.uid), {
-          name: fu.displayName || fu.email.split('@')[0],
-          email: fu.email,
-          purchases: [],
-          createdAt: new Date().toISOString(),
-          loginMethod: 'google'
-        });
+      if(pc === 'auth/popup-blocked'){
+        /* Popup blocked — fallback to redirect */
+        toast('Popup blocked — redirecting to Google…', 'info');
+        localStorage.setItem('ak_google_redirect', '1');
+        await window._fbSignInGoogleRedirect();
+        return; /* Page will redirect — code below won't run */
       }
-    }catch(fe){ console.warn('Firestore error:', fe); }
-    const u = {
-      uid: fu.uid,
-      email: fu.email,
-      name: fu.displayName || fu.email.split('@')[0],
-      photo: fu.photoURL || null
-    };
-    userPhotoSrc = fu.photoURL || null;
-    photoSrc = userPhotoSrc;
-    saveSession(u, purch, null);
-    _authBusy = false;
-    setLoggedIn(u, purch);
-    closeOv('authOverlay');
-    clrAllErrs();
-    const isNew = result.additionalUserInfo?.isNewUser ?? false;
-    toast(isNew
-      ? 'Welcome to AI Katrukko, ' + u.name.split(' ')[0] + '! 🎉'
-      : 'Welcome back, ' + u.name.split(' ')[0] + '! 👋',
-      'ok');
-  }catch(err){
-    _authBusy = false;
-    const c = err.code || '';
-    console.warn('Google Sign-In error:', c, err.message);
-    if(c === 'auth/account-exists-with-different-credential'){
-      toast('An account with this email already exists. Please login with email & password instead.', 'err');
-      switchAuth('login');
-    } else if(c === 'auth/network-request-failed'){
-      toast('Network error. Please check your internet connection.', 'err');
-    } else if(c === 'auth/operation-not-allowed'){
-      toast('Google Sign-In is not enabled on this project. Please use email & password.', 'err');
-    } else if(c !== 'auth/popup-closed-by-user' && c !== 'auth/cancelled-popup-request'){
-      toast('Google Sign-In failed. Please try again or use email & password.', 'err');
+      if(pc === 'auth/operation-not-allowed'){
+        toast('Google Sign-In not enabled yet. Please use Email & Password below.', 'err');
+        _authBusy = false;
+        if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
+        return;
+      }
+      if(pc === 'auth/account-exists-with-different-credential'){
+        toast('This email is registered with Email/Password. Please use that to login.', 'err');
+        switchAuth('login');
+        _authBusy = false;
+        if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
+        return;
+      }
+      if(pc === 'auth/network-request-failed'){
+        toast('Network error. Check your internet connection.', 'err');
+        _authBusy = false;
+        if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
+        return;
+      }
+      /* Any other error */
+      console.error('Google Sign-In unexpected error:', pe);
+      toast('Google Sign-In failed (' + pc + '). Try Email & Password instead.', 'err');
+      _authBusy = false;
+      if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
     }
   }finally{
     if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
-    setTimeout(()=>{ _authBusy = false; }, 600);
+    setTimeout(()=>{ _authBusy = false; }, 200);
   }
 }
+
+/* ── Handle Google Redirect result on page load (for popup-blocked fallback) ── */
+async function _checkGoogleRedirect(){
+  if(!localStorage.getItem('ak_google_redirect')) return;
+  localStorage.removeItem('ak_google_redirect');
+  await window._fbReady;
+  try{
+    const result = await window._fbGetRedirectResult();
+    if(result && result.user){
+      _authBusy = true;
+      await _finishGoogleLogin(result);
+    }
+  }catch(e){
+    console.warn('Redirect result error:', e.code, e.message);
+  }
+}
+/* Call on load */
+window.addEventListener('load', ()=>{ setTimeout(_checkGoogleRedirect, 800); });
 
 function setLoggedIn(u,p){
   user=u; purchases=p||[];
@@ -3677,8 +3729,10 @@ window.addEventListener('load',()=>{
   if(saved){
     const u=JSON.parse(saved);
     const p=JSON.parse(localStorage.getItem('ak_purchases')||'[]');
+    /* Show UI immediately from localStorage (fast) — Firebase _fbAuthReady will confirm & sync silently after */
     setLoggedInSilent(u,p);
   }
+  /* NOTE: Firebase onAuthStateChanged fires after this and calls _fbAuthReady for full sync */
 });
 
 function setLoggedInSilent(u,p){
@@ -4310,14 +4364,32 @@ async function generateWeeklyLesson(cat, weekNum){
    PAGE INIT — Restore session UI on every load/refresh
    Works seamlessly on all devices where user is logged in
 ══════════════════════════════════════════════ */
-/* ── Firebase Auth Ready: guarded so it doesn't double-fire during active login ── */
+/* ── Firebase Auth Ready: Always sync from Firebase — fixes login not persisting & account not remembered ── */
 window._fbAuthReady = function(fbUser, fbPurch){
   if(_authBusy) return;
-  if(fbUser && !user){
-    user=fbUser; purchases=fbPurch||[];
-    saveSession(user,purchases,null);
-    setLoggedIn(user,purchases);
+  if(fbUser){
+    /* Always update from Firebase — overrides stale localStorage data */
+    const freshUser = {
+      uid: fbUser.uid,
+      email: fbUser.email,
+      name: fbUser.name || fbUser.email.split('@')[0],
+      photo: fbUser.photo || null
+    };
+    /* Merge purchases: Firebase + locally stored (for multi-device) */
+    const localPurch = JSON.parse(localStorage.getItem('ak_purch_'+fbUser.email)||'[]');
+    const mergedPurch = [...new Set([...(fbPurch||[]), ...localPurch])];
+    user = freshUser;
+    purchases = mergedPurch;
+    saveSession(user, purchases, null);
+    /* Only update UI if not already visually logged in (avoid flicker) */
+    if(!document.getElementById('navUser').classList.contains('show')){
+      setLoggedIn(user, purchases);
+    } else {
+      /* Already showing — just refresh badges & purchases silently */
+      updateBadges();
+    }
   } else if(!fbUser && user){
+    /* Firebase says logged out — clear everything */
     user=null; purchases=[];
     clearSession();
     document.getElementById('navUser').classList.remove('show');
