@@ -5,70 +5,72 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Katrukko — Your AI Learning Buddy</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<!-- ══ FIREBASE AUTH SYSTEM ══ -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- ══ FIREBASE AUTH SYSTEM — Multi-device + Google Sign-In ══ -->
+<!-- Step 1: Set up the ready promise BEFORE the module loads -->
 <script>
-  (function initFirebase(){
-    try {
-      const firebaseConfig = {
-        apiKey: "AIzaSyAF-FUEXFxBNMCyNLErnTGoW8aEq8nNxMU",
-        authDomain: "aikatrukko-e49f9.firebaseapp.com",
-        projectId: "aikatrukko-e49f9",
-        storageBucket: "aikatrukko-e49f9.firebasestorage.app",
-        messagingSenderId: "467227648026",
-        appId: "1:467227648026:web:0397af7f404a6e4cbfb1a3",
-        measurementId: "G-C5VVXEZ9W4"
-      };
+  window._fbLoaded = false;
+  window._fbReady = new Promise(function(res){ window._fbReadyResolve = res; });
+</script>
+<!-- Step 2: Load Firebase as a module -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const firebaseConfig = {
+    apiKey: "AIzaSyAF-FUEXFxBNMCyNLErnTGoW8aEq8nNxMU",
+    authDomain: "aikatrukko-e49f9.firebaseapp.com",
+    projectId: "aikatrukko-e49f9",
+    storageBucket: "aikatrukko-e49f9.firebasestorage.app",
+    messagingSenderId: "467227648026",
+    appId: "1:467227648026:web:0397af7f404a6e4cbfb1a3",
+    measurementId: "G-C5VVXEZ9W4"
+  };
 
-      const _auth      = firebase.auth();
-      const _db        = firebase.firestore();
-      const _gProvider = new firebase.auth.GoogleAuthProvider();
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  const gProvider = new GoogleAuthProvider();
+  gProvider.setCustomParameters({ prompt: 'select_account' });
 
-      window._fbAuth   = _auth;
-      window._fbDb     = _db;
+  // ── Expose everything to global scope ──
+  window._fbAuth = auth;
+  window._fbDb   = db;
 
-      window._fbCreateUser    = (a, email, pw) => _auth.createUserWithEmailAndPassword(email, pw);
-      window._fbSignIn        = (a, email, pw) => _auth.signInWithEmailAndPassword(email, pw);
-      window._fbSignOut       = ()             => _auth.signOut();
-      window._fbUpdateProfile = (u, p)         => u.updateProfile(p);
-      window._fbSignInGoogle  = ()             => _auth.signInWithPopup(_gProvider);
-      window._fbResetPassword = (email)        => _auth.sendPasswordResetEmail(email);
+  window._fbCreateUser     = (a, email, pw) => createUserWithEmailAndPassword(a, email, pw);
+  window._fbSignIn         = (a, email, pw) => signInWithEmailAndPassword(a, email, pw);
+  window._fbSignOut        = (a) => signOut(a);
+  window._fbUpdateProfile  = (u, p) => updateProfile(u, p);
+  window._fbSignInGoogle   = () => signInWithPopup(auth, gProvider);
+  window._fbResetPassword  = (email) => sendPasswordResetEmail(auth, email);
+  window._fbDoc            = (d, col, id) => doc(d, col, id);
+  window._fbSetDoc         = (ref, data) => setDoc(ref, data, {merge:true});
+  window._fbGetDoc         = (ref) => getDoc(ref);
+  window._fbUpdateDoc      = (ref, data) => updateDoc(ref, data);
+  window._localRegister    = () => {};
 
-      window._fbDoc       = (d, col, id) => _db.collection(col).doc(id);
-      window._fbSetDoc    = (ref, data)  => ref.set(data, {merge: true});
-      window._fbGetDoc    = (ref)        => ref.get();
-      window._fbUpdateDoc = (ref, data)  => ref.update(data);
-      window._localRegister = () => {};
-      window._fbReady     = true;
+  // ── Signal Firebase is fully ready — resolves the promise ──
+  window._fbLoaded = true;
+  window._fbReadyResolve();
 
-      // ── Auth state listener ──
-      _auth.onAuthStateChanged(async (fbUser) => {
-        if (fbUser) {
-          let purch = [];
-          try {
-            const snap = await _db.collection('users').doc(fbUser.uid).get();
-            if (snap.exists) purch = snap.data().purchases || [];
-          } catch(e) {}
-          const u = {
-            uid:   fbUser.uid,
-            email: fbUser.email,
-            name:  fbUser.displayName || fbUser.email.split('@')[0],
-            photo: fbUser.photoURL || null
-          };
-          if (window._fbAuthReady) window._fbAuthReady(u, purch);
-        } else {
-          if (window._fbAuthReady) window._fbAuthReady(null, []);
-        }
-      });
-
-    } catch(e) {
-      console.error('Firebase init error:', e);
+  // ── Auth state listener — fires after login/logout ──
+  let _authListenerFired = false;
+  onAuthStateChanged(auth, async (fbUser) => {
+    if(fbUser){
+      let purch = [];
+      try {
+        const snap = await getDoc(doc(db,'users',fbUser.uid));
+        if(snap.exists()) purch = snap.data().purchases || [];
+      } catch(e){}
+      const u = { uid: fbUser.uid, email: fbUser.email, name: fbUser.displayName || fbUser.email.split('@')[0], photo: fbUser.photoURL || null };
+      if(window._fbAuthReady) window._fbAuthReady(u, purch);
+    } else {
+      if(_authListenerFired && window._fbAuthReady) window._fbAuthReady(null, []);
     }
-  })();
+    _authListenerFired = true;
+  });
 </script>
 <style>
 /* ══════════════════════════════════════════════
@@ -196,13 +198,6 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;}
 }
 .imggen-result img{width:100%;height:auto;border-radius:10px;display:block;}
 .imggen-placeholder{text-align:center;color:#718096;font-size:.78rem;padding:24px;}
-.imggen-chip{
-  font-size:.62rem;padding:4px 12px;border-radius:100px;
-  border:1px solid var(--border2);color:#4a5568;cursor:pointer;
-  background:#fff;transition:all .15s;white-space:nowrap;
-  user-select:none;
-}
-.imggen-chip:hover{border-color:var(--aqua);color:var(--aqua);background:var(--aqua-dim);}
 .imggen-credits{
   display:flex;align-items:center;justify-content:space-between;
   font-size:.68rem;color:#718096;padding:8px 0;
@@ -250,7 +245,6 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;}
   border-radius:100px;padding:6px 14px;font-size:.72rem;font-weight:700;color:var(--aqua);
   margin-bottom:16px;
 }
-@keyframes dotPulse{from{opacity:.3;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
 .trial-loader{display:flex;align-items:center;justify-content:center;gap:8px;padding:30px;font-size:.75rem;color:#718096;}
 
 /* ── SCROLLBAR ── */
@@ -763,6 +757,9 @@ footer{
 }
 .modal-close:hover{background:var(--aqua);color:var(--black);}
 .field{margin-bottom:16px;}
+.field-err{font-size:.68rem;color:#e53e3e;margin-top:5px;font-weight:500;display:block;}
+.inp-err{border-color:#e53e3e!important;background:#fff5f5!important;}
+.inp-err:focus{box-shadow:0 0 0 2px rgba(229,62,62,.15)!important;}
 .field label{display:block;font-size:.72rem;font-weight:600;color:var(--gray1);margin-bottom:6px;letter-spacing:.2px;}
 .field input{
   width:100%;padding:11px 14px;border-radius:8px;
@@ -1221,11 +1218,11 @@ footer{
 <body>
 
 <!-- ══ UPGRADE BANNER (shown after login) ══ -->
-<div id="upgradeBanner" style="display:none;background:linear-gradient(90deg,#0f172a,#0e7490,#0f172a);background-size:200% 100%;animation:bannerShift 4s linear infinite;overflow:hidden;position:relative;z-index:999;">
+<div id="upgradeBanner" style="display:none;background:linear-gradient(90deg,#0f0c29,#2d0060,#5a0fbf,#7b2fff,#9d4fff,#7b2fff,#5a0fbf,#2d0060,#0f0c29);background-size:300% 100%;animation:bannerGradShift 8s ease infinite;overflow:hidden;position:relative;z-index:999;box-shadow:0 3px 16px rgba(123,47,255,0.5);">
   <div style="display:flex;align-items:center;white-space:nowrap;animation:bannerScroll 22s linear infinite;padding:10px 0;gap:0;">
-    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; 5000+ VIP Prompts &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
-    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; 5000+ VIP Prompts &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
-    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; 5000+ VIP Prompts &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
+    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; 1000+ VIP Prompts &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
+    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; 1000+ VIP Prompts &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
+    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; 1000+ VIP Prompts &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
   </div>
 </div>
 <style>
@@ -1239,7 +1236,7 @@ footer{
     <button onclick="closePricingPopup()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#64748b;">✕</button>
     <div style="text-align:center;margin-bottom:8px;font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--aqua);text-transform:uppercase;">🔒 Unlock This Feature</div>
     <h2 style="text-align:center;font-size:1.2rem;font-weight:800;color:#1a202c;margin-bottom:4px;">Master Prompt Library</h2>
-    <p style="text-align:center;font-size:.78rem;color:#64748b;margin-bottom:24px;">Choose a plan to get instant access to 1000+ or 5000+ curated AI prompts.</p>
+    <p style="text-align:center;font-size:.78rem;color:#64748b;margin-bottom:24px;">Choose a plan to get instant access to 1000+ or 1000+ curated AI prompts.</p>
 
     <!-- 3 plan mini-cards -->
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
@@ -1271,7 +1268,7 @@ footer{
         <div style="font-weight:800;font-size:.85rem;margin:6px 0 2px;">Elite Mastery</div>
         <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Entrepreneurs</div>
         <div style="font-size:1.2rem;font-weight:900;color:#1a202c;margin-bottom:4px;">₹2,499</div>
-        <div style="font-size:.62rem;color:#d97706;font-weight:600;margin-bottom:10px;">5000+ VIP Prompt Bank</div>
+        <div style="font-size:.62rem;color:#d97706;font-weight:600;margin-bottom:10px;">1000+ VIP Prompt Bank</div>
         <button onclick="curCat='unemployed';closePricingPopup();openPayModal();" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:8px;padding:8px;font-size:.7rem;font-weight:700;cursor:pointer;">Choose →</button>
       </div>
 
@@ -1283,7 +1280,7 @@ footer{
         <td style="padding:8px 12px;color:#64748b;font-weight:600;">Prompt Library</td>
         <td style="padding:8px;text-align:center;color:#94a3b8;">Limited</td>
         <td style="padding:8px;text-align:center;color:#0891b2;font-weight:700;">1000+ Prompts</td>
-        <td style="padding:8px;text-align:center;color:#d97706;font-weight:700;">5000+ VIP Bank</td>
+        <td style="padding:8px;text-align:center;color:#d97706;font-weight:700;">1000+ VIP Bank</td>
       </tr>
       <tr>
         <td style="padding:8px 12px;color:#64748b;font-weight:600;">Community</td>
@@ -1307,6 +1304,44 @@ footer{
     <p style="text-align:center;font-size:.65rem;color:#94a3b8;margin-top:16px;">One-time payment · No subscription · Lifetime access</p>
   </div>
 </div>
+
+<!-- ══ RUNNING ANNOUNCEMENT BANNER ══ -->
+<div style="background:linear-gradient(90deg,#0f0c29,#2d0060,#5a0fbf,#7b2fff,#9d4fff,#7b2fff,#5a0fbf,#2d0060,#0f0c29);background-size:300% 100%;animation:bannerGradShift 8s ease infinite;overflow:hidden;height:38px;display:flex;align-items:center;position:relative;z-index:201;box-shadow:0 3px 16px rgba(123,47,255,0.5);">
+  <div style="display:flex;animation:marqueeScroll 32s linear infinite;white-space:nowrap;will-change:transform;">
+    <span style="display:inline-flex;align-items:center;gap:32px;padding-right:60px;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:#fff;letter-spacing:.4px;">
+      <span>🚀 Welcome to AI Katrukko — Your AI Learning Buddy!</span>
+      <span style="opacity:.4;">✦</span>
+      <span>🎓 Module 1 is 100% FREE — No credit card needed!</span>
+      <span style="opacity:.4;">✦</span>
+      <span>🤖 Powered by Claude AI — Live Prompts · AI Coach · Image Generation</span>
+      <span style="opacity:.4;">✦</span>
+      <span>💳 One-Time Payment from ₹399 only — No subscription, Lifetime access!</span>
+      <span style="opacity:.4;">✦</span>
+      <span>🎙️ Pooja explains every lesson in clear India-English — learn hands-free, anytime</span>
+      <span style="opacity:.4;">✦</span>
+      <span>🇮🇳 Built for Students, Job Seekers &amp; Business Owners across India</span>
+      <span style="opacity:.4;">✦</span>
+    </span>
+    <span style="display:inline-flex;align-items:center;gap:32px;padding-right:60px;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:#fff;letter-spacing:.4px;" aria-hidden="true">
+      <span>🚀 Welcome to AI Katrukko — Your AI Learning Buddy!</span>
+      <span style="opacity:.4;">✦</span>
+      <span>🎓 Module 1 is 100% FREE — No credit card needed!</span>
+      <span style="opacity:.4;">✦</span>
+      <span>🤖 Powered by Claude AI — Live Prompts · AI Coach · Image Generation</span>
+      <span style="opacity:.4;">✦</span>
+      <span>💳 One-Time Payment from ₹399 only — No subscription, Lifetime access!</span>
+      <span style="opacity:.4;">✦</span>
+      <span>🎙️ Pooja explains every lesson in clear India-English — learn hands-free, anytime</span>
+      <span style="opacity:.4;">✦</span>
+      <span>🇮🇳 Built for Students, Job Seekers &amp; Business Owners across India</span>
+      <span style="opacity:.4;">✦</span>
+    </span>
+  </div>
+</div>
+<style>
+@keyframes marqueeScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes bannerGradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+</style>
 
 <!-- ══ NAV ══ -->
 <nav>
@@ -1545,7 +1580,7 @@ footer{
         <div class="cat-pr-row"><span class="cat-new">₹2,499</span><span class="cat-period">/ lifetime</span></div>
         <div class="cat-feats" style="flex:1;">
           <div class="cat-feat"><div class="cat-feat-dot"></div>ALL 3 Courses · 36 Lessons Lifetime</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>5000+ VIP Prompt Bank</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>1000+ VIP Prompt Bank</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Daily Priority AI Trend Updates</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Gold-Tier Certificate</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>✅ VIP Private Discord Community</div>
@@ -1597,7 +1632,7 @@ footer{
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Prompt Library</td>
             <td style="padding:12px;text-align:center;color:#718096;">Limited Access</td>
             <td style="padding:12px;text-align:center;background:#fff5f7;color:#4a5568;font-weight:600;">1000+ Master Prompts</td>
-            <td style="padding:12px;text-align:center;color:#4a5568;font-weight:600;">5000+ VIP Prompt Bank</td>
+            <td style="padding:12px;text-align:center;color:#4a5568;font-weight:600;">1000+ VIP Prompt Bank</td>
           </tr>
           <tr style="border-bottom:1px solid #f0f4f8;background:#fafafa;">
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Community</td>
@@ -1891,17 +1926,17 @@ footer{
       <div style="flex:1;height:1px;background:#e2e8f0;"></div>
     </div>
     <div id="loginForm">
-      <div class="field"><label>Email</label><input type="email" id="liEmail" placeholder="you@email.com"></div>
-      <div class="field"><label>Password</label><input type="password" id="liPass" placeholder="Your password"></div>
+      <div class="field"><label>Email</label><input type="email" id="liEmail" placeholder="you@email.com" oninput="clrErr(this)" autocomplete="email"></div>
+      <div class="field" style="position:relative;"><label>Password</label><input type="password" id="liPass" placeholder="Your password" oninput="clrErr(this)" autocomplete="current-password" style="padding-right:44px;"><span onclick="var f=document.getElementById('liPass');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'👁':'🙈';" style="position:absolute;right:12px;bottom:10px;cursor:pointer;font-size:.9rem;user-select:none;" title="Show/hide password">👁</span></div>
       <button class="submit-btn" onclick="doLogin()">Login to AI Katrukko</button>
       <div style="text-align:center;margin-top:10px;">
         <span onclick="openForgotPassword()" style="font-size:.73rem;color:var(--aqua);cursor:pointer;font-weight:600;text-decoration:underline;">Forgot Password?</span>
       </div>
     </div>
     <div id="signupForm" style="display:none;">
-      <div class="field"><label>Full Name</label><input type="text" id="suName" placeholder="Your name"></div>
-      <div class="field"><label>Email</label><input type="email" id="suEmail" placeholder="you@email.com"></div>
-      <div class="field"><label>Password</label><input type="password" id="suPass" placeholder="Create a password"></div>
+      <div class="field"><label>Full Name</label><input type="text" id="suName" placeholder="Your name" oninput="clrErr(this)" autocomplete="name"></div>
+      <div class="field"><label>Email</label><input type="email" id="suEmail" placeholder="you@email.com" oninput="clrErr(this)" autocomplete="email"></div>
+      <div class="field" style="position:relative;"><label>Password</label><input type="password" id="suPass" placeholder="Min 6 characters" oninput="clrErr(this)" autocomplete="new-password" style="padding-right:44px;"><span onclick="var f=document.getElementById('suPass');f.type=f.type==='password'?'text':'password';this.textContent=f.type==='password'?'👁':'🙈';" style="position:absolute;right:12px;bottom:10px;cursor:pointer;font-size:.9rem;user-select:none;" title="Show/hide password">👁</span></div>
       <button class="submit-btn" onclick="doSignup()">Create Free Account →</button>
     </div>
     <p class="auth-switch" id="authSwitch">Don't have an account? <span onclick="switchAuth('signup')">Sign up free →</span></p>
@@ -2183,47 +2218,158 @@ const TRENDS = {
 const PROMPTS = {
   student:{
     free:[
-      {t:'📝 Essay Writer',b:'Write an essay outline for: <em>[topic]</em> for <em>[subject]</em>. Include introduction, 3 main arguments with sub-points, and a conclusion. Then write a 150-word introduction paragraph in an academic but clear tone.'},
-      {t:'📚 Study Note Summariser',b:'Summarise this text for me: <em>[paste textbook content]</em>. Give me: 5 key bullet points I can memorise, 3 likely exam questions with model answers, and one real-world example that explains the concept.'},
-      {t:'🔗 LinkedIn Headline',b:'Write 5 LinkedIn headline options for a final year student studying <em>[subject]</em> looking for a role in <em>[field]</em>. Each headline should be keyword-rich, specific, and under 15 words. No "seeking opportunities."'}
+      {t:'📄 Resume Summary Writer',b:'Write a professional resume summary for someone applying for <em>[job role]</em> in the <em>[field/industry]</em>. Key skills: <em>[skill 1, skill 2, skill 3]</em>. Experience: <em>[X years / fresher]</em>. Under 60 words, confident and specific — no filler phrases like "hardworking" or "team player."'},
+      {t:'🔗 LinkedIn Headline Generator',b:'Write 5 LinkedIn headline options for someone with skills in <em>[your skills]</em> targeting <em>[job title]</em> in <em>[industry]</em>. Each under 15 words, keyword-rich, and avoids "seeking opportunities." Make each one stand out differently.'},
+      {t:'💬 Explain Any Concept Simply',b:'Explain <em>[concept / topic / tool]</em> in plain language. Give me: a 2-sentence simple explanation, one real Indian example, 3 key things I must know, and one mistake beginners make. Keep it practical, not textbook.'}
     ],
     locked:[
-      {t:'🎤 Mock Interview',b:'Act as a strict but fair interviewer for a <em>[job title]</em> position. Interview me one question at a time. After each answer: tell me what was strong, what was weak, and give a model answer. Start with "Tell me about yourself." Continue for 8 questions.'},
-      {t:'📄 ATS Resume Optimizer',b:'Here is my resume: <em>[paste resume]</em>. Here is the job description: <em>[paste JD]</em>. Score my resume match out of 10. List exact keywords I\'m missing. Rewrite my professional summary to better match this role.'},
-      {t:'🗓️ Exam Study Plan',b:'I am preparing for <em>[exam]</em> in <em>[X weeks]</em>. My weak areas are <em>[subjects]</em>. Create a detailed daily study plan with time slots, prioritise topics, and give me 10 practice questions for <em>[weakest topic]</em> with answers.'},
-      {t:'✉️ Cold Email to Company',b:'Write a cold email to a recruiter at <em>[company]</em> for an internship/job as <em>[role]</em>. I have skills in <em>[skills]</em> and <em>[relevant experience]</em>. Under 120 words, professional but warm. End with one clear ask.'},
-      {t:'📑 Group Project Planner',b:'I have a group project on <em>[topic]</em> with <em>[N] team members</em>. We have <em>[X weeks]</em>. Create a detailed project timeline with milestones, divide work fairly, and list what each member should do each week.'}
+      {t:'🎤 Mock Interview Coach',b:'Act as a strict but fair interviewer for a <em>[job title]</em> role in <em>[industry]</em>. Ask one question at a time. After each answer: what was strong, what was weak, model answer. Start with "Tell me about yourself." Do 8 rounds.'},
+      {t:'✉️ Cold Email / Outreach',b:'Write a cold email to a <em>[recruiter / manager / HR]</em> at <em>[company]</em> for a <em>[role]</em> in <em>[field]</em>. My background: <em>[brief]</em>. Under 120 words. Professional but warm. End with one specific ask.'},
+      {t:'📝 Cover Letter Generator',b:'Write a cover letter for <em>[job title]</em> at <em>[company]</em> in <em>[field]</em>. My top strength: <em>[strength]</em>. Do NOT start with "I am writing to apply." Open with immediate value. Under 200 words, warm and professional.'},
+      {t:'🛠️ AI Tool Finder for My Field',b:'I work in <em>[field/industry]</em> as a <em>[role]</em>. Suggest the top 5 AI tools for my daily work. For each: tool name, what it does, one specific use case in my field, and whether it is free or paid.'},
+      {t:'📚 30-Day Skill Learning Plan',b:'I want to learn <em>[skill / tool / subject]</em> in 30 days, spending <em>[X hours/day]</em>. Create a daily plan: week-by-week topics, best free resources, and 3 mini-projects to build. Make it achievable, not overwhelming.'},
+      {t:'🗓️ Study / Work Plan Creator',b:'I need to complete <em>[task / project / exam prep]</em> in <em>[X days/weeks]</em>. I have <em>[X hours/day]</em> available. Create a structured daily schedule with milestones, buffer days, and a final review day.'},
+      {t:'📊 Report / Document Writer',b:'Write a professional <em>[report type]</em> on <em>[topic]</em> for <em>[audience]</em>. Include: executive summary, key findings, 3 recommendations, and a conclusion. Tone: <em>[formal/semi-formal]</em>. Under 500 words.'},
+      {t:'🔍 Research Summariser',b:'Summarise this content: <em>[paste article / paper / report]</em>. Give me: 5 key takeaways, the main argument, 2 questions it raises, and one practical action I can take today. Under 200 words total.'},
+      {t:'📧 Professional Email Templates',b:'Create 5 professional email templates for: <em>[choose: follow-up, request, decline, thank you, escalation]</em>. Each under 80 words. Polished, warm, and direct — no filler sentences.'},
+      {t:'🧠 Brainstorm Ideas',b:'Give me 10 creative ideas for <em>[project / content / initiative]</em> in the <em>[field]</em> space. For each idea: a title, one sentence description, and why it would work. Focus on ideas that are practical and actionable in India.'},
+      {t:'📌 Meeting Agenda Creator',b:'Create a structured meeting agenda for a <em>[meeting type]</em> with <em>[N people]</em>. Duration: <em>[X minutes]</em>. Goal: <em>[outcome]</em>. Include: opening, 3-5 agenda items with time slots, action item section, and closing.'},
+      {t:'💡 Problem-Solving Prompt',b:'I am facing this challenge: <em>[describe problem]</em> in my <em>[field/work/study]</em>. Give me: 3 root causes, 5 practical solutions ranked by ease of implementation, and one immediate action I can take today.'},
+      {t:'🌐 LinkedIn Post Writer',b:'Write a LinkedIn post about <em>[topic / experience / lesson learned]</em> in the <em>[field]</em> space. Hook: grab attention in the first line. Body: 3-4 short paragraphs. CTA: one question to drive comments. Under 200 words.'},
+      {t:'📋 Project Planner',b:'Help me plan a <em>[project type]</em> in <em>[field]</em> with a <em>[X week]</em> timeline. Create: project phases, weekly milestones, key deliverables, risks to watch, and a final checklist. Simple and actionable.'},
+      {t:'🎯 Goal Setting Framework',b:'Help me set SMART goals for <em>[career / skill / project]</em> goal: <em>[describe goal]</em>. Break it into: monthly milestones, weekly actions, daily habits, and how to track progress. Give me a simple one-page plan.'},
+      {t:'🏆 Achievement Bullet Writer',b:'Rewrite these job responsibilities as achievement-focused resume bullets: <em>[paste your responsibilities]</em>. Use the format: Action verb + what you did + measurable result. Make each bullet strong and ATS-friendly.'},
+      {t:'📱 Social Media Bio Writer',b:'Write a punchy bio for <em>[platform: LinkedIn / Instagram / Twitter]</em> for someone in the <em>[field]</em> space. Role: <em>[your role]</em>. Key strength: <em>[strength]</em>. Under 150 characters for Twitter, under 200 words for LinkedIn About section.'},
+      {t:'🔑 Keyword Research for My Field',b:'List the top 20 keywords and phrases a <em>[role]</em> in <em>[field]</em> should include on their resume, LinkedIn, and portfolio to pass ATS and attract recruiters in 2025. Group them by: core skills, tools, and soft skills.'},
+      {t:'📣 Elevator Pitch Creator',b:'Write a 30-second elevator pitch for me. I am a <em>[role]</em> with expertise in <em>[skills]</em> in the <em>[field]</em> space. I want to <em>[goal: get hired / network / pitch my work]</em>. Make it memorable, confident, and specific.'},
+      {t:'🤔 Career Decision Helper',b:'I am deciding between <em>[option A]</em> and <em>[option B]</em> in my career. Help me think through: pros and cons of each, what questions I should ask myself, what a 5-year projection looks like for each path, and a recommendation framework.'},
+      {t:'📖 Daily Learning Routine',b:'Create a daily AI-powered learning routine for someone in <em>[field]</em> who has <em>[X minutes/day]</em>. Include: what to read, what to practice, which AI tool to use each day, and a weekly review habit. Make it sustainable.'},
+      {t:'💼 Portfolio Project Ideas',b:'Suggest 5 portfolio project ideas for a <em>[role]</em> in <em>[field]</em>. For each: project title, what problem it solves, what skills it demonstrates, estimated completion time, and which platforms to showcase it on.'},
+      {t:'🔧 Tool Comparison',b:'Compare <em>[Tool A]</em> vs <em>[Tool B]</em> for use in <em>[field / task]</em>. Cover: key features, pricing, ease of use, best for whom, limitations, and a final recommendation based on <em>[my goal: X]</em>.'},
+      {t:'📝 Performance Review Self-Assessment',b:'Help me write a self-assessment for my performance review. My role: <em>[role]</em>. Key achievements this period: <em>[list]</em>. Areas I improved: <em>[list]</em>. Goals for next period: <em>[list]</em>. Tone: confident, honest, and growth-oriented.'},
+      {t:'🌟 Thank You / Appreciation Note',b:'Write a warm thank you note to <em>[person: mentor / interviewer / colleague]</em> for <em>[what they did]</em>. Under 100 words. Genuine, specific, and professional. Include one specific detail that shows I was paying attention.'},
+      {t:'🧩 SWOT Analysis for Career',b:'Help me do a personal SWOT analysis for my career as a <em>[role]</em> in <em>[field]</em>. Be specific and honest. For each quadrant (Strengths, Weaknesses, Opportunities, Threats), give 4-5 points. End with one key action to take this month.'},
+      {t:'📬 Networking Message Templates',b:'Write 3 networking message templates for reaching out to <em>[senior professional / peer / alumni]</em> in the <em>[field]</em> space. Context: <em>[conference / LinkedIn / referral]</em>. Each under 100 words. Genuine, not transactional.'},
+      {t:'🗣️ Presentation Script Writer',b:'Write a 3-minute presentation script on <em>[topic]</em> for an audience of <em>[audience type]</em>. Include: a strong opening hook, 3 key points with one example each, and a memorable closing line. Conversational but professional tone.'},
+      {t:'🔄 Skill Translation Helper',b:'I am transitioning from <em>[current field/role]</em> to <em>[target field/role]</em>. List 10 transferable skills I already have that apply to the new field. For each skill: how it transfers, and how to describe it on a resume or LinkedIn.'},
+      {t:'📐 Framework Explainer',b:'Explain the <em>[framework / methodology / model]</em> used in <em>[field]</em>. Give me: what it is in 2 sentences, when to use it, a simple step-by-step example, and one common mistake people make when applying it.'},
+      {t:'🏅 Certification / Course Recommender',b:'I am a <em>[role]</em> in <em>[field]</em> wanting to upskill in <em>[area]</em>. Recommend 5 certifications or online courses for 2025. For each: name, platform, cost, time to complete, and how it helps my career specifically.'},
+      {t:'🔔 Daily Habit Builder with AI',b:'Build a 5-habit daily routine for a <em>[role]</em> in <em>[field]</em> to stay sharp, productive, and ahead in their career. For each habit: what to do, how long, which AI tool helps, and what result to expect in 30 days.'},
+      {t:'💬 Feedback Request Message',b:'Write a message asking for feedback from <em>[manager / client / mentor / peer]</em> on <em>[specific work / project / skill]</em>. Under 80 words. Professional, specific, and easy to respond to — not a generic "any feedback?" message.'},
+      {t:'🎓 Learning From Failure Reflection',b:'Help me reflect on and learn from this professional setback: <em>[describe situation]</em>. Guide me through: what happened, what I could have done differently, what I learned, and how to use this experience positively going forward.'},
+      {t:'🔮 Future-Proof Career Advisor',b:'Based on trends in <em>[field]</em>, what are the top 5 skills that will be most valuable in the next 3 years? For each: why it matters, how to learn it, which AI tools support it, and a 90-day action plan to start.'},
+      {t:'📂 Work Portfolio Description',b:'Write a compelling description for my portfolio project: <em>[project name and brief]</em>. Include: problem it solves, my role, tools/methods used, results achieved, and what I learned. Under 150 words. Suitable for LinkedIn, resume, or portfolio site.'},
+      {t:'🧲 Personal Brand Audit',b:'Audit my personal brand as a <em>[role]</em> in <em>[field]</em>. Based on my LinkedIn: <em>[paste URL or summary]</em>. Give me: what my current brand communicates, what it should communicate, 5 specific changes to make, and one content idea to post this week.'},
+      {t:'🏗️ Side Project Starter',b:'I want to start a side project in <em>[field/area]</em> with <em>[X hours/week]</em> available. Suggest 3 project ideas that: build my skills, create portfolio value, and could grow into something bigger. For each: scope, tools needed, and first 3 steps.'},
+      {t:'🌍 Remote Work Productivity Prompt',b:'I work remotely as a <em>[role]</em>. Help me design a productive workday structure using AI tools. Include: morning routine, deep work blocks, AI-powered task management, communication habits, and an end-of-day shutdown ritual.'},
+      {t:'📊 Data / Numbers Explainer',b:'Explain these numbers / data points to me in plain language: <em>[paste data or stats]</em>. Tell me: what they mean, what trend they show, what action they suggest, and one question I should be asking based on this data.'},
+      {t:'🤝 Collaboration Proposal',b:'Write a professional collaboration proposal to <em>[person / company / team]</em> for <em>[collaboration type]</em> in <em>[field]</em>. Include: what I offer, what I am asking for, mutual benefits, and a clear next step. Under 200 words.'},
+      {t:'🎯 OKR / KPI Builder',b:'Help me define OKRs or KPIs for <em>[my role / team / project]</em> in <em>[field]</em> for the next quarter. For each objective: 3 measurable key results, how to track them, and a weekly check-in question to stay on course.'},
+      {t:'🔐 AI Ethics Checker',b:'I am using AI for <em>[task]</em> in my <em>[field/role]</em>. Check my approach for ethical concerns: data privacy, bias, transparency, and fairness. Suggest 3 best practices I should follow and one thing I should avoid.'},
+      {t:'📡 Industry Trend Briefing',b:'Give me a briefing on the top 5 trends shaping the <em>[field/industry]</em> in 2025. For each trend: what it is, why it matters, how it affects my role as a <em>[job title]</em>, and one action I can take to stay ahead.'},
+      {t:'🖊️ Proposal / Pitch Writer',b:'Write a one-page pitch / proposal for <em>[idea / project / initiative]</em> in <em>[field]</em>. Audience: <em>[decision maker]</em>. Include: problem, solution, why now, why me, expected outcome, and a clear ask. Persuasive but concise.'},
+      {t:'🧑‍💻 AI Prompt Improver',b:'Here is my current AI prompt: <em>[paste your prompt]</em>. Improve it by: making it more specific, adding context, defining the output format, and adding a constraint to improve quality. Show me the improved version and explain each change.'},
+      {t:'📞 Phone / Video Call Prep',b:'Help me prepare for a <em>[interview / client call / networking call / presentation]</em> with <em>[person / company]</em> in the <em>[field]</em>. Give me: 5 questions to ask them, 3 key points to communicate about myself, and how to close the call strongly.'},
+      {t:'🔑 Password to Power: Reframe Weakness',b:'I often get asked about my weakness in interviews: <em>[your weakness]</em>. Help me reframe this honestly and positively in under 80 words. Show growth mindset, specific improvement steps I have taken, and relevance to the role.'}
     ]
   },
   business:{
     free:[
-      {t:'📱 Instagram Caption Batch',b:'I run a <em>[type of business]</em>. Give me 10 Instagram captions for this week. Mix: 3 educational, 3 promotional, 2 behind-the-scenes, 2 engaging questions. Each under 80 words with 5 relevant hashtags.'},
-      {t:'💬 Customer Reply Templates',b:'I run a <em>[type of business]</em>. Create 10 customer reply templates for: pricing inquiry, delivery delay, refund request, product question, positive review response, negative review response, discount request, WhatsApp inquiry, out-of-stock, and general thank you. Each under 60 words.'},
-      {t:'🛍️ Product Description',b:'Write a product description for <em>[product name]</em>. Target customer: <em>[who they are]</em>. Focus on benefits and how it improves their life — not just features. Under 100 words. End with a clear call to action.'}
+      {t:'📄 Resume Summary Writer',b:'Write a professional resume summary for someone applying for <em>[job role]</em> in the <em>[field/industry]</em>. Key skills: <em>[skill 1, skill 2, skill 3]</em>. Experience: <em>[X years / fresher]</em>. Under 60 words, confident and specific.'},
+      {t:'🔗 LinkedIn Headline Generator',b:'Write 5 LinkedIn headline options for someone with skills in <em>[your skills]</em> targeting <em>[job title]</em> in <em>[industry]</em>. Each under 15 words, keyword-rich, avoids "seeking opportunities."'},
+      {t:'🎯 ATS Resume Optimiser',b:'Here is my resume: <em>[paste resume]</em>. Here is the job description: <em>[paste JD]</em>. Score match out of 10. List missing keywords. Rewrite my professional summary to better match this role. Suggest 3 bullet rewrites with stronger action verbs.'}
     ],
     locked:[
-      {t:'📊 Business Proposal',b:'Write a business proposal for a client who needs <em>[service]</em>. Include: project understanding, proposed solution, deliverables, timeline placeholder, pricing placeholder, and a strong closing. Professional but warm. Under 400 words.'},
-      {t:'📣 Meta Ad Copy (3 Versions)',b:'Write a Facebook/Instagram ad for my <em>[product/service]</em>. Target: <em>[demographics]</em>. Main benefit: <em>[key benefit]</em>. Include: scroll-stopping first line, 3 benefit bullets, social proof line, strong CTA. Under 150 words. Give 3 variations: emotional, logical, urgency-based.'},
-      {t:'📋 SOP Creator',b:'Create a detailed SOP for <em>[task/process]</em> in my <em>[business type]</em>. Include: purpose, who is responsible, step-by-step instructions, tools needed, and a quality check. Write it so a new team member with zero experience can follow it independently.'},
-      {t:'📈 30-Day Content Plan',b:'Create a 30-day social media content plan for my <em>[business type]</em>. Audience: <em>[target customer]</em>. Goal: <em>[followers/sales/brand awareness]</em>. Include: weekly themes, daily post types, 3 content pillars, and which platforms to prioritise.'},
-      {t:'💎 Digital Product Idea',b:'I run a <em>[business type]</em> with expertise in <em>[skills/knowledge]</em>. Suggest 5 digital products I could create and sell online. For each: product type, who would buy it, what to include, what price to charge, and where to sell it.'}
+      {t:'🎤 Full Mock Interview (10 Questions)',b:'Act as a senior interviewer for <em>[job title]</em> in <em>[field]</em>. Ask 10 questions (mix behavioural + technical). After each answer: score 1-10, what was strong, what was weak, model answer. Be strict but constructive.'},
+      {t:'💰 Salary Negotiation Script',b:'Write a salary negotiation script. Offer received: <em>[amount]</em> for <em>[role]</em> in <em>[field]</em>. My target: <em>[amount]</em>. Give a word-for-word response — confident, specific, not desperate. Include how to handle pushback professionally.'},
+      {t:'📈 Career Growth Roadmap',b:'I am a <em>[current role]</em> in <em>[field]</em> with <em>[X years]</em> experience. Goal: become <em>[target role]</em> in <em>[X years]</em>. Create a step-by-step roadmap: skills to gain, certifications, projects to build, milestones per year.'},
+      {t:'📧 Professional Email Templates (10 Types)',b:'Create 10 professional email templates for: joining a new team, requesting feedback, declining a meeting, following up on a proposal, requesting deadline extension, escalating an issue, thanking a mentor, sharing project update, cold networking, post-interview thank you. Each under 80 words.'},
+      {t:'🗂️ Meeting Notes → Executive Summary',b:'Convert these meeting notes into a polished executive summary: <em>[paste notes]</em>. Include: key decisions made, action items with owners, open questions, next steps. Format for sharing with leadership.'},
+      {t:'🌐 LinkedIn About Section Rewrite',b:'Rewrite my LinkedIn About section for a <em>[target role]</em> in <em>[field]</em>. Current version: <em>[paste]</em>. Use storytelling format. 200-250 words. Hook in first line. Show journey, skills, and what I bring. End with a CTA.'},
+      {t:'🏆 Achievement Bullet Rewriter',b:'Rewrite these job responsibilities as achievement-focused resume bullets: <em>[paste responsibilities]</em>. Format: Action verb + what you did + measurable result. Make each ATS-friendly and impactful.'},
+      {t:'📋 Project Proposal Writer',b:'Write a professional project proposal for <em>[project name]</em> in <em>[field/domain]</em>. Include: executive summary, problem statement, proposed solution, deliverables, timeline, expected outcomes. Clear and structured, under 400 words.'},
+      {t:'🔍 Research → Insights Converter',b:'Summarise this content: <em>[paste article / report / paper]</em>. Give me: 5 key takeaways, main argument, 2 questions it raises, one practical action today. Under 200 words.'},
+      {t:'🧠 Industry Trends Briefing',b:'Brief me on top 5 trends in <em>[field/industry]</em> for 2025. For each: what it is, why it matters, how it affects my role as <em>[job title]</em>, one action to stay ahead.'},
+      {t:'📣 LinkedIn Post Writer (Storytelling Format)',b:'Write a LinkedIn post about <em>[topic / experience / lesson]</em> in <em>[field]</em>. Hook: grab attention in first line. Body: 3-4 short paragraphs with insight. CTA: one question to drive comments. Under 200 words.'},
+      {t:'🔑 Keyword Map for My Role',b:'List top 25 keywords for a <em>[role]</em> in <em>[field]</em> for resume, LinkedIn, and ATS in 2025. Group by: core skills, tools, soft skills, and industry terms.'},
+      {t:'🛠️ AI Workflow Designer',b:'I work as a <em>[role]</em> in <em>[field]</em>. My repetitive tasks: <em>[list]</em>. Design an AI workflow for each task: which tool, what prompt, time saved. Format as a daily automation playbook.'},
+      {t:'💡 Problem-Solving Framework',b:'I am facing: <em>[describe problem]</em> in my <em>[work/field]</em>. Give me: 3 root causes, 5 solutions ranked by impact + ease, one immediate action I can take today, and a 2-week plan to resolve it.'},
+      {t:'🎓 Certification Roadmap',b:'I am a <em>[role]</em> in <em>[field]</em> wanting to upskill in <em>[area]</em>. Recommend 5 certifications for 2025. For each: name, platform, cost, time, career impact.'},
+      {t:'📊 Data Explainer',b:'Explain these numbers to me in plain language: <em>[paste data / stats]</em>. What they mean, what trend they show, what action they suggest, one question I should ask based on this data.'},
+      {t:'🔄 Career Pivot Planner',b:'I am transitioning from <em>[current field]</em> to <em>[target field]</em>. List 10 transferable skills I have. For each: how it transfers, how to describe it on resume/LinkedIn, and one way to demonstrate it immediately.'},
+      {t:'🏗️ Portfolio Project Blueprint',b:'Help me plan a portfolio project for <em>[role]</em> in <em>[field]</em>. It should: solve a real problem, show my top skills, be completable in <em>[X weeks]</em>, and impress interviewers. Give me: brief, structure, tools, and presentation approach.'},
+      {t:'🤝 Collaboration Pitch',b:'Write a collaboration pitch to <em>[person / company]</em> for <em>[collaboration type]</em> in <em>[field]</em>. Include: what I offer, what I ask, mutual benefits, clear next step. Under 200 words.'},
+      {t:'🗣️ Presentation Script (5 Minutes)',b:'Write a 5-minute presentation script on <em>[topic]</em> for <em>[audience]</em>. Strong opening hook, 3 key points with examples, memorable closing. Conversational but professional.'},
+      {t:'🔮 Future Skills Advisor',b:'Top 5 skills that will be most valuable in <em>[field]</em> over next 3 years. For each: why it matters, how to learn it, which AI tools support it, 90-day action plan.'},
+      {t:'🧩 Personal SWOT Analysis',b:'Do a personal SWOT analysis for my career as a <em>[role]</em> in <em>[field]</em>. 4-5 specific points per quadrant. End with one key action to take this month and a 3-month growth plan.'},
+      {t:'📬 Recruiter Outreach Sequence',b:'Write a 3-message LinkedIn outreach sequence to a recruiter at <em>[company]</em> for <em>[role]</em>. Message 1: connection request (under 300 chars). Message 2: follow-up (under 100 words). Message 3: final follow-up (under 80 words). Each specific and not generic.'},
+      {t:'📂 Work Portfolio Description Writer',b:'Write a compelling portfolio description for: <em>[project name and brief]</em>. Include: problem solved, my role, tools/methods, results achieved, what I learned. Under 150 words. Suitable for LinkedIn, resume, portfolio site.'},
+      {t:'🌟 Reference / Recommendation Request',b:'Write a polite, specific request asking <em>[manager / colleague / mentor]</em> for a LinkedIn recommendation or reference letter. Context: <em>[relationship, what they know about my work]</em>. Under 100 words. Make it easy for them to say yes.'},
+      {t:'🎯 OKR Builder for My Role',b:'Define OKRs for <em>[my role / project]</em> in <em>[field]</em> for next quarter. For each objective: 3 measurable key results, how to track, weekly check-in question.'},
+      {t:'🔐 AI Use Case for My Job',b:'I am a <em>[role]</em> in <em>[field]</em>. Give me 10 specific, practical ways I can use AI tools in my daily work this week. For each: task, best AI tool, exact prompt to use, time saved.'},
+      {t:'📡 Weekly Learning Digest Prompt',b:'Create a weekly learning system for staying current in <em>[field]</em>. Include: what to read (newsletters, sources), what to watch, one AI tool to explore, one concept to practise, and a Friday reflection prompt.'},
+      {t:'🖊️ Pitch Deck Outline',b:'Create a pitch deck outline for <em>[idea / project / initiative]</em> in <em>[field]</em>. Audience: <em>[decision makers]</em>. Include: 8-10 slide titles, what each slide should contain, one key visual for each, and the core story arc.'},
+      {t:'📞 Pre-Call / Pre-Interview Prep',b:'Prepare me for a <em>[interview / client call / networking call]</em> with <em>[person/company]</em> in <em>[field]</em>. Give me: 5 smart questions to ask, 3 things to communicate about myself, how to close the call, one thing to research beforehand.'},
+      {t:'🧑‍💻 Prompt Improver',b:'Here is my current AI prompt: <em>[paste prompt]</em>. Improve it: more specific, add context, define output format, add quality constraint. Show improved version and explain each change.'},
+      {t:'🔧 Tool Comparison Table',b:'Compare <em>[Tool A]</em> vs <em>[Tool B]</em> vs <em>[Tool C]</em> for <em>[task]</em> in <em>[field]</em>. Cover: features, pricing, ease of use, best for whom, limitations. Final recommendation for my goal: <em>[X]</em>.'},
+      {t:'📱 Personal Branding Content Calendar',b:'Create a 4-week LinkedIn content calendar for a <em>[role]</em> in <em>[field]</em>. Goal: <em>[build authority / find a job / get clients]</em>. 3 posts/week with: topic, hook idea, format (story/tip/poll/case study), and best posting day.'},
+      {t:'🏅 Award / Recognition Nomination Writer',b:'Write a nomination for <em>[person name]</em> for <em>[award / recognition]</em> in <em>[field]</em>. Their key contribution: <em>[describe]</em>. Under 250 words, specific and compelling. Highlight impact, not just effort.'},
+      {t:'💼 Job Description Analyser',b:'Analyse this job description: <em>[paste JD]</em>. Tell me: top 5 must-have skills, top 5 nice-to-have, culture signals hidden in the language, salary range estimate, and 3 questions I should ask in the interview.'},
+      {t:'🔑 Interview Question Bank',b:'Give me 20 interview questions for a <em>[role]</em> in <em>[field]</em>. Mix: 7 behavioural (STAR format), 7 technical, 3 situational, 3 culture-fit. For each question, give a brief note on what the interviewer is really assessing.'},
+      {t:'🧲 Personal Brand Statement',b:'Write a personal brand statement for a <em>[role]</em> in <em>[field]</em> with expertise in <em>[skill 1, skill 2]</em>. 2-3 sentences. Memorable and specific. Works across LinkedIn, resume, and in-person introduction.'},
+      {t:'🌍 Remote Work / Freelance Proposal',b:'Write a freelance / remote work proposal for <em>[client / company]</em> for <em>[service]</em>. Include: understanding of their need, my approach, deliverables, timeline, rate placeholder, and why I am the right choice. Under 300 words.'},
+      {t:'📐 Skills Gap Analysis',b:'I want to become a <em>[target role]</em> in <em>[field]</em>. My current skills: <em>[list]</em>. Identify my skills gap: what I am missing, how critical each gap is, how long to fill each gap, and the best resource to use for each.'},
+      {t:'🎪 Networking Event Conversation Starters',b:'Give me 10 conversation starters for a <em>[industry event / conference / meetup]</em> in the <em>[field]</em> space. Each should be genuine, not salesy, and designed to start a real professional conversation. Include 3 follow-up questions for each.'},
+      {t:'🔔 Daily AI Productivity Stack',b:'Build a daily AI tool stack for a <em>[role]</em> in <em>[field]</em>. Morning, deep work, meetings, admin, learning — for each time block: best AI tool, one ready-to-use prompt, and expected outcome. Format as a schedulable routine.'},
+      {t:'📝 Performance Self-Review Writer',b:'Write my performance self-review. Role: <em>[role]</em>. Achievements this period: <em>[list]</em>. Improvements: <em>[list]</em>. Goals next period: <em>[list]</em>. Tone: confident, honest, growth-oriented. Under 400 words.'},
+      {t:'🤔 Career Decision Matrix',b:'I am deciding between <em>[option A]</em> and <em>[option B]</em>. Help me: pros/cons of each, 5 questions to ask myself, 5-year projection for each path, and a decision framework. Help me think clearly, not just list options.'},
+      {t:'🧬 Industry Jargon Translator',b:'Explain these industry terms from <em>[field]</em> in plain English: <em>[paste 5-10 terms]</em>. For each: simple definition (1 sentence), real-world example, and when you would use it. No jargon in the explanation.'},
+      {t:'🎙️ Podcast / Video Script Opener',b:'Write the first 60 seconds of a podcast episode / video on <em>[topic]</em> for an audience of <em>[audience type]</em> in <em>[field]</em>. Hook them immediately. Set up what they will learn. Sound conversational and confident.'},
+      {t:'🗃️ Knowledge Base / FAQ Builder',b:'Create a FAQ document for <em>[topic / product / service / role]</em> in <em>[field]</em>. Generate 15 common questions with clear, concise answers. Each answer under 60 words. Suitable for a team wiki, website, or onboarding doc.'}
     ]
   },
   unemployed:{
     free:[
-      {t:'📄 Resume Summary',b:'Write a professional resume summary for me. I am a <em>fresher / [X years] experienced</em> professional with skills in <em>[skill 1, 2, 3]</em> targeting <em>[job type/industry]</em>. Under 60 words, confident and proactive — no filler phrases.'},
-      {t:'💌 Cover Letter Opening',b:'Write a compelling cover letter opening for a <em>[job title]</em> role at <em>[company]</em>. My key strength: <em>[strength]</em>. Do NOT start with "I am writing to apply." Open with something that immediately shows value. Under 80 words.'},
-      {t:'🔗 LinkedIn Headline',b:'Write 5 LinkedIn headline options for a job seeker with skills in <em>[skills]</em> looking for <em>[target role]</em> in <em>[industry]</em>. Each keyword-rich, specific, under 15 words. Avoid "seeking opportunities" — make each stand out.'}
+      {t:'📄 Resume Summary Writer',b:'Write a professional resume summary for someone applying for <em>[job role]</em> in the <em>[field/industry]</em>. Key skills: <em>[skill 1, skill 2, skill 3]</em>. Experience: <em>[X years / fresher]</em>. Under 60 words, confident and specific.'},
+      {t:'🔗 LinkedIn Headline Generator',b:'Write 5 LinkedIn headline options for someone with skills in <em>[your skills]</em> targeting <em>[job title]</em> in <em>[industry]</em>. Each under 15 words, keyword-rich, avoids "seeking opportunities."'},
+      {t:'🎯 ATS Resume Optimiser',b:'Here is my resume: <em>[paste resume]</em>. Here is the job description: <em>[paste JD]</em>. Score match out of 10. List missing keywords. Rewrite my professional summary. Suggest 3 bullet rewrites with stronger action verbs.'}
     ],
     locked:[
-      {t:'🎯 ATS Resume Optimiser',b:'Here is my resume: <em>[paste resume]</em>. Here is the job description: <em>[paste JD]</em>. Score how well my resume matches out of 10. List exact keywords I\'m missing. Rewrite my professional summary to better match this role. Suggest 3 bullet point rewrites with stronger action verbs.'},
-      {t:'🤝 Full Mock Interview',b:'Act as a strict but fair interviewer for a <em>[job title]</em> position. Interview me one question at a time. After each answer: what was strong, what was weak, and a model answer I should aim for. Start with "Tell me about yourself." Continue for 10 questions.'},
-      {t:'💰 Salary Negotiation Script',b:'Write a salary negotiation script. I received an offer of <em>[amount]</em> for <em>[role]</em>. My target is <em>[amount]</em> based on market research. Give me a word-for-word phone script — confident, specific, not desperate. Include how to handle pushback professionally.'},
-      {t:'📧 Follow-Up Thank You Email',b:'Write a follow-up thank you email after my interview for <em>[role]</em> at <em>[company]</em>. I interviewed with <em>[name/title]</em>. We discussed <em>[specific topic]</em>. Under 100 words, warm and professional. Reaffirm interest without desperation.'},
-      {t:'🔗 Recruiter Cold DM',b:'Write a LinkedIn connection request + first message to a recruiter at <em>[company]</em> for <em>[role]</em>. My background: <em>[brief]</em>. Connection note: under 300 characters. Follow-up message: under 100 words. Specific, not generic.'}
+      {t:'🏆 VIP: Complete Job Hunt System (30 Days)',b:'I am looking for a <em>[job title]</em> in <em>[field]</em> in <em>[city/remote]</em>. Build a complete 30-day job hunting system: daily actions, weekly milestones, AI tools for resume tailoring, how to find and reach decision-makers, tracking system, and follow-up strategy. Step-by-step action plan, not generic advice.'},
+      {t:'🧠 VIP: Deep Skills Audit',b:'Conduct a detailed skills audit for a <em>[role]</em> in <em>[field]</em>. Step 1: Top 10 skills required in 2025. Step 2: For each skill — 30-day learning plan + best resource. Step 3: 3 portfolio projects to demonstrate them. Step 4: AI tools to accelerate each skill.'},
+      {t:'📐 VIP: Portfolio Project Blueprint',b:'Help me plan a portfolio project for <em>[role]</em> in <em>[field]</em>. It should: solve a real problem, demonstrate my top skills, be completable in <em>[X weeks]</em>, and impress interviewers. Full project brief, tech stack, structure, tools, and how to present it.'},
+      {t:'🔗 VIP: LinkedIn Profile Full Overhaul',b:'Rewrite my entire LinkedIn profile for <em>[target role]</em> in <em>[field]</em>. Current profile: <em>[paste or describe]</em>. Rewrite: Headline, About (storytelling, 250 words), all Experience bullets (STAR + metrics), Skills section, Featured section ideas. Make every word count.'},
+      {t:'🎯 VIP: Daily AI Productivity System',b:'Build a personalised daily AI productivity system for a <em>[role]</em> in <em>[field]</em>. Tasks I do daily: <em>[list]</em>. For each time block (morning / deep work / meetings / admin / review): best AI tool, ready-to-use prompt, and expected time saved. Format as a daily schedule I can start tomorrow.'},
+      {t:'🎤 VIP: Interview Mastery (10 Round Simulation)',b:'Act as a senior hiring manager at a top company in <em>[field]</em> interviewing me for <em>[job title]</em>. Run a full 10-round interview: 4 behavioural, 3 technical, 2 situational, 1 culture-fit. After each answer: score 1-10, strengths, weaknesses, model answer. At the end: overall feedback and top 3 areas to improve.'},
+      {t:'💰 VIP: Salary Negotiation + Offer Evaluation',b:'I received a job offer: <em>[paste offer details]</em> for <em>[role]</em> in <em>[field]</em>. Help me: evaluate if this is a good offer, research market rate, write a negotiation script, handle 3 possible employer responses, and decide when to accept. Full strategy, not just a script.'},
+      {t:'🌐 VIP: Personal Brand 90-Day Launch Plan',b:'I want to build a personal brand as a <em>[role]</em> in <em>[field]</em> in the next 90 days. Create: Week 1-4 foundation plan, content strategy (3 platforms), 12-week content calendar (4 posts/week), engagement strategy, and how to measure brand growth. Full actionable plan.'},
+      {t:'📊 VIP: Career Pivot Full Roadmap',b:'I want to transition from <em>[current field/role]</em> to <em>[target field/role]</em> in <em>[X months]</em>. Create a complete pivot roadmap: transferable skills map, skill gaps to fill, certifications to get, portfolio projects to build, networking strategy, job search approach, and monthly milestones. Be specific, not generic.'},
+      {t:'🔑 VIP: AI Tools Masterclass for My Role',b:'I am a <em>[role]</em> in <em>[field]</em>. Give me a complete AI tools masterclass: Top 10 tools for my role, exact use case for each, ready-to-use prompt template for each, how to integrate them into my workflow, and a 30-day adoption plan. Include both free and paid options.'},
+      {t:'📣 VIP: Content to Client Pipeline',b:'I want to use LinkedIn / social media to attract <em>[clients / employers / collaborators]</em> as a <em>[role]</em> in <em>[field]</em>. Build a complete system: content strategy, 8-week posting plan, DM templates for warm leads, follow-up sequence, and how to convert engagement into real opportunities.'},
+      {t:'🏗️ VIP: Six-Month Career Acceleration Plan',b:'I am a <em>[role]</em> in <em>[field]</em> with <em>[X years]</em> experience. My career goal: <em>[target]</em>. Build a 6-month acceleration plan with: monthly focus areas, skills to gain each month, projects to complete, people to connect with, and measurable milestones. Make it ambitious but achievable.'},
+      {t:'🧩 VIP: SWOT + Strategy Plan',b:'Do a comprehensive personal SWOT analysis for a <em>[role]</em> in <em>[field]</em>. 5+ points per quadrant. Then build a strategy: how to use strengths to seize opportunities, how to fix weaknesses before threats hit, and a 90-day action plan with weekly check-ins.'},
+      {t:'🤝 VIP: Networking System Builder',b:'Build a complete professional networking system for a <em>[role]</em> in <em>[field]</em>. Include: where to find the right people, 5 outreach templates for different scenarios, how to add value before asking for anything, a follow-up system, and how to maintain relationships long-term.'},
+      {t:'📱 VIP: Social Proof Builder',b:'Help me build social proof as a <em>[role]</em> in <em>[field]</em> with limited experience. Strategy: how to get testimonials, what projects to do to build credibility, how to document and showcase results, which platforms to prioritise, and a 60-day visibility plan.'},
+      {t:'🔔 VIP: Job Search Tracker + Follow-Up System',b:'Build me a complete job search tracking system. Include: spreadsheet structure (columns, statuses), daily / weekly action checklist, follow-up email templates for 7-day / 14-day / 30-day intervals, how to handle ghosting professionally, and a weekly review framework.'},
+      {t:'🎓 VIP: Learning Path for My Dream Role',b:'I want to become a <em>[dream role]</em> in <em>[field]</em>. I currently know: <em>[current skills]</em>. Build a complete learning path: Phase 1 (foundations), Phase 2 (core skills), Phase 3 (advanced + portfolio), Phase 4 (job-ready). Include resources, projects, and timeline for each phase.'},
+      {t:'📡 VIP: Industry Insider Briefing',b:'Give me a deep briefing on the <em>[field/industry]</em> in India for 2025. Cover: top companies, who is hiring, emerging roles, salary benchmarks, skills most in demand, culture/interview styles by company type, and 5 insider tips most job seekers do not know.'},
+      {t:'🖊️ VIP: Complete Application Package',b:'Help me create a complete application package for a <em>[job title]</em> at <em>[company]</em> in <em>[field]</em>. Create: tailored resume summary, 3 achievement bullets for my top experience, cover letter (under 250 words), LinkedIn note to recruiter, and 5 questions to ask in the interview.'},
+      {t:'🌍 VIP: Freelance / Consulting Launch Kit',b:'I want to start freelancing / consulting as a <em>[role]</em> in <em>[field]</em>. Build a complete launch kit: niche definition, ideal client profile, service packages + pricing, portfolio setup checklist, first 5 clients outreach plan, and a 90-day revenue goal roadmap.'},
+      {t:'🔮 VIP: Future-Proof Career Blueprint',b:'The <em>[field]</em> is changing fast. Build me a 2025-2030 career blueprint as a <em>[role]</em>. Include: which skills AI will replace vs enhance in my role, top 5 skills to invest in now, certifications that will matter, roles that will emerge, and a year-by-year upskilling roadmap.'},
+      {t:'📂 VIP: GitHub / Portfolio Audit + Fix',b:'Audit my portfolio / GitHub / Behance / Dribbble: <em>[paste link or describe]</em>. For a <em>[role]</em> in <em>[field]</em>. Tell me: what is missing, what to remove, what to improve, how to describe each project for maximum impact, and one addition to make this week.'},
+      {t:'💼 VIP: Dream Company Research Brief',b:'I want to work at <em>[company name]</em> as a <em>[role]</em>. Research brief: what the company does, culture and values, recent news, interview process and style, what they look for in <em>[role]</em>, 5 smart questions to ask, and how to tailor my application specifically for them.'},
+      {t:'🧬 VIP: Skills Monetisation Planner',b:'I have skills in <em>[skill 1, skill 2, skill 3]</em> in <em>[field]</em>. Map out 5 ways I can monetise these skills in 2025: freelancing, consulting, digital products, content, or teaching. For each path: how to start, time to first income, effort required, and income potential in India.'},
+      {t:'🎪 VIP: Conference / Event Strategy',b:'I am attending <em>[event/conference]</em> in <em>[field]</em>. Build a strategy: pre-event research (who to meet, what to know), conversation starters, how to follow up within 24 hours, what to post on LinkedIn to build credibility, and how to turn conversations into opportunities.'},
+      {t:'🏅 VIP: Promotion / Raise Case Builder',b:'Help me build a case for a promotion / salary raise as a <em>[role]</em> in <em>[field]</em>. I have been in this role for <em>[X months/years]</em>. My achievements: <em>[list]</em>. Create: a written case document, how to present it in a meeting, responses to likely objections, and the right timing strategy.'},
+      {t:'🔐 VIP: AI Ethics + Responsible Use at Work',b:'I use AI for <em>[tasks]</em> in my role as a <em>[role]</em> in <em>[field]</em>. Give me a complete responsible AI use guide: what to share with AI (and what never to share), how to verify AI outputs, disclosure best practices, company policy questions to ask, and 5 habits of responsible AI users.'},
+      {t:'🧑‍💻 VIP: Technical Interview Prep Kit',b:'Prepare me for the technical portion of an interview for <em>[role]</em> in <em>[field]</em>. Give me: top 20 technical questions likely to be asked, model answers for each, 3 practical exercises or tasks to practise, common mistakes candidates make, and how to think aloud during a technical round.'},
+      {t:'📰 VIP: Thought Leadership Article Writer',b:'Write a 600-word thought leadership article for LinkedIn on <em>[topic]</em> in <em>[field]</em>. Target: <em>[audience]</em>. Include: a counter-intuitive opening, 3 strong insights with real examples, a prediction about where the field is heading, and a call to action. My POV: <em>[your perspective]</em>.'},
+      {t:'🌟 VIP: Mentor / Sponsor Outreach System',b:'I want to find a mentor or sponsor in <em>[field]</em>. Build a complete system: where to find the right people, how to research them, 3 personalised outreach messages for different contexts, how to structure the first conversation, and how to nurture the relationship long-term without being transactional.'}
     ]
   }
 };
+
+
 
 const QUIZ_DATA = {
   student:{
@@ -2846,7 +2992,7 @@ function renderPricing(){
     ],
     unemployed:[
       '🌟 ALL 3 Courses · 36 Lessons Lifetime',
-      '💡 5000+ VIP Prompt Bank',
+      '💡 1000+ VIP Prompt Bank',
       '📈 Daily Priority AI Trend Updates',
       '🥇 Gold-Tier Certificate',
       '👑 VIP Private Discord Community',
@@ -2900,138 +3046,249 @@ function renderPricing(){
   document.getElementById('tab-pricing').innerHTML=html;
 }
 
-/* ── AUTH ── */
+/* ══ AUTH — COMPLETE FIX ══
+   - await _fbReady before every Firebase call (fixes "not a function")
+   - Inline field errors (red highlight under the field)
+   - Google: new user → create, existing → login, same button for both tabs
+   - Signup with existing email → auto-switch to login with email pre-filled
+   - finally{} ensures buttons never stay disabled
+══════════════════════════════════════════════ */
+
+/* Firebase ready promise — created before module loads, resolved when Firebase is ready */
+/* window._fbReady is already set in the inline script before this */
+
+const _GBTN = `<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg> Continue with Google`;
+
+let _authBusy = false;
+
+function clrErr(inp){
+  inp.classList.remove('inp-err');
+  const e = inp.parentElement.querySelector('.field-err');
+  if(e) e.remove();
+}
+function clrAllErrs(){
+  document.querySelectorAll('.field-err').forEach(e=>e.remove());
+  document.querySelectorAll('.inp-err').forEach(e=>e.classList.remove('inp-err'));
+}
+function fldErr(id, msg){
+  const inp = document.getElementById(id); if(!inp) return;
+  inp.classList.add('inp-err');
+  const old = inp.parentElement.querySelector('.field-err'); if(old) old.remove();
+  const d = document.createElement('span'); d.className='field-err'; d.textContent=msg;
+  inp.parentElement.appendChild(d);
+  inp.focus();
+}
+
 function openAuth(mode){
   document.getElementById('authOverlay').classList.add('show');
   switchAuth(mode);
 }
 function switchAuth(mode){
-  const isLogin=mode==='login';
-  document.getElementById('loginForm').style.display=isLogin?'block':'none';
-  document.getElementById('signupForm').style.display=isLogin?'none':'block';
-  document.getElementById('authTitle').textContent=isLogin?'Welcome Back':'Create Your Account';
-  document.getElementById('atLogin').classList.toggle('on',isLogin);
-  document.getElementById('atSignup').classList.toggle('on',!isLogin);
-  document.getElementById('authSwitch').innerHTML=isLogin?
-    `Don't have an account? <span onclick="switchAuth('signup')">Sign up free →</span>`:
-    `Already have an account? <span onclick="switchAuth('login')">Login →</span>`;
-}
-async function doLogin(){
-  const e=document.getElementById('liEmail').value.trim().toLowerCase();
-  const p=document.getElementById('liPass').value;
-  if(!e||!p){toast('Please fill all fields','err');return;}
-  if(!e.includes('@')){toast('Please enter a valid email','err');return;}
-  const btn=document.querySelector('#loginForm .submit-btn');
-  if(btn){btn.textContent='Logging in…';btn.disabled=true;}
-  try{
-    const cred = await window._fbSignIn(null, e, p);
-    const fbUser = cred.user;
-    const found = { name: fbUser.displayName || e.split('@')[0], email: e, uid: fbUser.uid, photo: fbUser.photoURL||null };
-    let purch = [];
-    try{
-      const snap = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',fbUser.uid));
-      if(snap.exists) purch = snap.data().purchases || [];
-    }catch(ex){}
-    saveSession(found, purch, null);
-    completed = JSON.parse(localStorage.getItem('ak_done')||'{}');
-    userPhotoSrc = fbUser.photoURL || localStorage.getItem('ak_photo') || null;
-    photoSrc = userPhotoSrc;
-    setLoggedIn(found, purch);
-    closeOv('authOverlay');
-    document.getElementById('liEmail').value='';
-    document.getElementById('liPass').value='';
-    toast('Welcome back, '+found.name.split(' ')[0]+'! 👋','ok');
-  }catch(err){
-    let msg = 'Login failed. Please check your email & password.';
-    const code = err.code || '';
-    if(code==='auth/user-not-found'||code==='auth/invalid-credential') msg = 'No account found or wrong password.';
-    else if(code==='auth/wrong-password') msg = 'Wrong password. Try again.';
-    else if(code==='auth/invalid-email') msg = 'Invalid email address.';
-    else if(code==='auth/too-many-requests') msg = 'Too many attempts. Please wait a few minutes.';
-    toast(msg,'err');
-    console.error('Login error:', err.code, err.message);
-  }
-  if(btn){btn.textContent='Login to AI Katrukko';btn.disabled=false;}
-}
-async function doSignup(){
-  const n=document.getElementById('suName').value.trim();
-  const e=document.getElementById('suEmail').value.trim().toLowerCase();
-  const p=document.getElementById('suPass').value;
-  if(!n||!e||!p){toast('Please fill all fields','err');return;}
-  if(!e.includes('@')){toast('Please enter a valid email','err');return;}
-  if(p.length<6){toast('Password must be at least 6 characters','err');return;}
-  const btn=document.querySelector('#signupForm .submit-btn');
-  if(btn){btn.textContent='Creating account…';btn.disabled=true;}
-  try{
-    const cred = await window._fbCreateUser(null, e, p);
-    const fbUser = cred.user;
-    await window._fbUpdateProfile(fbUser, { displayName: n });
-    const newUser = { name: n, email: e, uid: fbUser.uid, photo: null };
-    await window._fbSetDoc(window._fbDoc(window._fbDb,'users',fbUser.uid), {
-      name: n, email: e, purchases: [], createdAt: new Date().toISOString()
-    });
-    saveSession(newUser, [], null);
-    setLoggedIn(newUser, []);
-    closeOv('authOverlay');
-    document.getElementById('suName').value='';
-    document.getElementById('suEmail').value='';
-    document.getElementById('suPass').value='';
-    toast('Account created! Module 1 is free 🎉','ok');
-  }catch(err){
-    let msg = 'Signup failed. Please try again.';
-    const code = err.code || '';
-    if(code==='auth/email-already-in-use'){
-      msg = 'This email is already registered! Please Login instead.';
-      setTimeout(()=>{ switchAuth('login'); document.getElementById('liEmail').value=document.getElementById('suEmail').value; }, 1500);
-    }
-    else if(code==='auth/invalid-email') msg = 'Please enter a valid email address.';
-    else if(code==='auth/weak-password') msg = 'Password must be at least 6 characters.';
-    toast(msg,'err');
-    console.error('Signup error:',err.code, err.message);
-  }
-  if(btn){btn.textContent='Create Free Account →';btn.disabled=false;}
+  const L = mode==='login';
+  document.getElementById('loginForm').style.display  = L?'block':'none';
+  document.getElementById('signupForm').style.display = L?'none':'block';
+  document.getElementById('authTitle').textContent    = L?'Welcome Back':'Create Your Account';
+  document.getElementById('atLogin').classList.toggle('on', L);
+  document.getElementById('atSignup').classList.toggle('on',!L);
+  document.getElementById('authSwitch').innerHTML = L
+    ? `Don't have an account? <span onclick="switchAuth('signup')">Sign up free →</span>`
+    : `Already have an account? <span onclick="switchAuth('login')">Login →</span>`;
+  clrAllErrs();
 }
 
-/* ── Google Sign-In ── */
-async function doGoogleSignIn(){
-  const btn = document.getElementById('googleSignInBtn');
-  if(btn){btn.innerHTML='⏳ Signing in…';btn.disabled=true;}
+/* ── LOGIN ── */
+async function doLogin(){
+  await window._fbReady;
+  clrAllErrs();
+  const e = document.getElementById('liEmail').value.trim().toLowerCase();
+  const p = document.getElementById('liPass').value;
+  if(!e)             { fldErr('liEmail','Please enter your email'); return; }
+  if(!e.includes('@')){ fldErr('liEmail','Please enter a valid email address'); return; }
+  if(!p)             { fldErr('liPass','Please enter your password'); return; }
+
+  const btn = document.querySelector('#loginForm .submit-btn');
+  if(btn){ btn.textContent='Logging in…'; btn.disabled=true; }
   try{
-    const result = await window._fbSignInGoogle();
-    const fbUser = result.user;
+    _authBusy = true;
+    const cred = await window._fbSignIn(window._fbAuth, e, p);
+    const fu = cred.user;
     let purch = [];
-    const snap = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',fbUser.uid));
-    if(snap.exists){
-      purch = snap.data().purchases || [];
+    try{
+      const s = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',fu.uid));
+      if(s.exists()) purch = s.data().purchases || [];
+    }catch(x){}
+    const found = { name: fu.displayName || e.split('@')[0], email: e, uid: fu.uid, photo: fu.photoURL || null };
+    saveSession(found, purch, null);
+    completed = JSON.parse(localStorage.getItem('ak_done') || '{}');
+    userPhotoSrc = fu.photoURL || localStorage.getItem('ak_photo') || null;
+    photoSrc = userPhotoSrc;
+    _authBusy = false;
+    setLoggedIn(found, purch);
+    closeOv('authOverlay');
+    document.getElementById('liEmail').value = '';
+    document.getElementById('liPass').value = '';
+    toast('Welcome back, ' + found.name.split(' ')[0] + '! 👋', 'ok');
+  }catch(err){
+    _authBusy = false;
+    const c = err.code || '';
+    console.warn('Login error:', c, err.message);
+    if(c === 'auth/user-not-found'){
+      fldErr('liEmail', 'No account found with this email. Please sign up!');
+    } else if(c === 'auth/wrong-password'){
+      fldErr('liPass', 'Incorrect password. Try again or use Forgot Password.');
+    } else if(c === 'auth/invalid-credential' || c === 'auth/invalid-login-credentials' || c === 'auth/INVALID_LOGIN_CREDENTIALS'){
+      fldErr('liEmail', 'Email or password is incorrect.');
+      fldErr('liPass', 'Please check and try again, or use Forgot Password.');
+    } else if(c === 'auth/invalid-email'){
+      fldErr('liEmail', 'Please enter a valid email address.');
+    } else if(c === 'auth/too-many-requests'){
+      toast('Too many failed attempts. Please wait a few minutes and try again.', 'err');
+    } else if(c === 'auth/network-request-failed'){
+      toast('Network error. Please check your internet connection.', 'err');
+    } else if(c === 'auth/user-disabled'){
+      fldErr('liEmail', 'This account has been disabled. Please contact support.');
     } else {
-      await window._fbSetDoc(window._fbDoc(window._fbDb,'users',fbUser.uid), {
-        name: fbUser.displayName||fbUser.email.split('@')[0], email: fbUser.email,
-        purchases: [], createdAt: new Date().toISOString()
-      });
+      toast('Login failed (' + c + '). Please try again.', 'err');
     }
-    const u = { uid: fbUser.uid, email: fbUser.email, name: fbUser.displayName||fbUser.email.split('@')[0], photo: fbUser.photoURL||null };
-    userPhotoSrc = fbUser.photoURL||null;
+  }finally{
+    if(btn){ btn.textContent = 'Login to AI Katrukko'; btn.disabled = false; }
+    setTimeout(()=>{ _authBusy = false; }, 600);
+  }
+}
+
+/* ── SIGNUP ── */
+async function doSignup(){
+  await window._fbReady;
+  clrAllErrs();
+  const n = document.getElementById('suName').value.trim();
+  const e = document.getElementById('suEmail').value.trim().toLowerCase();
+  const p = document.getElementById('suPass').value;
+  if(!n)              { fldErr('suName',  'Please enter your full name'); return; }
+  if(!e)              { fldErr('suEmail', 'Please enter your email'); return; }
+  if(!e.includes('@')){ fldErr('suEmail', 'Please enter a valid email address'); return; }
+  if(!p)              { fldErr('suPass',  'Please create a password'); return; }
+  if(p.length < 6)    { fldErr('suPass',  'Password must be at least 6 characters'); return; }
+
+  const btn = document.querySelector('#signupForm .submit-btn');
+  if(btn){ btn.textContent = 'Creating…'; btn.disabled = true; }
+  try{
+    _authBusy = true;
+    const cred = await window._fbCreateUser(window._fbAuth, e, p);
+    const fu = cred.user;
+    await window._fbUpdateProfile(fu, { displayName: n });
+    const nu = { name: n, email: e, uid: fu.uid, photo: null };
+    try{
+      await window._fbSetDoc(window._fbDoc(window._fbDb,'users',fu.uid), {
+        name: n, email: e, purchases: [], createdAt: new Date().toISOString()
+      });
+    }catch(fe){ console.warn('Firestore write error:', fe); }
+    saveSession(nu, [], null);
+    _authBusy = false;
+    setLoggedIn(nu, []);
+    closeOv('authOverlay');
+    document.getElementById('suName').value = '';
+    document.getElementById('suEmail').value = '';
+    document.getElementById('suPass').value = '';
+    toast('Account created! Module 1 is free — start learning now 🎉', 'ok');
+  }catch(err){
+    _authBusy = false;
+    const c = err.code || '';
+    console.warn('Signup error:', c, err.message);
+    if(c === 'auth/email-already-in-use'){
+      const em = document.getElementById('suEmail').value.trim().toLowerCase();
+      fldErr('suEmail', 'This email is already registered. Please login instead.');
+      setTimeout(()=>{
+        switchAuth('login');
+        document.getElementById('liEmail').value = em;
+        document.getElementById('liPass').focus();
+        toast('Enter your password to login!', 'info');
+      }, 900);
+    } else if(c === 'auth/invalid-email'){
+      fldErr('suEmail', 'Please enter a valid email address.');
+    } else if(c === 'auth/weak-password'){
+      fldErr('suPass', 'Password must be at least 6 characters.');
+    } else if(c === 'auth/network-request-failed'){
+      toast('Network error. Please check your internet connection.', 'err');
+    } else {
+      toast('Signup failed (' + c + '). Please try again.', 'err');
+    }
+  }finally{
+    if(btn){ btn.textContent = 'Create Free Account →'; btn.disabled = false; }
+    setTimeout(()=>{ _authBusy = false; }, 600);
+  }
+}
+
+/* ── GOOGLE SIGN-IN ── */
+async function doGoogleSignIn(){
+  await window._fbReady;
+  const btn = document.getElementById('googleSignInBtn');
+  if(btn){ btn.innerHTML = '⏳ Connecting to Google…'; btn.disabled = true; }
+  try{
+    _authBusy = true;
+    let result;
+    try{
+      result = await window._fbSignInGoogle();
+    }catch(pe){
+      const pc = pe.code || '';
+      if(pc === 'auth/popup-blocked'){
+        toast('Popup was blocked by your browser. Please allow popups for this site and try again.', 'err');
+        return;
+      }
+      if(pc === 'auth/popup-closed-by-user' || pc === 'auth/cancelled-popup-request') return;
+      throw pe;
+    }
+    const fu = result.user;
+    let purch = [];
+    try{
+      const s = await window._fbGetDoc(window._fbDoc(window._fbDb,'users',fu.uid));
+      if(s.exists()){
+        purch = s.data().purchases || [];
+      } else {
+        await window._fbSetDoc(window._fbDoc(window._fbDb,'users',fu.uid), {
+          name: fu.displayName || fu.email.split('@')[0],
+          email: fu.email,
+          purchases: [],
+          createdAt: new Date().toISOString(),
+          loginMethod: 'google'
+        });
+      }
+    }catch(fe){ console.warn('Firestore error:', fe); }
+    const u = {
+      uid: fu.uid,
+      email: fu.email,
+      name: fu.displayName || fu.email.split('@')[0],
+      photo: fu.photoURL || null
+    };
+    userPhotoSrc = fu.photoURL || null;
     photoSrc = userPhotoSrc;
     saveSession(u, purch, null);
+    _authBusy = false;
     setLoggedIn(u, purch);
     closeOv('authOverlay');
-    toast('Welcome, '+u.name.split(' ')[0]+'! 🎉','ok');
+    clrAllErrs();
+    const isNew = result.additionalUserInfo?.isNewUser ?? false;
+    toast(isNew
+      ? 'Welcome to AI Katrukko, ' + u.name.split(' ')[0] + '! 🎉'
+      : 'Welcome back, ' + u.name.split(' ')[0] + '! 👋',
+      'ok');
   }catch(err){
-    const code = err.code || '';
-    if(code==='auth/popup-closed-by-user'||code==='auth/cancelled-popup-request'){
-      // silent
-    } else if(code==='auth/popup-blocked'){
-      toast('Popup blocked! Allow popups for this site and try again.','err');
-    } else if(code==='auth/unauthorized-domain'){
-      toast('Google sign-in not enabled for this domain. Use email/password login.','err');
-    } else if(code==='auth/network-request-failed'){
-      toast('Network error. Check your connection and try again.','err');
-    } else {
-      toast('Google Sign-In failed. Try email/password login instead.','err');
-      console.error('Google sign-in error:', err.code, err.message);
+    _authBusy = false;
+    const c = err.code || '';
+    console.warn('Google Sign-In error:', c, err.message);
+    if(c === 'auth/account-exists-with-different-credential'){
+      toast('An account with this email already exists. Please login with email & password instead.', 'err');
+      switchAuth('login');
+    } else if(c === 'auth/network-request-failed'){
+      toast('Network error. Please check your internet connection.', 'err');
+    } else if(c === 'auth/operation-not-allowed'){
+      toast('Google Sign-In is not enabled on this project. Please use email & password.', 'err');
+    } else if(c !== 'auth/popup-closed-by-user' && c !== 'auth/cancelled-popup-request'){
+      toast('Google Sign-In failed. Please try again or use email & password.', 'err');
     }
+  }finally{
+    if(btn){ btn.innerHTML = _GBTN; btn.disabled = false; }
+    setTimeout(()=>{ _authBusy = false; }, 600);
   }
-  if(btn){btn.innerHTML='<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg> Continue with Google';btn.disabled=false;}
 }
 
 function setLoggedIn(u,p){
@@ -3071,7 +3328,10 @@ function setLoggedIn(u,p){
 
 /* ── Smooth logout: clears session but stays on page ── */
 function logout(){
-  window._fbSignOut().catch(()=>{});
+  /* Firebase sign out */
+  if(window._fbAuth){
+    window._fbSignOut(window._fbAuth).catch(()=>{});
+  }
   const wasName = user?.name?.split(' ')[0] || '';
   user=null; purchases=[]; authToken=null;
   clearSession();
@@ -3081,7 +3341,9 @@ function logout(){
   const banner=document.getElementById('upgradeBanner');
   if(banner) banner.style.display='none';
   goHome();
-  setTimeout(()=>{ toast('Logged out. See you soon, '+wasName+'! 👋','info'); }, 100);
+  setTimeout(()=>{
+    toast('Logged out. See you soon, '+wasName+'! 👋','info');
+  }, 100);
 }
 
 /* ── Quick re-login: opens login modal smoothly ── */
@@ -3233,7 +3495,10 @@ function toggleFaq(el){
 }
 
 /* ── UTILS ── */
-function closeOv(id){document.getElementById(id).classList.remove('show');}
+function closeOv(id){
+  document.getElementById(id).classList.remove('show');
+  if(id==='authOverlay') clrAllErrs();
+}
 function cpP(btn){
   const t=btn.closest('.pc').querySelector('.pb').innerText;
   navigator.clipboard.writeText(t).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000);});
@@ -4045,19 +4310,18 @@ async function generateWeeklyLesson(cat, weekNum){
    PAGE INIT — Restore session UI on every load/refresh
    Works seamlessly on all devices where user is logged in
 ══════════════════════════════════════════════ */
-/* ── Firebase Auth Ready: called when Firebase detects logged-in user ── */
+/* ── Firebase Auth Ready: guarded so it doesn't double-fire during active login ── */
 window._fbAuthReady = function(fbUser, fbPurch){
+  if(_authBusy) return;
   if(fbUser && !user){
-    /* Firebase says user is logged in — sync to app state */
-    user = fbUser; purchases = fbPurch || [];
-    saveSession(user, purchases, null);
-    setLoggedIn(user, purchases);
+    user=fbUser; purchases=fbPurch||[];
+    saveSession(user,purchases,null);
+    setLoggedIn(user,purchases);
   } else if(!fbUser && user){
-    /* Firebase says logged out — clear local state */
-    user = null; purchases = [];
+    user=null; purchases=[];
     clearSession();
     document.getElementById('navUser').classList.remove('show');
-    document.getElementById('navAuth').style.display = 'flex';
+    document.getElementById('navAuth').style.display='flex';
     updateBadges();
   }
 };
@@ -4104,11 +4368,9 @@ function openFreeTrial(){
 function showFreeTrialDashboard(){
   document.getElementById('freeTrialOverlay').classList.add('show');
   document.body.style.overflow='hidden';
-  renderTrialInfo();
-  if(isTrialExpired()){ setTimeout(()=>{ closeFreeTrialDashboard(); showTrialExpiredPopup(); },300); return; }
   switchTrialTab('practice');
+  renderTrialInfo();
   initPracticeSpace();
-  updateImgGenCredits();
 }
 
 function closeFreeTrialDashboard(){
@@ -4123,100 +4385,14 @@ function switchTrialTab(tab){
   document.getElementById('ftdPanel_'+tab).style.display='block';
 }
 
-/* ══════════════════════════════════════════════
-   TRIAL SYSTEM — Per-user, 5 chat + 5 image credits
-   Keys stored per email so limits are user-specific
-══════════════════════════════════════════════ */
-const TRIAL_CHAT_LIMIT = 5;
-const TRIAL_IMG_LIMIT  = 5;
-const TRIAL_DAYS       = 14;
-
-function trialKey(type){ return 'ak_trial_'+type+'_'+(user?.email||'guest'); }
-
-function getTrialStart(){
-  const k = 'ak_trial_start_'+(user?.email||'guest');
-  let d = localStorage.getItem(k);
-  if(!d){ d = new Date().toISOString().split('T')[0]; localStorage.setItem(k,d); }
-  return new Date(d);
-}
-function getTrialDaysLeft(){
-  return Math.max(0, TRIAL_DAYS - Math.floor((Date.now()-getTrialStart())/86400000));
-}
-function isTrialExpired(){ return getTrialDaysLeft() === 0; }
-
-function getChatCredits(){ return parseInt(localStorage.getItem(trialKey('chat'))??TRIAL_CHAT_LIMIT); }
-function getImgCredits(){  return parseInt(localStorage.getItem(trialKey('img'))??TRIAL_IMG_LIMIT); }
-function setChatCredits(n){ localStorage.setItem(trialKey('chat'), n); }
-function setImgCredits(n){  localStorage.setItem(trialKey('img'), n); }
-
-/* ── Trial Expired Popup ── */
-function showTrialExpiredPopup(){
-  const existing = document.getElementById('trialExpiredOverlay');
-  if(existing){ existing.style.display='flex'; return; }
-  const plans = [
-    { cat:'student', icon:'🎓', label:'Starter', price:'₹399', color:'#3b82f6',
-      feats:['3 Lessons · AI Foundations','50 AI Prompts','Voice-guided by Pooja','Quiz after every lesson'] },
-    { cat:'business', icon:'💼', label:'Professional', price:'₹999', color:'#dc143c', badge:'⭐ Best Seller',
-      feats:['12 Full Lessons · All Modules','1000+ Prompt Library','Certificate included','WhatsApp Community'] },
-    { cat:'unemployed', icon:'👑', label:'Elite', price:'₹2,499', color:'#f59e0b', badge:'👑 Best Value',
-      feats:['ALL 3 Courses · 36 Lessons','5000+ VIP Prompt Bank','Gold Certificate','1-on-1 with Pooja'] }
-  ];
-  const el = document.createElement('div');
-  el.id = 'trialExpiredOverlay';
-  el.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto;';
-  el.innerHTML=`
-  <div style="background:#fff;border-radius:20px;width:100%;max-width:700px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.25);margin:auto;">
-    <div style="background:linear-gradient(135deg,#1a202c,#2d3748);padding:28px 32px;text-align:center;">
-      <div style="font-size:2.5rem;margin-bottom:8px;">⏰</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#fff;margin-bottom:6px;">Your 14-Day Free Trial Has Ended</div>
-      <div style="font-size:.82rem;color:rgba(255,255,255,0.65);">You've explored AI Katrukko — time to unlock the full experience!</div>
-    </div>
-    <div style="padding:28px 24px;">
-      <div style="text-align:center;margin-bottom:22px;">
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:#1a202c;">Choose Your Plan — One-Time Payment · Lifetime Access</div>
-        <div style="font-size:.75rem;color:#718096;margin-top:4px;">No subscription. No renewal. Pay once, learn forever.</div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px;">
-        ${plans.map(p=>`
-        <div style="border:2px solid ${p.cat==='business'?'#dc143c':'#e2e8f0'};border-radius:14px;padding:18px 14px;text-align:center;position:relative;${p.cat==='business'?'box-shadow:0 8px 24px rgba(220,20,60,0.15);':''}" >
-          ${p.badge?`<div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:${p.color};color:#fff;font-size:.55rem;font-weight:800;padding:3px 12px;border-radius:100px;white-space:nowrap;">${p.badge}</div>`:''}
-          <div style="font-size:2rem;margin-bottom:6px;">${p.icon}</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:#1a202c;margin-bottom:4px;">${p.label}</div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;color:${p.color};margin-bottom:12px;">${p.price}</div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:16px;text-align:left;">
-            ${p.feats.map(f=>`<div style="font-size:.65rem;color:#4a5568;display:flex;align-items:flex-start;gap:5px;"><span style="color:${p.color};font-weight:800;flex-shrink:0;">✓</span>${f}</div>`).join('')}
-          </div>
-          <button onclick="document.getElementById('trialExpiredOverlay').style.display='none';curCat='${p.cat}';openPayModal();" style="width:100%;padding:10px;background:${p.color};color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Get ${p.label} →</button>
-        </div>`).join('')}
-      </div>
-      <div style="text-align:center;padding-top:16px;border-top:1px solid #e2e8f0;">
-        <div style="font-size:.72rem;color:#94a3b8;">🔒 Secure payment via Razorpay · 7-day issue resolution guarantee</div>
-      </div>
-    </div>
-  </div>`;
-  document.body.appendChild(el);
-  // Close on backdrop click
-  el.addEventListener('click', e=>{ if(e.target===el) el.style.display='none'; });
-}
-
-/* ── Check & show trial expired popup on dashboard open ── */
-function checkTrialStatus(){
-  if(!user) return false;
-  if(isTrialExpired()){
-    setTimeout(()=>{ closeFreeTrialDashboard(); showTrialExpiredPopup(); }, 300);
-    return true;
-  }
-  return false;
-}
-
-/* ── Practice Space ── */
+/* Practice Space — AI chat powered by Claude */
 let practiceMessages = [];
+let practiceCreditsLeft = 10;
 
 function initPracticeSpace(){
-  if(checkTrialStatus()) return;
   practiceMessages = [];
-  const left = getChatCredits();
-  renderPracticeMessages([{role:'ai',text:`👋 Hi! I'm your AI Practice Coach. Ask me anything about AI, prompts, job search, or business! 💡<br><br>You have <strong>${left}/${TRIAL_CHAT_LIMIT} free messages</strong> in your trial.`}]);
+  practiceCreditsLeft = parseInt(localStorage.getItem('ak_trial_credits'))||10;
+  renderPracticeMessages([{role:'ai',text:'👋 Hi! I\'m your AI Practice Coach. Ask me anything about AI, prompts, job search, or learning. You have '+practiceCreditsLeft+' free messages in your trial!'}]);
   updateCreditsBar();
 }
 
@@ -4233,40 +4409,30 @@ function renderPracticeMessages(msgs){
 }
 
 function updateCreditsBar(){
-  const left = getChatCredits();
-  const pct = (left/TRIAL_CHAT_LIMIT)*100;
+  const pct = (practiceCreditsLeft/10)*100;
   const bar = document.getElementById('creditsBar');
   const txt = document.getElementById('creditsTxt');
-  if(bar){ bar.style.width=pct+'%'; bar.style.background = left<=1?'#ff4444':'var(--aqua)'; }
-  if(txt) txt.textContent = left+'/'+TRIAL_CHAT_LIMIT+' messages remaining';
-  // Disable input if out of credits
-  const inp = document.getElementById('practiceInput');
-  const btn = document.getElementById('practiceSend');
-  if(left<=0){
-    if(inp){ inp.disabled=true; inp.placeholder='Trial messages used up — upgrade to continue!'; }
-    if(btn){ btn.disabled=true; }
-  } else {
-    if(inp){ inp.disabled=false; inp.placeholder='Ask your AI coach anything…'; }
-  }
+  if(bar) bar.style.width = pct+'%';
+  if(txt) txt.textContent = practiceCreditsLeft+'/10 messages remaining';
 }
 
 async function sendPracticeMessage(){
-  if(checkTrialStatus()) return;
   const inp = document.getElementById('practiceInput');
   const btn = document.getElementById('practiceSend');
   const msg = inp?.value?.trim();
   if(!msg) return;
-  let left = getChatCredits();
-  if(left <= 0){
-    showTrialLimitPopup('chat');
+  if(practiceCreditsLeft <= 0){
+    toast('Trial messages used up! Upgrade for unlimited access.','info');
     return;
   }
   inp.value='';
-  left--;
-  setChatCredits(left);
+  practiceCreditsLeft--;
+  localStorage.setItem('ak_trial_credits', practiceCreditsLeft);
   practiceMessages.push({role:'user',text:msg});
   renderPracticeMessages();
   if(btn){ btn.disabled=true; btn.textContent='Thinking...'; }
+
+  // Thinking indicator
   practiceMessages.push({role:'ai',text:'<span style="color:#718096;">⏳ Thinking…</span>'});
   renderPracticeMessages();
 
@@ -4277,11 +4443,11 @@ async function sendPracticeMessage(){
       body:JSON.stringify({
         model:'claude-sonnet-4-20250514',
         max_tokens:1000,
-        system:`You are Pooja's AI Practice Coach for AI Katrukko — a Tamil Nadu-based AI learning platform.
-You help Indian students, job seekers, and business owners learn AI skills in a friendly, simple way.
-Keep answers concise (under 120 words), practical, and India-relevant.
+        system:`You are Pooja's AI Practice Coach for AI Katrukko — a Tamil Nadu-based AI learning platform. 
+You help Indian students, job seekers, and business owners learn AI skills in a friendly, simple way. 
+Keep answers concise (under 120 words), practical, and India-relevant. 
 Use clear India-English. Add emojis occasionally for warmth.
-The user has ${left} messages left in their free trial — if they're running low (2 or fewer), naturally encourage upgrading for unlimited access.`,
+You're in a "14-day free trial" limited practice space — mention upgrade perks naturally if relevant.`,
         messages:[
           ...practiceMessages.slice(0,-1).filter(m=>m.role!=='ai'||!m.text.includes('Thinking')).map(m=>({
             role:m.role==='ai'?'assistant':'user',
@@ -4293,6 +4459,7 @@ The user has ${left} messages left in their free trial — if they're running lo
     });
     const data = await resp.json();
     const reply = data.content?.[0]?.text || 'Sorry, I could not answer that. Please try again!';
+    // Remove thinking bubble, add real reply
     practiceMessages = practiceMessages.filter(m=>!m.text.includes('Thinking'));
     practiceMessages.push({role:'ai',text:reply});
     renderPracticeMessages();
@@ -4303,53 +4470,40 @@ The user has ${left} messages left in their free trial — if they're running lo
   }
   if(btn){ btn.disabled=false; btn.textContent='Send'; }
   updateCreditsBar();
-  // If now at 0, show upgrade nudge in chat
-  if(getChatCredits()<=0){
-    setTimeout(()=>{
-      practiceMessages.push({role:'ai',text:'🎯 You\'ve used all your free trial messages! Upgrade to get <strong>unlimited AI coaching</strong>, all 12 lessons, and 1000+ prompts. <span style="color:var(--aqua);cursor:pointer;font-weight:700;" onclick="closeFreeTrialDashboard();curCat=\'business\';openPayModal();">Upgrade Now →</span>'});
-      renderPracticeMessages();
-      updateCreditsBar();
-    }, 800);
-  }
 }
 
-/* ── Image Generation ── */
+/* Image Generation — using Pollinations.ai (free, no key needed) */
+let imgGenCredits = parseInt(localStorage.getItem('ak_imggen_credits'))||3;
+
 function updateImgGenCredits(){
-  const left = getImgCredits();
   const bar = document.getElementById('imggenCreditsBar');
   const txt = document.getElementById('imggenCreditsTxt');
-  if(bar){ bar.style.width=((left/TRIAL_IMG_LIMIT)*100)+'%'; bar.style.background=left<=1?'#ff4444':'var(--aqua)'; }
-  if(txt) txt.textContent = left+'/'+TRIAL_IMG_LIMIT+' free generations remaining';
-  const btn = document.getElementById('imggenBtn');
-  const inp = document.getElementById('imggenInput');
-  if(left<=0){
-    if(btn){ btn.disabled=true; btn.textContent='Limit Reached'; }
-    if(inp){ inp.disabled=true; inp.placeholder='Upgrade for unlimited image generation!'; }
-  } else {
-    if(btn){ btn.disabled=false; btn.textContent='Generate ✨'; }
-    if(inp){ inp.disabled=false; }
-  }
+  if(bar) bar.style.width = ((imgGenCredits/3)*100)+'%';
+  if(txt) txt.textContent = imgGenCredits+'/3 free generations remaining';
 }
 
 async function generateImage(){
-  if(checkTrialStatus()) return;
   const inp = document.getElementById('imggenInput');
   const btn = document.getElementById('imggenBtn');
   const resultBox = document.getElementById('imggenResult');
   const prompt = inp?.value?.trim();
   if(!prompt){ toast('Enter a description first!','err'); return; }
-  let left = getImgCredits();
-  if(left<=0){ showTrialLimitPopup('img'); return; }
-  left--;
-  setImgCredits(left);
+  if(imgGenCredits<=0){
+    toast('Image credits used! Upgrade to Professional or Elite for unlimited generations.','info');
+    return;
+  }
+  imgGenCredits--;
+  localStorage.setItem('ak_imggen_credits',imgGenCredits);
   updateImgGenCredits();
   if(btn){ btn.disabled=true; btn.textContent='Generating...'; }
-  resultBox.innerHTML=`<div class="trial-loader"><div style="display:flex;gap:5px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--aqua);animation:dotPulse .6s infinite alternate"></span><span style="width:8px;height:8px;border-radius:50%;background:var(--aqua);animation:dotPulse .6s .2s infinite alternate"></span><span style="width:8px;height:8px;border-radius:50%;background:var(--aqua);animation:dotPulse .6s .4s infinite alternate"></span></div><span style="margin-left:10px;font-size:.78rem;color:#718096;">Creating your image…</span></div>`;
+  resultBox.innerHTML=`<div class="trial-loader"><div class="dots"><span></span><span></span><span></span></div> Creating your image…</div>`;
 
   try{
-    const encodedPrompt = encodeURIComponent(prompt+', digital art, high quality, vibrant, India-inspired aesthetic');
+    // Use Pollinations.ai free image generation
+    const encodedPrompt = encodeURIComponent(prompt+', digital art, high quality, India-inspired aesthetic');
     const seed = Math.floor(Math.random()*99999);
     const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&seed=${seed}&nologo=true`;
+    
     const img = new Image();
     img.onload = ()=>{
       resultBox.innerHTML='';
@@ -4357,20 +4511,21 @@ async function generateImage(){
       wrapper.style.cssText='position:relative;width:100%;';
       img.style.cssText='width:100%;border-radius:10px;display:block;';
       const dlBtn = document.createElement('a');
-      dlBtn.href=url; dlBtn.download='ai-katrukko-image.jpg'; dlBtn.target='_blank';
+      dlBtn.href = url;
+      dlBtn.download = 'ai-katrukko-image.jpg';
+      dlBtn.target='_blank';
       dlBtn.style.cssText='position:absolute;bottom:10px;right:10px;background:rgba(0,0,0,0.7);color:#fff;padding:6px 12px;border-radius:6px;font-size:.65rem;font-weight:700;text-decoration:none;font-family:Syne,sans-serif;';
       dlBtn.textContent='⬇ Download';
-      wrapper.appendChild(img); wrapper.appendChild(dlBtn);
+      wrapper.appendChild(img);
+      wrapper.appendChild(dlBtn);
       resultBox.appendChild(wrapper);
       if(btn){ btn.disabled=false; btn.textContent='Generate ✨'; }
-      // Show upgrade nudge if last image used
-      if(getImgCredits()<=0){
-        setTimeout(()=>showTrialLimitPopup('img'),1200);
-      }
     };
     img.onerror = ()=>{
-      resultBox.innerHTML=`<div class="imggen-placeholder">⚠️ Could not generate. Please try a different prompt!</div>`;
-      left++; setImgCredits(left); updateImgGenCredits();
+      resultBox.innerHTML=`<div class="imggen-placeholder">⚠️ Could not generate image. Please try a different prompt!</div>`;
+      imgGenCredits++; // Refund on error
+      localStorage.setItem('ak_imggen_credits',imgGenCredits);
+      updateImgGenCredits();
       if(btn){ btn.disabled=false; btn.textContent='Generate ✨'; }
     };
     img.src = url;
@@ -4380,57 +4535,13 @@ async function generateImage(){
   }
 }
 
-/* ── Trial Limit Popup (mid-trial, credits gone) ── */
-function showTrialLimitPopup(type){
-  const isChat = type==='chat';
-  const existing = document.getElementById('trialLimitOverlay');
-  if(existing) existing.remove();
-  const el = document.createElement('div');
-  el.id='trialLimitOverlay';
-  el.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:16px;';
-  el.innerHTML=`
-  <div style="background:#fff;border-radius:20px;width:100%;max-width:480px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-    <div style="background:linear-gradient(135deg,#dc143c,#ff2952);padding:24px;text-align:center;">
-      <div style="font-size:2.2rem;margin-bottom:8px;">${isChat?'💬':'🎨'}</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#fff;">${isChat?'AI Chat Limit Reached':'Image Credits Used Up'}</div>
-      <div style="font-size:.78rem;color:rgba(255,255,255,0.8);margin-top:4px;">Upgrade to continue — Lifetime access, no monthly fees!</div>
-    </div>
-    <div style="padding:24px;">
-      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
-        <div onclick="document.getElementById('trialLimitOverlay').remove();closeFreeTrialDashboard();curCat='student';openPayModal();" style="border:1.5px solid #e2e8f0;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .2s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e2e8f0'">
-          <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:#1a202c;">🎓 Starter Plan</div><div style="font-size:.68rem;color:#718096;margin-top:2px;">3 Lessons · 50 Prompts</div></div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#3b82f6;">₹399</div>
-        </div>
-        <div onclick="document.getElementById('trialLimitOverlay').remove();closeFreeTrialDashboard();curCat='business';openPayModal();" style="border:2px solid #dc143c;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#fff5f7;transition:all .2s;position:relative;" onmouseover="this.style.background='#ffe4e8'" onmouseout="this.style.background='#fff5f7'">
-          <div style="position:absolute;top:-9px;left:12px;background:#dc143c;color:#fff;font-size:.52rem;font-weight:800;padding:2px 10px;border-radius:100px;">⭐ BEST SELLER</div>
-          <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:#1a202c;">💼 Professional Plan</div><div style="font-size:.68rem;color:#718096;margin-top:2px;">12 Lessons · 1000+ Prompts · Certificate</div></div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#dc143c;">₹999</div>
-        </div>
-        <div onclick="document.getElementById('trialLimitOverlay').remove();closeFreeTrialDashboard();curCat='unemployed';openPayModal();" style="border:1.5px solid #f59e0b;border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#fffbeb;transition:all .2s;" onmouseover="this.style.background='#fef3c7'" onmouseout="this.style.background='#fffbeb'">
-          <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:#1a202c;">👑 Elite Plan</div><div style="font-size:.68rem;color:#718096;margin-top:2px;">36 Lessons · 5000+ Prompts · 1-on-1 Coaching</div></div>
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#f59e0b;">₹2,499</div>
-        </div>
-      </div>
-      <button onclick="document.getElementById('trialLimitOverlay').remove();" style="width:100%;padding:11px;background:#f1f5f9;color:#64748b;border:none;border-radius:8px;font-size:.78rem;font-weight:600;cursor:pointer;">Maybe later</button>
-    </div>
-  </div>`;
-  document.body.appendChild(el);
-  el.addEventListener('click', e=>{ if(e.target===el) el.remove(); });
-}
-
 function renderTrialInfo(){
-  const daysLeft = getTrialDaysLeft();
-  const chatLeft = getChatCredits();
-  const imgLeft  = getImgCredits();
+  const trialStart = localStorage.getItem('ak_trial_start') || new Date().toISOString().split('T')[0];
+  if(!localStorage.getItem('ak_trial_start')) localStorage.setItem('ak_trial_start', trialStart);
+  const started = new Date(trialStart);
+  const daysLeft = Math.max(0, 14 - Math.floor((Date.now()-started)/86400000));
   const el = document.getElementById('trialDaysLeft');
-  if(el) el.textContent = daysLeft>0 ? '⏳ '+daysLeft+' days left in your free trial' : '❌ Trial expired — upgrade to continue';
-  const infoDays = document.getElementById('trialInfoDays');
-  if(infoDays) infoDays.textContent = daysLeft>0 ? '⏳ '+daysLeft+' of 14 days remaining' : '❌ Trial Expired';
-  const chatEl = document.getElementById('infoChatCredits');
-  if(chatEl) chatEl.textContent = chatLeft>0 ? chatLeft+' of 5 messages remaining. Ask anything about AI, career, or business.' : '✅ All 5 messages used. Upgrade for unlimited coaching!';
-  const imgEl = document.getElementById('infoImgCredits');
-  if(imgEl) imgEl.textContent = imgLeft>0 ? imgLeft+' of 5 image generations remaining.' : '✅ All 5 images used. Upgrade for unlimited generations!';
-  if(daysLeft===0) setTimeout(()=>showTrialExpiredPopup(), 400);
+  if(el) el.textContent = '⏳ '+daysLeft+' days left in your free trial';
 }
 
 /* Hook: after signup, open trial dashboard automatically */
@@ -4514,7 +4625,7 @@ function toggleSbMod(mi){
     <div class="ftd-tabs">
       <button class="ftd-tab active" id="ftdTab_practice" onclick="switchTrialTab('practice')">💬 AI Practice Space</button>
       <button class="ftd-tab" id="ftdTab_imggen" onclick="switchTrialTab('imggen');setTimeout(updateImgGenCredits,50);">🎨 Image Generation</button>
-      <button class="ftd-tab" id="ftdTab_info" onclick="switchTrialTab('info');renderTrialInfo();">ℹ️ Trial Info</button>
+      <button class="ftd-tab" id="ftdTab_info" onclick="switchTrialTab('info');renderTrialInfo();const d=document.getElementById('trialInfoDays');if(d){const s=localStorage.getItem('ak_trial_start')||new Date().toISOString().split('T')[0];const dl=Math.max(0,14-Math.floor((Date.now()-new Date(s))/86400000));d.textContent='⏳ '+dl+' days left in your free trial';}">ℹ️ Trial Info</button>
     </div>
 
     <!-- Panel: Practice Space -->
@@ -4540,32 +4651,21 @@ function toggleSbMod(mi){
           <input class="imggen-input" id="imggenInput" placeholder="Describe the image you want… e.g. 'A Chennai street at sunset, digital art'" onkeydown="if(event.key==='Enter')generateImage()">
           <button class="imggen-btn" id="imggenBtn" onclick="generateImage()">Generate ✨</button>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center;">
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:-4px;">
           <span style="font-size:.62rem;color:var(--aqua);font-weight:600;margin-right:4px;">Try:</span>
-          <span onclick="document.getElementById('imggenInput').value='Indian entrepreneur using laptop'" class="imggen-chip">Indian entrepreneur using laptop</span>
-          <span onclick="document.getElementById('imggenInput').value='AI robot helping student study'" class="imggen-chip">AI robot helping student study</span>
-          <span onclick="document.getElementById('imggenInput').value='Chennai Marina Beach sunset digital art'" class="imggen-chip">Chennai Marina Beach sunset digital art</span>
-          <span onclick="document.getElementById('imggenInput').value='Tamil Nadu farmer with futuristic AI tools'" class="imggen-chip">Tamil Nadu farmer with futuristic AI tools</span>
+          ${['Indian entrepreneur using laptop','AI robot helping student study','Chennai Marina Beach sunset digital art','Tamil Nadu farmer with futuristic AI tools'].map(s=>`<span onclick="document.getElementById('imggenInput').value='${s}'" style="font-size:.62rem;padding:3px 10px;border-radius:100px;border:1px solid var(--border2);color:#4a5568;cursor:pointer;background:#fff;transition:all .15s;" onmouseover="this.style.borderColor='var(--aqua)'" onmouseout="this.style.borderColor='var(--border2)'">${s}</span>`).join('')}
         </div>
         <div class="imggen-result" id="imggenResult">
           <div class="imggen-placeholder">
-            <div style="font-size:2.5rem;margin-bottom:8px;">🎨</div>
-            <div style="font-weight:600;color:#4a5568;">Type a description above and hit Generate</div>
-            <div style="font-size:.65rem;margin-top:6px;color:#94a3b8;">Powered by AI · Free for trial users</div>
+            <div style="font-size:2rem;margin-bottom:8px;">🖼️</div>
+            <div>Your generated image will appear here</div>
+            <div style="font-size:.65rem;margin-top:6px;color:#94a3b8;">Free, instant, no sign-in required</div>
           </div>
         </div>
         <div class="imggen-credits">
           <span id="imggenCreditsTxt" style="font-size:.65rem;color:#718096;"></span>
           <div class="credits-bar-wrap"><div class="credits-bar" id="imggenCreditsBar"></div></div>
           <span style="font-size:.65rem;color:var(--aqua);font-weight:700;cursor:pointer;white-space:nowrap;" onclick="closeFreeTrialDashboard();curCat='business';openPayModal();">Get unlimited →</span>
-        </div>
-        <!-- Upgrade nudge -->
-        <div style="background:linear-gradient(135deg,#fff5f7,#fff);border:1.5px solid rgba(220,20,60,0.2);border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:4px;">
-          <div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;color:#1a202c;">🚀 Unlimited AI Images + Full Course</div>
-            <div style="font-size:.68rem;color:#718096;margin-top:2px;">Upgrade from just ₹999 — Lifetime access. No subscription.</div>
-          </div>
-          <button onclick="closeFreeTrialDashboard();curCat='business';openPayModal();" style="padding:8px 18px;background:var(--aqua);color:#fff;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;cursor:pointer;white-space:nowrap;transition:all .2s;" onmouseover="this.style.background='#ff2952'" onmouseout="this.style.background='var(--aqua)'">Upgrade Now →</button>
         </div>
       </div>
     </div>
@@ -4578,14 +4678,14 @@ function toggleSbMod(mi){
           <div class="trial-feat-ic">💬</div>
           <div>
             <div class="trial-feat-title">AI Practice Space</div>
-            <div class="trial-feat-desc" id="infoChatCredits">5 free messages with your AI coach. Ask anything about AI, career, or business.</div>
+            <div class="trial-feat-desc">10 free messages with your AI coach. Ask anything about AI, career, or business.</div>
           </div>
         </div>
         <div class="trial-feat-card">
           <div class="trial-feat-ic">🎨</div>
           <div>
             <div class="trial-feat-title">Image Generation</div>
-            <div class="trial-feat-desc" id="infoImgCredits">5 free AI image generations. Perfect for social posts, business visuals, or exploring.</div>
+            <div class="trial-feat-desc">3 free AI image generations. Perfect for social posts, business visuals, or exploring.</div>
           </div>
         </div>
         <div class="trial-feat-card">
