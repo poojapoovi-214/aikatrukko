@@ -1025,12 +1025,16 @@ footer{
   }
 
   /* NAV */
-  nav{padding:0 14px;height:54px;}
+  nav{padding:0 14px;height:54px;overflow:hidden;}
   .logo{font-size:.95rem;}
   .logo-mark{width:28px;height:28px;font-size:.7rem;}
-  .nav-r{gap:6px;}
-  .nb{padding:6px 10px;font-size:.68rem;}
-  #navAuth{gap:5px;}
+  .nav-r{gap:4px;max-width:calc(100vw - 120px);overflow:hidden;}
+  .nb{padding:5px 8px;font-size:.65rem;white-space:nowrap;}
+  #navAuth{gap:4px;}
+  .nav-user{gap:4px;flex-wrap:nowrap;overflow:hidden;}
+  .nav-name{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.7rem;}
+  #navDeviceBadge{font-size:.55rem;padding:2px 6px;}
+  .nav-user .nb-o{padding:5px 7px;font-size:.62rem;}
 
   /* HERO */
   .hero{padding:36px 16px 32px;}
@@ -3471,7 +3475,7 @@ async function sendAkChat(){
 
   // Remove thinking, add reply
   akChatHistory = akChatHistory.filter(m=>!m.thinking);
-  akChatHistory.push({role:'ai', text: reply || '⚠️ Could not connect. Please open this on <strong>aikatrukko.in</strong> — the AI works only on the live site!'});
+  akChatHistory.push({role:'ai', text: reply || '⚠️ Could not connect right now. Please try again in a moment!'});
   renderAkChatMsgs();
   sendBtn.disabled = false;
   document.getElementById('akChatInput').focus();
