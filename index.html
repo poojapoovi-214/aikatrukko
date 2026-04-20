@@ -7,6 +7,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <!-- ══ FIREBASE AUTH SYSTEM ══ -->
 <script>
+/* ─── Console safety patch (some browsers/webviews block console methods) ─── */
+(function(){
+  var noop=function(){};
+  ['log','info','warn','error','debug','group','groupEnd','time','timeEnd'].forEach(function(m){
+    if(typeof console==='undefined'){ window.console={}; }
+    if(typeof console[m]!=='function'){ console[m]=noop; }
+  });
+})();
+
 /* ─── Step 1: Ready promise — set up BEFORE Firebase loads ─── */
 window._fbLoaded = false;
 window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
@@ -86,7 +95,7 @@ window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
   window._fbUpdateDoc = function(ref, data){ return ref.update(data); };
 
   window._fbFallbackActive = true;
-  console.info('Auth: local-storage fallback active — attempting to load Firebase…');
+  console.log('Auth: local-storage fallback active — attempting to load Firebase…');
 })();
 
 /* ─── Step 3: Dynamically load Firebase ES modules ─── */
@@ -150,11 +159,11 @@ window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
 
     window._fbLoaded = true;
     window._fbReadyResolve();
-    console.info('Firebase loaded successfully ✓');
+    console.log('Firebase loaded successfully ✓');
 
   } catch(err) {
     /* Firebase failed to load (sandbox / network / CSP) — fallback stays active */
-    console.warn('Firebase unavailable — using local fallback. Auth works locally only.', err.message);
+    console.log('Firebase unavailable — using local fallback.', err.message);
     window._fbLoaded = false;
     window._fbReadyResolve(); /* unblock auth UI so buttons work */
   }
@@ -930,26 +939,55 @@ footer{
 @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ══ RESPONSIVE ══ */
-@media(max-width:900px){
-  .hero{grid-template-columns:1fr;gap:40px;padding:50px 24px;}
-  .hero-right{display:block;}
-  .feat-grid{grid-template-columns:1fr 1fr;}
-  .cats-grid{grid-template-columns:1fr;}
-  .steps-row{grid-template-columns:1fr 1fr;}
-  .pricing-grid{grid-template-columns:1fr;}
-  nav{padding:0 20px;}
-  .nav-mid{display:none;}
-  .sec{padding:60px 24px;}
-  .breadcrumb,.platform-head,.tabs,.tab-content{padding-left:24px;padding-right:24px;}
+
+/* ── TABLET LANDSCAPE (max 1024px) ── */
+@media(max-width:1024px){
+  .hero{padding:70px 28px 60px;}
+  .sec{padding:70px 28px;}
+  .sec-in{max-width:100%;}
+  .breadcrumb,.platform-head,.tabs,.tab-content{padding-left:28px;padding-right:28px;}
 }
 
-/* ══ MOBILE (max 600px) ══ */
+/* ── TABLET (max 900px) ── */
+@media(max-width:900px){
+  /* NAV */
+  nav{padding:0 20px;}
+  .nav-mid{display:none;}
+  .nb{padding:7px 12px;font-size:.72rem;}
+
+  /* HERO */
+  .hero{grid-template-columns:1fr;gap:40px;padding:50px 24px;}
+  .hero-right{display:block;}
+
+  /* GRIDS */
+  .feat-grid{grid-template-columns:1fr 1fr;}
+  .cats-grid{grid-template-columns:1fr 1fr;}
+  .steps-row{grid-template-columns:1fr 1fr;}
+  .pricing-grid{grid-template-columns:1fr 1fr;}
+
+  /* SECTIONS */
+  .sec{padding:60px 24px;}
+  .breadcrumb,.platform-head,.tabs,.tab-content{padding-left:24px;padding-right:24px;}
+
+  /* PLATFORM HEADER */
+  .ph-inner{flex-direction:column;align-items:flex-start;}
+
+  /* DASHBOARD */
+  .dash-body{grid-template-columns:1fr;padding:16px;}
+  .dash-sidebar{position:static;max-height:320px;}
+}
+
+/* ── MOBILE (max 600px) ── */
 @media(max-width:600px){
+  /* WHY BANNER & WEEKLY GRID (inline style grids) */
+  div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr !important;}
   #homeWeeklyGrid{grid-template-columns:1fr !important;}
   .weekly-widget{margin-top:14px;}
 
-  /* TRUST BAR / WHY BANNER */
-  div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr 1fr !important;}
+  /* PRICING POPUP 3-col grid → 1 col */
+  div[style*="grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"]{
+    grid-template-columns:1fr !important;
+  }
 
   /* NAV */
   nav{padding:0 14px;height:54px;}
@@ -959,9 +997,6 @@ footer{
   .nb{padding:6px 10px;font-size:.68rem;}
   #navAuth{gap:5px;}
 
-  /* TRUST BAR */
-  div[style*="background:#dc143c"]{font-size:.62rem;padding:7px 10px;letter-spacing:0;}
-
   /* HERO */
   .hero{padding:36px 16px 32px;}
   .hero h1{font-size:clamp(1.9rem,7vw,2.6rem);letter-spacing:-1px;}
@@ -970,6 +1005,17 @@ footer{
   .hbtn-p,.hbtn-s{padding:11px 18px;font-size:.82rem;width:100%;text-align:center;}
   .hero-trust{gap:12px;}
   .trust-i{font-size:.65rem;}
+
+  /* HERO RIGHT CARD */
+  .h-card-top{padding:16px 14px;}
+  .h-ava{width:54px;height:54px;}
+  .h-name{font-size:.9rem;}
+  .h-stat-n{font-size:1.1rem;}
+  .h-stat-l{font-size:.52rem;}
+  .h-cats{padding:12px;}
+  .h-cat{padding:10px 12px;gap:10px;}
+  .h-cat-nm{font-size:.75rem;}
+  .h-cat-dc{font-size:.6rem;}
 
   /* SECTIONS */
   .sec{padding:44px 16px;}
@@ -985,7 +1031,13 @@ footer{
   .steps-row::before{display:none;}
 
   /* CATEGORY CARDS */
+  .cats-grid{grid-template-columns:1fr;}
   .cat-card{padding:20px 16px;}
+
+  /* PRICING CARDS */
+  .pricing-grid{grid-template-columns:1fr;gap:14px;}
+  .price-card{padding:18px 16px;}
+  .pc-new{font-size:1.6rem;}
 
   /* PLATFORM PAGE */
   .breadcrumb{padding:14px 16px;font-size:.7rem;}
@@ -993,8 +1045,9 @@ footer{
   .ph-left{flex-wrap:wrap;gap:10px;}
   .ph-icon{width:44px;height:44px;font-size:1.3rem;}
   .ph-title{font-size:1.05rem;}
+  .ph-inner{gap:12px;}
 
-  /* TABS - horizontal scroll on mobile */
+  /* TABS */
   .tabs{
     padding:0 16px;
     overflow-x:auto;
@@ -1005,8 +1058,6 @@ footer{
   }
   .tabs::-webkit-scrollbar{display:none;}
   .tab{padding:12px 14px;font-size:.73rem;white-space:nowrap;flex-shrink:0;}
-
-  /* TAB CONTENT */
   .tab-content{padding:20px 16px;}
 
   /* LESSON PANEL */
@@ -1030,14 +1081,24 @@ footer{
   .trend-tag{font-size:.62rem;padding:3px 8px;}
   .gen-btn{font-size:.66rem;padding:6px 10px;}
 
-  /* PRICING INSIDE PLATFORM */
-  .pricing-grid{grid-template-columns:1fr;gap:14px;}
-  .price-card{padding:18px 16px;}
-  .pc-new{font-size:1.6rem;}
+  /* PROFILE */
+  .course-stat-grid{grid-template-columns:1fr 1fr;}
+  .prof-hero{padding:18px 16px;}
+  .prof-body{padding:16px;}
 
   /* MODALS */
   .modal{padding:22px 18px;margin:10px;border-radius:14px;}
   .modal-ttl{font-size:.98rem;}
+
+  /* PRICING POPUP */
+  #pricingPopupOverlay > div{padding:20px 14px !important;border-radius:14px !important;}
+  #pricingPopupOverlay table{font-size:.65rem !important;}
+  #pricingPopupOverlay table td{padding:6px 6px !important;}
+
+  /* DASHBOARD */
+  .dash-body{grid-template-columns:1fr !important;padding:8px !important;}
+  .dash-sidebar{position:static;max-height:260px;}
+  .dash-lesson-panel{padding:16px 12px;}
 
   /* FOOTER */
   footer{padding:28px 16px;}
@@ -1049,6 +1110,16 @@ footer{
 
   /* TOAST */
   .toast{bottom:16px;right:12px;left:12px;text-align:center;}
+}
+
+/* ── SMALL MOBILE (max 400px) ── */
+@media(max-width:400px){
+  .hero h1{font-size:1.8rem;}
+  .hbtn-p,.hbtn-s{padding:10px 14px;font-size:.78rem;}
+  .nav-r{gap:4px;}
+  .nb{padding:5px 8px;font-size:.64rem;}
+  .hero-trust{flex-direction:column;align-items:flex-start;gap:6px;}
+  div[style*="grid-template-columns:repeat(4,1fr)"]{grid-template-columns:1fr !important;}
 }
 
 
@@ -1292,8 +1363,15 @@ footer{
 
 /* responsive */
 @media(max-width:768px){
-  .dash-body{grid-template-columns:1fr;padding:12px;}
-  .dash-sidebar{position:static;max-height:360px;}
+  .dash-body{grid-template-columns:1fr;padding:12px;gap:12px;}
+  .dash-sidebar{position:static;max-height:300px;}
+}
+@media(max-width:600px){
+  .dash-body{padding:8px;gap:8px;}
+  .dash-sidebar{max-height:240px;}
+  .dash-lesson-panel{padding:16px 12px;}
+  .dash-tabs-wrap{flex-wrap:nowrap;overflow-x:auto;padding:4px;}
+  .dash-tabs-wrap .tab{white-space:nowrap;flex-shrink:0;padding:8px 12px;font-size:.7rem;}
 }
 
 /* Style overrides for dashboard mode */
@@ -1320,7 +1398,7 @@ footer{
 
 <!-- ══ PRICING POPUP OVERLAY ══ -->
 <div id="pricingPopupOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;padding:16px;" onclick="closePricingPopup(event)">
-  <div style="background:#fff;border-radius:20px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:32px 24px;position:relative;" onclick="event.stopPropagation()">
+  <div style="background:#fff;border-radius:20px;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;padding:clamp(16px,4vw,32px) clamp(12px,3vw,24px);position:relative;" onclick="event.stopPropagation()">
     <button onclick="closePricingPopup()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#64748b;">✕</button>
     <div style="text-align:center;margin-bottom:8px;font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--aqua);text-transform:uppercase;">🔒 Unlock This Feature</div>
     <h2 style="text-align:center;font-size:1.2rem;font-weight:800;color:#1a202c;margin-bottom:4px;">Master Prompt Library</h2>
@@ -1520,7 +1598,7 @@ footer{
 
 
 <!-- ══ WHY AI KATRUKKO BANNER ══ -->
-<div style="background:linear-gradient(135deg,#fff5f7,#fff);border-top:1px solid rgba(220,20,60,0.12);border-bottom:1px solid rgba(220,20,60,0.12);padding:28px 40px;">
+<div style="background:linear-gradient(135deg,#fff5f7,#fff);border-top:1px solid rgba(220,20,60,0.12);border-bottom:1px solid rgba(220,20,60,0.12);padding:28px clamp(16px,4vw,40px);">
   <div style="max-width:1100px;margin:0 auto;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
       <div style="width:4px;height:22px;border-radius:2px;background:var(--aqua);"></div>
@@ -2805,9 +2883,14 @@ async function loadWeeklyContent(mi,li,cat){
   try{
     const url=WORKER_URL;
     const prompt=`Generate a weekly fresh AI tip for an Indian ${cat==='student'?'student':cat==='business'?'business owner':'job seeker'} learning about "${les.title}". Week ${weekNum} of ${new Date().getFullYear()}. Return ONLY valid JSON: {"tip":"one specific actionable tip under 30 words related to this lesson","prompt":"a ready-to-use ChatGPT prompt under 40 words with placeholders in [brackets]","india_example":"a real Indian context example under 25 words"}`;
-    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.8,maxOutputTokens:200}})});
-    if(!r.ok) return;
+    const ctrl=new AbortController();
+    const tid=setTimeout(()=>ctrl.abort(),8000);
+    let r;
+    try{ r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.8,maxOutputTokens:200}}),
+      signal:ctrl.signal}); }
+    finally{ clearTimeout(tid); }
+    if(!r||!r.ok) return;
     const d=await r.json();
     const raw=d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
     const p=JSON.parse(raw);
@@ -3299,19 +3382,18 @@ async function genLive(trend){
   try{
     const catLabel={student:'students',business:'business owners',unemployed:'job seekers'}[curCat];
     const url=WORKER_URL;
-    const r=await fetch(url,{
+    const _cGL=new AbortController();const _tGL=setTimeout(()=>_cGL.abort(),12000);
+    let r;try{r=await fetch(url,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         contents:[{parts:[{text:
-          `Generate 2 practical AI prompts for ${catLabel} in India for the trend: "${t}".
-Return ONLY valid JSON (no markdown, no extra text): {"prompts":[{"title":"emoji + short title","prompt":"full prompt with [placeholders]"}]}
-Each prompt max 70 words. Make them immediately actionable and specific to Indian context.`
+          `Generate 2 practical AI prompts for ${catLabel} in India for the trend: "${t}".\nReturn ONLY valid JSON (no markdown, no extra text): {"prompts":[{"title":"emoji + short title","prompt":"full prompt with [placeholders]"}]}\nEach prompt max 70 words. Make them immediately actionable and specific to Indian context.`
         }]}],
         generationConfig:{temperature:0.7,maxOutputTokens:600}
-      })
-    });
-    if(!r.ok) throw new Error('API error '+r.status);
+      }),signal:_cGL.signal
+    });}finally{clearTimeout(_tGL);}
+    if(!r||!r.ok) throw new Error('API error '+(r?r.status:'timeout'));
     const d=await r.json();
     const raw=d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(raw);
@@ -4313,9 +4395,10 @@ async function genProfilePrompt(){
   ttl.textContent='AI Prompt \u2014 Made for '+(user.name||'You');
   try{
     const url=WORKER_URL;
-    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:'Generate 1 practical ready-to-use AI prompt for a '+role+' in India who has completed '+done+' lessons with a '+streak+'-day streak. Under 60 words, specific, actionable. Return ONLY the prompt text, no quotes or labels.'}]}],generationConfig:{temperature:0.85,maxOutputTokens:200}})});
-    if(!r.ok)throw new Error('api');
+    const _c2=new AbortController();const _t2=setTimeout(()=>_c2.abort(),10000);
+    let r;try{r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:'Generate 1 practical ready-to-use AI prompt for a '+role+' in India who has completed '+done+' lessons with a '+streak+'-day streak. Under 60 words, specific, actionable. Return ONLY the prompt text, no quotes or labels.'}]}],generationConfig:{temperature:0.85,maxOutputTokens:200}}),signal:_c2.signal});}finally{clearTimeout(_t2);}
+    if(!r||!r.ok)throw new Error('api');
     const d=await r.json();
     profPromptCache=d.candidates[0].content.parts[0].text.trim();
     box.textContent=profPromptCache;
@@ -4350,9 +4433,10 @@ function renderNewModuleFeed(){
 async function fetchTrendModule(feed){
   try{
     const url=WORKER_URL;
-    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:'What is the single most important new AI tool or trend in 2025 in India right now for students, job seekers, or business owners? Return ONLY valid JSON (no markdown): {"title":"emoji + module title under 8 words","desc":"one sentence under 25 words"}'}]}],generationConfig:{temperature:0.7,maxOutputTokens:120}})});
-    if(!r.ok)return;
+    const _c3=new AbortController();const _t3=setTimeout(()=>_c3.abort(),10000);
+    let r;try{r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:'What is the single most important new AI tool or trend in 2025 in India right now for students, job seekers, or business owners? Return ONLY valid JSON (no markdown): {"title":"emoji + module title under 8 words","desc":"one sentence under 25 words"}'}]}],generationConfig:{temperature:0.7,maxOutputTokens:120}}),signal:_c3.signal});}finally{clearTimeout(_t3);}
+    if(!r||!r.ok)return;
     const d=await r.json();
     const raw=d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
     const p=JSON.parse(raw);
@@ -4442,9 +4526,10 @@ async function fetchHomeLiveWeeklyTip(grid, weekNum){
   }
   try{
     const url=WORKER_URL;
-    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:[{parts:[{text:`Generate a fresh AI tip for an Indian learner for week ${weekNum} of ${new Date().getFullYear()}. It should be practical and usable today. Return ONLY valid JSON: {"headline":"emoji + title under 8 words","tip":"one actionable sentence under 30 words","prompt":"ready-to-use ChatGPT prompt under 40 words with [placeholders]","india_note":"India-specific context under 20 words"}`}]}],generationConfig:{temperature:0.9,maxOutputTokens:220}})});
-    if(!r.ok) return;
+    const _c4=new AbortController();const _t4=setTimeout(()=>_c4.abort(),10000);
+    let r;try{r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:[{parts:[{text:`Generate a fresh AI tip for an Indian learner for week ${weekNum} of ${new Date().getFullYear()}. It should be practical and usable today. Return ONLY valid JSON: {"headline":"emoji + title under 8 words","tip":"one actionable sentence under 30 words","prompt":"ready-to-use ChatGPT prompt under 40 words with [placeholders]","india_note":"India-specific context under 20 words"}`}]}],generationConfig:{temperature:0.9,maxOutputTokens:220}}),signal:_c4.signal});}finally{clearTimeout(_t4);}
+    if(!r||!r.ok) return;
     const d=await r.json();
     const raw=d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
     const p=JSON.parse(raw);
@@ -4768,9 +4853,15 @@ async function generateWeeklyLesson(cat, weekNum){
   "content": "HTML lesson content using these classes: lc-title, lc-body, example-box with ex-label/ex-text, tip-card, india-example with india-example-label/india-example-text, do-now-box with do-now-label/do-now-text. Include a practical prompt template.",
   "quiz": {"q": "question", "opts": ["option1","option2","option3"], "ans": 0, "exp": "explanation under 20 words"}
 }`;
-    const r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.8, maxOutputTokens:800}})});
-    if(!r.ok) return null;
+    const controller = new AbortController();
+    const timeout = setTimeout(()=>controller.abort(), 10000); // 10s timeout
+    let r;
+    try{
+      r = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({contents:[{parts:[{text:prompt}]}], generationConfig:{temperature:0.8, maxOutputTokens:800}}),
+        signal: controller.signal});
+    } finally { clearTimeout(timeout); }
+    if(!r || !r.ok) return null;
     const d = await r.json();
     const raw = d.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();
     const p = JSON.parse(raw);
@@ -4781,7 +4872,9 @@ async function generateWeeklyLesson(cat, weekNum){
       localStorage.setItem(cacheKey, JSON.stringify(p));
       return p;
     }
-  }catch(e){ console.error('Weekly lesson gen error:', e); }
+  }catch(e){
+    // Silent fail — network unavailable or worker down, will retry next session
+  }
   return null;
 }
 
@@ -4936,20 +5029,22 @@ You're in a "14-day free trial" limited practice space — mention upgrade perks
 
   let reply = null;
 
-  /* ── Call Cloudflare Worker proxy (Groq backend) ── */
+  /* ── Call Cloudflare Worker proxy (API key is safe on server) ── */
   try{
-    const resp = await fetch(WORKER_URL,{
+    const geminiHistory = historyMsgs.map(m=>({
+      role: m.role === 'assistant' ? 'model' : 'user',
+      parts:[{text:m.content}]
+    }));
+    const _cPS=new AbortController();const _tPS=setTimeout(()=>_cPS.abort(),15000);
+    let resp;try{resp = await fetch(WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         system: systemPrompt,
-        messages: historyMsgs.map(m=>({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts:[{text:m.content}]
-        })).concat([{role:'user',parts:[{text:msg}]}])
-      })
-    });
-    if(resp.ok){
+        messages:[...geminiHistory, {role:'user',parts:[{text:msg}]}]
+      }),signal:_cPS.signal
+    });}finally{clearTimeout(_tPS);}
+    if(resp&&resp.ok){
       const data = await resp.json();
       reply = data.candidates?.[0]?.content?.parts?.[0]?.text || null;
     }
