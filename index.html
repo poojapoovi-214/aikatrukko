@@ -765,6 +765,41 @@ nav{
 .ai-copy:hover{background:var(--aqua);color:var(--black);}
 .ai-card-text{font-size:.75rem;color:var(--gray1);line-height:1.7;}
 .ai-card-text em{color:var(--aqua);font-style:normal;}
+
+/* ── AI CHAT POPUP ── */
+.ak-chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;display:flex;align-items:flex-end;justify-content:center;padding:0;}
+.ak-chat-overlay.hidden{display:none;}
+.ak-chat-box{width:100%;max-width:520px;height:78vh;max-height:650px;background:#f8f9fb;border-radius:20px 20px 0 0;border:1px solid #e2e8f0;display:flex;flex-direction:column;overflow:hidden;animation:chatSlideUp .25s ease;}
+@keyframes chatSlideUp{from{transform:translateY(80px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.ak-chat-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #e8edf2;background:#ffffff;}
+.ak-chat-hdr-left{display:flex;align-items:center;gap:10px;}
+.ak-chat-avatar{width:32px;height:32px;border-radius:50%;background:rgba(0,212,232,0.12);border:2px solid var(--aqua);display:flex;align-items:center;justify-content:center;font-size:16px;}
+.ak-chat-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:#1a202c;}
+.ak-chat-sub{font-size:.6rem;color:var(--aqua);font-weight:600;}
+.ak-chat-close{width:28px;height:28px;border-radius:50%;background:#f1f5f9;border:none;color:#64748b;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.ak-chat-close:hover{background:var(--aqua);color:#fff;}
+.ak-chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:#f4f6f9;}
+.ak-chat-msgs::-webkit-scrollbar{width:3px;}
+.ak-chat-msgs::-webkit-scrollbar-thumb{background:#d1d9e0;border-radius:3px;}
+.ak-msg{max-width:88%;border-radius:14px;padding:10px 13px;font-size:.76rem;line-height:1.65;}
+.ak-msg.user{align-self:flex-end;background:var(--aqua);color:#fff;font-weight:500;border-bottom-right-radius:3px;}
+.ak-msg.ai{align-self:flex-start;background:#ffffff;border:1px solid #e2e8f0;color:#374151;border-bottom-left-radius:3px;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.ak-msg.ai strong{color:#111827;}
+.ak-msg-thinking{align-self:flex-start;background:#ffffff;border:1px solid #e2e8f0;border-radius:14px;padding:10px 14px;font-size:.74rem;color:#94a3b8;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.ak-msg-thinking .ak-dots span{display:inline-block;animation:akDot 1.2s infinite;margin:0 1px;}
+.ak-msg-thinking .ak-dots span:nth-child(2){animation-delay:.2s;}
+.ak-msg-thinking .ak-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes akDot{0%,80%,100%{opacity:.2;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
+.ak-chat-input-wrap{padding:10px 12px;border-top:1px solid #e8edf2;background:#ffffff;display:flex;gap:8px;align-items:flex-end;}
+.ak-chat-input{flex:1;background:#f8f9fb;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px;font-size:.78rem;color:#1a202c;resize:none;font-family:'DM Sans',sans-serif;line-height:1.5;max-height:90px;outline:none;}
+.ak-chat-input:focus{border-color:var(--aqua);background:#fff;}
+.ak-chat-input::placeholder{color:#a0aec0;}
+.ak-chat-send{width:38px;height:38px;border-radius:10px;background:var(--aqua);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ak-chat-send:disabled{opacity:.4;cursor:not-allowed;}
+.ak-ask-btn{padding:4px 10px;border-radius:5px;background:rgba(0,212,232,0.10);border:1px solid rgba(0,212,232,0.35);color:#0891b2;font-size:.62rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.ak-ask-btn:hover{background:var(--aqua);color:#fff;}
+.ak-chat-clear{font-size:.6rem;color:#94a3b8;cursor:pointer;text-align:center;padding:4px 0 2px;text-decoration:underline;background:#ffffff;}
+.ak-chat-clear:hover{color:#64748b;}
 .ptitle{font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--gray1);text-transform:uppercase;letter-spacing:.5px;margin:16px 0 10px;}
 .prompts{display:flex;flex-direction:column;gap:10px;}
 .pc{background:var(--dark);border:1px solid var(--border);border-radius:10px;padding:14px;}
@@ -2682,12 +2717,8 @@ let fpStep = 0, fpEmail = '', fpCode = '';
    
    If BOTH keys are missing → AI chat shows friendly setup message.
 ══════════════════════════════════════════════ */
+const RZP_KEY  = 'rzp_test_XXXXXXXXXXXXXXXXXX';  // ⚠️ Replace with your Razorpay Live/Test key
 const WORKER_URL = 'https://ai-proxy.www-poojapoovi3.workers.dev'; // ✅ Cloudflare Worker proxy — API key safe on server
-let RZP_KEY = ''; // ✅ Securely fetched from Cloudflare Worker — not hardcoded
-fetch(WORKER_URL + '/get-rzp-key')
-  .then(r => r.json())
-  .then(d => { if(d && d.key) RZP_KEY = d.key; })
-  .catch(e => console.error('Failed to load payment key:', e));
 
 
 
@@ -3346,6 +3377,106 @@ function toggleVB(mi,li,playing){
 try{ if(synth) synth.onvoiceschanged=()=>{}; }catch(e){}
 
 /* ── AI COACH TAB ── */
+/* ══ AI CHAT POPUP FUNCTIONS ══ */
+let akChatHistory = []; // {role:'user'|'ai', text}
+
+function openAkChat(prefill){
+  const overlay = document.getElementById('akChatOverlay');
+  overlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  if(akChatHistory.length===0){
+    // Welcome message
+    akChatHistory.push({role:'ai', text:'👋 Vanakkam! I\'m your AI Coach. Ask me anything about AI, or use one of the prompts from the list — I\'ll answer it right here!'});
+  }
+  renderAkChatMsgs();
+  if(prefill){
+    const input = document.getElementById('akChatInput');
+    input.value = prefill.replace(/<em>/g,'').replace(/<\/em>/g,'');
+    input.style.height='auto';
+    input.style.height=Math.min(input.scrollHeight,90)+'px';
+    // Auto-send after brief delay
+    setTimeout(()=>sendAkChat(), 300);
+  } else {
+    document.getElementById('akChatInput').focus();
+  }
+}
+
+function closeAkChat(){
+  document.getElementById('akChatOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function clearAkChat(){
+  akChatHistory = [];
+  renderAkChatMsgs();
+}
+
+function renderAkChatMsgs(){
+  const container = document.getElementById('akChatMsgs');
+  if(!container) return;
+  container.innerHTML = akChatHistory.map(m=>{
+    const cls = m.role==='ai' ? 'ai' : 'user';
+    const txt = m.thinking
+      ? `<div class="ak-msg-thinking">🤖 Thinking<span class="ak-dots"><span>.</span><span>.</span><span>.</span></span></div>`
+      : `<div class="ak-msg ${cls}">${m.text.replace(/\n/g,'<br>')}</div>`;
+    return txt;
+  }).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendAkChat(){
+  const input = document.getElementById('akChatInput');
+  const sendBtn = document.getElementById('akChatSendBtn');
+  const msg = input.value.trim();
+  if(!msg) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  sendBtn.disabled = true;
+
+  // Add user message
+  akChatHistory.push({role:'user', text: msg});
+  // Add thinking placeholder
+  akChatHistory.push({role:'ai', text:'', thinking:true});
+  renderAkChatMsgs();
+
+  const catLabel = {student:'students', business:'business owners', unemployed:'job seekers'}[curCat] || 'learners';
+  const systemPrompt = `You are Pooja's AI Coach for AI Katrukko — a Tamil Nadu-based AI learning platform for Indian learners. You help ${catLabel} understand and use AI tools practically. Keep answers clear, friendly, concise (under 150 words), and India-relevant. Use simple India-English. Add emojis for warmth. Give actionable tips.`;
+
+  const historyMsgs = akChatHistory.slice(0,-1)
+    .filter(m=>!m.thinking)
+    .map(m=>({role: m.role==='ai'?'model':'user', parts:[{text: m.text.replace(/<[^>]+>/g,'')}]}));
+
+  let reply = null;
+  try{
+    const _ctrl=new AbortController();
+    const _t=setTimeout(()=>_ctrl.abort(),15000);
+    let resp;
+    try{
+      resp = await fetch(WORKER_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          system: systemPrompt,
+          messages:[...historyMsgs, {role:'user', parts:[{text:msg}]}]
+        }),
+        signal:_ctrl.signal
+      });
+    } finally { clearTimeout(_t); }
+    if(resp&&resp.ok){
+      const data = await resp.json();
+      reply = data.candidates?.[0]?.content?.parts?.[0]?.text || null;
+    }
+  } catch(e){ console.error('akChat error',e); }
+
+  // Remove thinking, add reply
+  akChatHistory = akChatHistory.filter(m=>!m.thinking);
+  akChatHistory.push({role:'ai', text: reply || '⚠️ Could not connect. Please open this on <strong>aikatrukko.in</strong> — the AI works only on the live site!'});
+  renderAkChatMsgs();
+  sendBtn.disabled = false;
+  document.getElementById('akChatInput').focus();
+}
+
 function renderCoach(){
   const cat=curCat, hasAcc=purchases.includes(cat), pr=PROMPTS[cat];
   document.getElementById('tab-coach').innerHTML=`
@@ -3360,10 +3491,10 @@ function renderCoach(){
       <div class="ai-result" id="aiResult"><div style="font-size:.74rem;color:var(--gray1);">Select a trend tag or click Generate — fresh AI prompts appear here!</div></div>
     </div>
     <div class="ptitle">✦ Core Prompts — Always Free</div>
-    <div class="prompts">${pr.free.map(p=>`<div class="pc"><div class="ph"><span class="pt">${p.t}</span><button class="cpbtn" onclick="cpP(this)">Copy</button></div><div class="pb">${p.b}</div></div>`).join('')}</div>
+    <div class="prompts">${pr.free.map(p=>`<div class="pc"><div class="ph"><span class="pt">${p.t}</span><div style="display:flex;gap:6px;"><button class="cpbtn" onclick="cpP(this)">Copy</button><button class="ak-ask-btn" onclick="openAkChat(this.closest('.pc').querySelector('.pb').innerText)">Ask AI →</button></div></div><div class="pb">${p.b}</div></div>`).join('')}</div>
     <div class="ptitle">${hasAcc?'⚡ Power Prompts — Unlocked':'🔒 Power Prompts — Purchase to Unlock'}</div>
     <div class="prompts">${pr.locked.map(p=>`<div class="pc">
-      <div class="ph"><span class="pt">${p.t}</span>${hasAcc?'<button class="cpbtn" onclick="cpP(this)">Copy</button>':''}</div>
+      <div class="ph"><span class="pt">${p.t}</span>${hasAcc?'<button class="cpbtn" onclick="cpP(this)">Copy</button><button class="ak-ask-btn" onclick="openAkChat(this.closest(\'.pc\').querySelector(\'.pb\').innerText)">Ask AI →</button>':''}</div></div>
       <div class="pb ${hasAcc?'':'locked-blur'}">${hasAcc?p.b:'Premium AI coaching prompt. Purchase this plan to unlock instantly.'}</div>
       ${!hasAcc?`<div class="p-lock" onclick="openPricingPopup()">🔒 Unlock for ${CATS[cat].new}</div>`:''}</div>`).join('')}
     </div>
@@ -3407,7 +3538,7 @@ async function genLive(trend){
     if(!prompts.length) throw new Error('No prompts');
     res.innerHTML=`<div style="margin-bottom:9px;font-size:.68rem;color:var(--gray1);">✨ Fresh AI prompts for <strong style="color:var(--aqua);">${t}</strong></div>`+
       prompts.map((p,i)=>`<div class="ai-card" style="${i<prompts.length-1?'margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);':''}">
-        <div class="ai-card-title">${p.title} <button class="ai-copy" onclick="navigator.clipboard.writeText(this.closest('.ai-card').querySelector('.ai-card-text').innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button></div>
+        <div class="ai-card-title">${p.title} <div style="display:flex;gap:6px;"><button class="ai-copy" onclick="navigator.clipboard.writeText(this.closest('.ai-card').querySelector('.ai-card-text').innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button><button class="ak-ask-btn" onclick="openAkChat(this.closest('.ai-card').querySelector('.ai-card-text').innerText)">Ask AI →</button></div></div>
         <div class="ai-card-text">${p.prompt.replace(/\[([^\]]+)\]/g,'<em>[$1]</em>')}</div>
       </div>`).join('');
   }catch(e){
@@ -5419,6 +5550,32 @@ function toggleSbMod(mi){
     <div class="cert-actions">
       <button class="cert-btn-dl" onclick="downloadCertificate('elite')">⬇ Download Certificate</button>
       <button class="cert-btn-cl" onclick="closeCertificate()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AI CHAT POPUP ══ -->
+<div class="ak-chat-overlay hidden" id="akChatOverlay" onclick="if(event.target===this)closeAkChat()">
+  <div class="ak-chat-box">
+    <div class="ak-chat-hdr">
+      <div class="ak-chat-hdr-left">
+        <div class="ak-chat-avatar">🤖</div>
+        <div>
+          <div class="ak-chat-title">AI Katrukko Coach</div>
+          <div class="ak-chat-sub">● Live · Powered by Claude AI</div>
+        </div>
+      </div>
+      <button class="ak-chat-close" onclick="closeAkChat()">✕</button>
+    </div>
+    <div class="ak-chat-msgs" id="akChatMsgs"></div>
+    <div style="padding:0 12px 2px;">
+      <div class="ak-chat-clear" onclick="clearAkChat()">🗑 Clear conversation</div>
+    </div>
+    <div class="ak-chat-input-wrap">
+      <textarea class="ak-chat-input" id="akChatInput" rows="1" placeholder="Ask anything about AI…"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAkChat()}"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+      <button class="ak-chat-send" id="akChatSendBtn" onclick="sendAkChat()">➤</button>
     </div>
   </div>
 </div>
