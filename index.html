@@ -652,7 +652,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;}
 
 /* ══ NAV ══ */
 nav{
-  position:sticky;top:0;z-index:200;
+  position:relative;top:auto;z-index:1;
   background:rgba(255,255,255,0.72);
   backdrop-filter:var(--glass-blur);
   -webkit-backdrop-filter:var(--glass-blur);
@@ -1691,6 +1691,7 @@ footer{
 </head>
 <body>
 <div id="scrollBar"></div>
+<div id="stickyHeader" style="position:sticky;top:0;z-index:500;width:100%;">
 <!-- ══ UPGRADE BANNER (shown after login) ══ -->
 <div id="upgradeBanner" style="display:none;background:linear-gradient(90deg,#0f0c29,#2d0060,#5a0fbf,#7b2fff,#9d4fff,#7b2fff,#5a0fbf,#2d0060,#0f0c29);background-size:300% 100%;animation:bannerGradShift 8s ease infinite;overflow:hidden;position:relative;z-index:999;box-shadow:0 3px 16px rgba(123,47,255,0.5);">
   <div style="display:flex;align-items:center;white-space:nowrap;animation:bannerScroll 22s linear infinite;padding:10px 0;gap:0;">
@@ -1844,8 +1845,7 @@ footer{
     </div>
   </div>
 </nav>
-
-
+</div><!-- /stickyHeader -->
 
 
 <!-- ══ HOMEPAGE ══ -->
@@ -2020,7 +2020,7 @@ footer{
           <div class="cat-feat" style="color:#aaa;"><span style="margin-right:6px;">❌</span>Community & Support Group</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Email Support (48hr reply)</div>
         </div>
-        <button class="cat-cta" style="margin-top:auto;">Get Started — ₹399 →</button>
+        <button class="cat-cta" style="margin-top:auto;" onclick="event.stopPropagation();curCat='student';openPayModal();">Get Started — ₹399 →</button>
       </div>
 
       <!-- PROFESSIONAL -->
@@ -2041,7 +2041,7 @@ footer{
           <div class="cat-feat"><div class="cat-feat-dot"></div>✅ WhatsApp Community Access</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Priority Support (24hr reply)</div>
         </div>
-        <button class="cat-cta" style="margin-top:auto;">Get Professional — ₹999 →</button>
+        <button class="cat-cta" style="margin-top:auto;" onclick="event.stopPropagation();curCat='business';openPayModal();">Get Professional — ₹999 →</button>
       </div>
 
       <!-- ELITE MASTERY -->
@@ -2061,7 +2061,7 @@ footer{
           <div class="cat-feat"><div class="cat-feat-dot"></div>✅ All Future Courses — Free Forever</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>1-on-1 Direct Support with Pooja</div>
         </div>
-        <button class="cat-cta" style="margin-top:auto;background:linear-gradient(135deg,var(--aqua),var(--aqua2));">Get Elite Access — ₹2,499 →</button>
+        <button class="cat-cta" style="margin-top:auto;background:linear-gradient(135deg,var(--aqua),var(--aqua2));" onclick="event.stopPropagation();curCat='unemployed';openPayModal();">Get Elite Access — ₹2,499 →</button>
       </div>
 
     </div>
@@ -3006,7 +3006,12 @@ function scrollTo2(id){
   if(document.getElementById('platform').style.display==='block') goHome();
   setTimeout(()=>{
     const el=document.getElementById(id);
-    if(el) el.scrollIntoView({behavior:'smooth'});
+    if(el){
+      const hdr=document.getElementById('stickyHeader');
+      const navH=hdr?hdr.offsetHeight:64;
+      const top=el.getBoundingClientRect().top+window.scrollY-navH-8;
+      window.scrollTo({top,behavior:'smooth'});
+    }
   },100);
 }
 
@@ -3965,6 +3970,7 @@ function fldErr(id, msg){
 }
 
 function openAuth(mode){
+  window.scrollTo({top:0,behavior:'instant'});
   document.getElementById('authOverlay').classList.add('show');
   switchAuth(mode);
 }
@@ -4355,7 +4361,7 @@ function openPayGate(){
   openPayModal();
 }
 function openPayModal(){
-  if(!user){openAuth('login');toast('Login first to purchase','info');return;}
+  if(!user){window.scrollTo({top:0,behavior:'instant'});openAuth('login');toast('Login first to purchase','info');return;}
   const cat=curCat||'student', C=CATS[cat];
   const icEl=document.getElementById('pyCatIc');
   const nmEl=document.getElementById('pyCatNm');
