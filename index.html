@@ -170,10 +170,23 @@ window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
   console.log('Auth: local-storage fallback active — attempting to load Firebase…');
 })();
 
-/* ─── Step 3: Dynamically load Firebase ES modules ─── */
-(async function loadFirebase(){
-  var FB = 'https://www.gstatic.com/firebasejs/10.12.0/';
-  var config = {
+/* ─── Step 3: Firebase loaded via module script tag (see below) ─── */
+/* _fbReadyResolve() is called by the module script after Firebase initializes */
+</script>
+
+<!-- ══ FIREBASE MODULE LOAD (replaces dynamic import — works on Render/static hosts) ══ -->
+<script type="module">
+  import { initializeApp }                        from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, GoogleAuthProvider,
+           signInWithPopup, signInWithRedirect,
+           getRedirectResult, signInWithEmailAndPassword,
+           createUserWithEmailAndPassword, signOut,
+           updateProfile, sendPasswordResetEmail,
+           onAuthStateChanged }                   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, doc, setDoc,
+           getDoc, updateDoc }                    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const config = {
     apiKey: "AIzaSyAF-FUEXFxBNMCyNLErnTGoW8aEq8nNxMU",
     authDomain: "aikatrukko-e49f9.firebaseapp.com",
     projectId: "aikatrukko-e49f9",
@@ -183,43 +196,39 @@ window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
   };
 
   try {
-    var appMod  = await import(FB + 'firebase-app.js');
-    var authMod = await import(FB + 'firebase-auth.js');
-    var fsMod   = await import(FB + 'firebase-firestore.js');
-
-    var app  = appMod.initializeApp(config);
-    var auth = authMod.getAuth(app);
-    var db   = fsMod.getFirestore(app);
-    var gProv = new authMod.GoogleAuthProvider();
+    const app  = initializeApp(config);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+    const gProv = new GoogleAuthProvider();
     gProv.setCustomParameters({ prompt: 'select_account' });
 
-    /* ── Overwrite stubs with real Firebase functions ── */
+    /* ── Overwrite fallback stubs with real Firebase ── */
     window._fbAuth = auth;
     window._fbDb   = db;
-    window._fbCreateUser    = function(e,pw){ return authMod.createUserWithEmailAndPassword(auth,e,pw); };
-    window._fbSignIn        = function(e,pw){ return authMod.signInWithEmailAndPassword(auth,e,pw); };
-    window._fbSignOut       = function(){     return authMod.signOut(auth); };
-    window._fbUpdateProfile = function(u,p){  return authMod.updateProfile(u,p); };
-    window._fbResetPassword = function(e){    return authMod.sendPasswordResetEmail(auth,e); };
-    window._fbSignInPopup   = function(){     return authMod.signInWithPopup(auth,gProv); };
-    window._fbSignInRedirect= function(){     return authMod.signInWithRedirect(auth,gProv); };
-    window._fbRedirectResult= function(){     return authMod.getRedirectResult(auth); };
-    window._fbDoc    = function(col,id){      return fsMod.doc(db,col,id); };
-    window._fbSetDoc = function(ref,data){    return fsMod.setDoc(ref,data,{merge:true}); };
-    window._fbGetDoc = function(ref){         return fsMod.getDoc(ref); };
-    window._fbUpdateDoc = function(ref,data){ return fsMod.updateDoc(ref,data); };
+    window._fbCreateUser    = (e,pw) => createUserWithEmailAndPassword(auth,e,pw);
+    window._fbSignIn        = (e,pw) => signInWithEmailAndPassword(auth,e,pw);
+    window._fbSignOut       = ()     => signOut(auth);
+    window._fbUpdateProfile = (u,p)  => updateProfile(u,p);
+    window._fbResetPassword = (e)    => sendPasswordResetEmail(auth,e);
+    window._fbSignInPopup   = ()     => signInWithPopup(auth,gProv);
+    window._fbSignInRedirect= ()     => signInWithRedirect(auth,gProv);
+    window._fbRedirectResult= ()     => getRedirectResult(auth);
+    window._fbDoc           = (col,id) => doc(db,col,id);
+    window._fbSetDoc        = (ref,data) => setDoc(ref,data,{merge:true});
+    window._fbGetDoc        = (ref)  => getDoc(ref);
+    window._fbUpdateDoc     = (ref,data) => updateDoc(ref,data);
     window._fbFallbackActive = false;
 
     /* ── Auth state listener ── */
-    var _firstFire = true;
-    authMod.onAuthStateChanged(auth, async function(fbUser){
+    let _firstFire = true;
+    onAuthStateChanged(auth, async (fbUser) => {
       if(fbUser){
-        var purch = [];
+        let purch = [];
         try{
-          var snap = await fsMod.getDoc(fsMod.doc(db,'users',fbUser.uid));
+          const snap = await getDoc(doc(db,'users',fbUser.uid));
           if(snap.exists()) purch = snap.data().purchases || [];
         }catch(e){}
-        var u = { uid:fbUser.uid, email:fbUser.email,
+        const u = { uid:fbUser.uid, email:fbUser.email,
           name: fbUser.displayName || fbUser.email.split('@')[0],
           photo: fbUser.photoURL || null };
         if(window._onAuthChange) window._onAuthChange(u, purch);
@@ -234,13 +243,12 @@ window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
     console.log('Firebase loaded successfully ✓');
 
   } catch(err) {
-    /* Firebase failed to load (sandbox / network / CSP) — fallback stays active */
-    console.log('Firebase unavailable — using local fallback.', err.message);
+    console.warn('Firebase module load failed — local fallback active.', err.message);
     window._fbLoaded = false;
-    window._fbReadyResolve(); /* unblock auth UI so buttons work */
+    window._fbReadyResolve();
   }
-})();
 </script>
+
 <style>
 /* ══════════════════════════════════════════════
    PALETTE: Black · White · Aqua Blue ONLY
@@ -4165,6 +4173,13 @@ async function doGoogleSignIn(){
   if(btn){ btn.innerHTML='⏳ Connecting…'; btn.disabled=true; }
   _authBusy = true;
   try{
+    /* Safety check — should never hit this if Firebase loaded */
+    if(typeof window._fbSignInPopup !== 'function'){
+      _authBusy = false;
+      if(btn){ btn.innerHTML=_GBTN; btn.disabled=false; }
+      toast('Google Sign-In unavailable. Try Email & Password.','err');
+      return;
+    }
     /* TRY POPUP FIRST */
     const result = await window._fbSignInPopup();
     await _finishGoogleLogin(result);
