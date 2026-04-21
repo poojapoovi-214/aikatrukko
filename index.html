@@ -2999,8 +2999,15 @@ let fpStep = 0, fpEmail = '', fpCode = '';
    
    If BOTH keys are missing → AI chat shows friendly setup message.
 ══════════════════════════════════════════════ */
-const RZP_KEY  = 'rzp_test_XXXXXXXXXXXXXXXXXX';  // ⚠️ Replace with your Razorpay Live/Test key
-const WORKER_URL = 'https://ai-proxy.www-poojapoovi3.workers.dev'; // ✅ Cloudflare Worker proxy — API key safe on server
+let RZP_KEY = '';
+const WORKER_URL = 'https://ai-proxy.www-poojapoovi3.workers.dev';
+(async function loadRzpKey(){
+  try{
+    const r = await fetch(WORKER_URL + '/get-rzp-key');
+    const d = await r.json();
+    if(d.key) RZP_KEY = d.key;
+  }catch(e){ console.warn('RZP key fetch failed', e); }
+})(); // ✅ Cloudflare Worker proxy — API key safe on server
 
 
 
