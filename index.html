@@ -3,7 +3,79 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Katrukko — Your AI Learning Buddy</title>
+<title>AI Katrukko — Learn AI in Tamil & English | AI Courses for Indians</title>
+
+<!-- ══ SEO CORE ══ -->
+<meta name="description" content="AI Katrukko is India's #1 AI learning platform in Tamil & English. Learn ChatGPT, Claude AI & more. Courses for Students, Job Seekers & Business Owners. Start free today — aikatrukko.in">
+<meta name="keywords" content="AI course Tamil, learn AI India, ChatGPT Tamil, AI for students India, AI for job seekers, AI Katrukko, artificial intelligence course Tamil Nadu, Pooja Gunasekaran">
+<meta name="author" content="Pooja Gunasekaran, AI Katrukko">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://aikatrukko.in/">
+
+<!-- ══ OPEN GRAPH (Facebook / WhatsApp share) ══ -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aikatrukko.in/">
+<meta property="og:title" content="AI Katrukko — Learn AI in Tamil & English | India's AI Learning Buddy">
+<meta property="og:description" content="Master AI skills in Tamil & English. ChatGPT, Claude, Prompt Engineering & more. Built for Indian Students, Job Seekers & Business Owners. Start free!">
+<meta property="og:image" content="https://aikatrukko.in/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="AI Katrukko">
+<meta property="og:locale" content="en_IN">
+
+<!-- ══ TWITTER CARD ══ -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://aikatrukko.in/">
+<meta name="twitter:title" content="AI Katrukko — Learn AI in Tamil & English">
+<meta name="twitter:description" content="India's AI learning platform. ChatGPT, Claude AI & more — in Tamil & English. Courses from Rs.399. Start free today!">
+<meta name="twitter:image" content="https://aikatrukko.in/og-image.jpg">
+
+<!-- ══ SCHEMA.ORG STRUCTURED DATA ══ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  "name": "AI Katrukko",
+  "url": "https://aikatrukko.in",
+  "logo": "https://aikatrukko.in/logo.png",
+  "description": "India's AI learning platform in Tamil & English. Courses for Students, Job Seekers & Business Owners.",
+  "founder": {
+    "@type": "Person",
+    "name": "Pooja Gunasekaran"
+  },
+  "sameAs": [
+    "https://www.linkedin.com/in/pooja-gunasekaran-a8a855260"
+  ],
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Starter Plan",
+      "price": "399",
+      "priceCurrency": "INR",
+      "description": "AI for Students — 6 months access"
+    },
+    {
+      "@type": "Offer",
+      "name": "Professional Plan",
+      "price": "999",
+      "priceCurrency": "INR",
+      "description": "AI for Business and Job Seekers — 1 year access"
+    },
+    {
+      "@type": "Offer",
+      "name": "Elite Mastery",
+      "price": "2499",
+      "priceCurrency": "INR",
+      "description": "Lifetime access to all AI courses"
+    }
+  ]
+}
+<\/script>
+
+<!-- ══ PERFORMANCE: Preconnect ══ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://www.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <!-- ══ FIREBASE AUTH SYSTEM ══ -->
 <script>
@@ -1346,12 +1418,10 @@ footer{
   .toast{bottom:16px;right:12px;left:12px;text-align:center;}
 
   /* NAV extras */
-  .nav-user{gap:4px;flex-wrap:nowrap;overflow:visible;max-width:calc(100vw - 80px);}
-  .nav-name{max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.68rem;}
-  #navDeviceBadge{display:none !important;}
-  .nav-user .nb-o{padding:5px 8px;font-size:.62rem;}
-  .nav-profile-btn{display:none !important;}
-  .nav-logout-btn{padding:5px 10px !important;font-size:.65rem !important;}
+  .nav-user{gap:4px;flex-wrap:nowrap;overflow:hidden;}
+  .nav-name{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.7rem;}
+  #navDeviceBadge{font-size:.55rem;padding:2px 6px;}
+  .nav-user .nb-o{padding:5px 7px;font-size:.62rem;}
   .hero-trust{gap:12px;}
   .trust-i{font-size:.65rem;}
   .h-card-top{padding:16px 14px;}
@@ -1765,8 +1835,8 @@ footer{
         <span style="width:5px;height:5px;border-radius:50%;background:var(--aqua);animation:blink 1.8s infinite;display:inline-block;"></span>
         ACTIVE
       </div>
-      <button class="nb nb-o nav-profile-btn" onclick="openProfile()" style="padding:6px 10px;font-size:.7rem;">👤 Profile</button>
-      <button class="nb nb-o nav-logout-btn" onclick="logout()" title="Logout — you can log back in anytime">Logout</button>
+      <button class="nb nb-o" onclick="openProfile()" style="padding:6px 10px;font-size:.7rem;">👤 Profile</button>
+      <button class="nb nb-o" onclick="logout()" title="Logout — you can log back in anytime">Logout</button>
     </div>
     <div id="navAuth" style="display:flex;gap:8px;">
       <button class="nb nb-o" onclick="openAuth('login')">Login</button>
