@@ -1346,10 +1346,12 @@ footer{
   .toast{bottom:16px;right:12px;left:12px;text-align:center;}
 
   /* NAV extras */
-  .nav-user{gap:4px;flex-wrap:nowrap;overflow:hidden;}
-  .nav-name{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.7rem;}
-  #navDeviceBadge{font-size:.55rem;padding:2px 6px;}
-  .nav-user .nb-o{padding:5px 7px;font-size:.62rem;}
+  .nav-user{gap:4px;flex-wrap:nowrap;overflow:visible;max-width:calc(100vw - 80px);}
+  .nav-name{max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.68rem;}
+  #navDeviceBadge{display:none !important;}
+  .nav-user .nb-o{padding:5px 8px;font-size:.62rem;}
+  .nav-profile-btn{display:none !important;}
+  .nav-logout-btn{padding:5px 10px !important;font-size:.65rem !important;}
   .hero-trust{gap:12px;}
   .trust-i{font-size:.65rem;}
   .h-card-top{padding:16px 14px;}
@@ -1763,8 +1765,8 @@ footer{
         <span style="width:5px;height:5px;border-radius:50%;background:var(--aqua);animation:blink 1.8s infinite;display:inline-block;"></span>
         ACTIVE
       </div>
-      <button class="nb nb-o" onclick="openProfile()" style="padding:6px 10px;font-size:.7rem;">👤 Profile</button>
-      <button class="nb nb-o" onclick="logout()" title="Logout — you can log back in anytime">Logout</button>
+      <button class="nb nb-o nav-profile-btn" onclick="openProfile()" style="padding:6px 10px;font-size:.7rem;">👤 Profile</button>
+      <button class="nb nb-o nav-logout-btn" onclick="logout()" title="Logout — you can log back in anytime">Logout</button>
     </div>
     <div id="navAuth" style="display:flex;gap:8px;">
       <button class="nb nb-o" onclick="openAuth('login')">Login</button>
