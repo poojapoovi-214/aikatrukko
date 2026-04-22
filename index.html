@@ -184,7 +184,8 @@ window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
            updateProfile, sendPasswordResetEmail,
            onAuthStateChanged }                   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
   import { getFirestore, doc, setDoc,
-           getDoc, updateDoc }                    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+           getDoc, updateDoc, getDocs,
+           collection }                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const config = {
     apiKey: "AIzaSyAF-FUEXFxBNMCyNLErnTGoW8aEq8nNxMU",
@@ -217,6 +218,8 @@ window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
     window._fbSetDoc        = (ref,data) => setDoc(ref,data,{merge:true});
     window._fbGetDoc        = (ref)  => getDoc(ref);
     window._fbUpdateDoc     = (ref,data) => updateDoc(ref,data);
+    window._fbGetDocs       = (ref)  => getDocs(ref);
+    window._fbCollection    = (col)  => collection(db,col);
     window._fbFallbackActive = false;
 
     /* ── Auth state listener ── */
@@ -2999,15 +3002,8 @@ let fpStep = 0, fpEmail = '', fpCode = '';
    
    If BOTH keys are missing → AI chat shows friendly setup message.
 ══════════════════════════════════════════════ */
-let RZP_KEY = '';
-const WORKER_URL = 'https://ai-proxy.www-poojapoovi3.workers.dev';
-(async function loadRzpKey(){
-  try{
-    const r = await fetch(WORKER_URL + '/get-rzp-key');
-    const d = await r.json();
-    if(d.key) RZP_KEY = d.key;
-  }catch(e){ console.warn('RZP key fetch failed', e); }
-})(); // ✅ Cloudflare Worker proxy — API key safe on server
+const RZP_KEY  = 'rzp_test_XXXXXXXXXXXXXXXXXX';  // ⚠️ Replace with your Razorpay Live/Test key
+const WORKER_URL = 'https://ai-proxy.www-poojapoovi3.workers.dev'; // ✅ Cloudflare Worker proxy — API key safe on server
 
 
 
@@ -4094,18 +4090,31 @@ async function doSignup(){
     await window._fbUpdateProfile(fu, { displayName: n });
     const nu = { uid: fu.uid, email: e, name: n, photo: null };
     try{
+      // First 5 users ku free access!
+      let freePurchases = [];
+      let isBeta = false;
+      try {
+        const usersSnap = await window._fbGetDocs(window._fbCollection('users'));
+        const totalUsers = usersSnap.size;
+        if(totalUsers < 5){
+          isBeta = true;
+          freePurchases = ['student','business','unemployed'];
+        }
+      } catch(ce){ console.warn('Count check error:', ce); }
+
       await window._fbSetDoc(window._fbDoc('users', fu.uid), {
-        name: n, email: e, purchases: [], createdAt: new Date().toISOString()
+        name: n, email: e, purchases: freePurchases, isBeta: isBeta, createdAt: new Date().toISOString()
       });
     }catch(fe){ console.warn('Firestore write error:', fe); }
     _authBusy = false;
-    saveSession(nu, [], null);
-    setLoggedIn(nu, []);
+    saveSession(nu, freePurchases, null);
+    setLoggedIn(nu, freePurchases);
     closeOv('authOverlay');
     document.getElementById('suName').value='';
     document.getElementById('suEmail').value='';
     document.getElementById('suPass').value='';
-    toast('Account created! Module 1 is free — start learning 🎉','ok');
+    const msg = isBeta ? 'Welcome! You got FREE full access as one of our first users 🎉' : 'Account created! Module 1 is free — start learning 🎉';
+    toast(msg,'ok');
   }catch(err){
     _authBusy = false;
     const c = err.code || '';
