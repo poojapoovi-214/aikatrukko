@@ -2517,11 +2517,11 @@ footer{
    DATA — 12 LESSONS PER CATEGORY (4 modules × 3)
 ══════════════════════════════════════════════ */
 const CATS = {
-  student:{label:'Starter',icon:'🌱',old:'₹799',new:'₹399',save:'Save ₹400',off:'50% OFF',
+  student:{label:'Starter',icon:'🌱',old:'',new:'₹399',save:'',off:'',
     sub:'AI Starter — Basic Modules for Students & Beginners'},
-  business:{label:'Professional',icon:'🚀',old:'₹1999',new:'₹999',save:'Save ₹1000',off:'50% OFF',
+  business:{label:'Professional',icon:'🚀',old:'',new:'₹999',save:'',off:'',
     sub:'AI Professional — Full Course for Job Seekers & Professionals'},
-  unemployed:{label:'Elite Mastery',icon:'👑',old:'₹4999',new:'₹2499',save:'Save ₹2500',off:'50% OFF',
+  unemployed:{label:'Elite Mastery',icon:'👑',old:'',new:'₹2499',save:'',off:'',
     sub:'AI Elite Mastery — Lifetime All Access for Entrepreneurs & VIPs'}
 };
 
@@ -3063,7 +3063,7 @@ function updateBannerForCat(cat){
     null,
     `🎓 Module 1 is 100% FREE — No credit card needed!`,
     null,
-    `💳 Unlock full access for just ${C.new} · ${C.off} · ${C.save}`,
+    `💳 Unlock full access for just ${C.new}`,
     null,
     `🎙️ Pooja explains every lesson in clear India-English — learn hands-free, anytime`,
     null,
@@ -3912,8 +3912,6 @@ function renderPricing(){
       <div class="pc-name">${C.label}</div>
       <div style="font-size:.65rem;font-weight:700;color:${pop?'var(--aqua)':'#94a3b8'};margin-bottom:6px;letter-spacing:.5px;">${planLabel[cat]}</div>
       <div class="pc-new">${C.new}</div>
-      <div class="pc-old" style="text-decoration:line-through;color:#94a3b8;font-size:.75rem;">${C.old}</div>
-      <div style="display:inline-block;background:rgba(0,212,200,0.1);color:var(--aqua);font-size:.6rem;font-weight:800;padding:3px 10px;border-radius:100px;margin:4px 0 10px;">${C.off} · ${C.save}</div>
       <div class="pc-period" id="pcPeriodText">/ see plan for duration</div>
       <div class="pc-feats">
         ${planFeats[cat].map(f=>`<div class="pc-feat"><span>${f.startsWith('❌')?'':'✓'}</span><span style="${f.startsWith('❌')?'color:#94a3b8;':''}">${f.replace('❌ ','').replace('✅ ','')}</span></div>`).join('')}
@@ -4423,7 +4421,7 @@ async function doPayment(){
     name: 'AI Katrukko',
     description: C.label+' Plan — Lifetime Access',
     image: '',
-    prefill:{name:user?.name||'', email:user?.email||''},
+    prefill:{name:user?.name||'', email:user?.email||'', contact:''},
     theme:{color:'#dc143c'},
     handler:function(response){
       grantAccess(cat);
