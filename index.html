@@ -661,8 +661,8 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;}
 
 /* ══ NAV ══ */
 nav{
-  position:sticky;top:0;z-index:500;
-  background:rgba(255,255,255,0.92);
+  position:relative;top:auto;z-index:1;
+  background:rgba(255,255,255,0.72);
   backdrop-filter:var(--glass-blur);
   -webkit-backdrop-filter:var(--glass-blur);
   box-shadow:0 2px 24px rgba(220,20,60,0.07), 0 1px 0 var(--glass-border);
@@ -1706,13 +1706,13 @@ footer{
 </head>
 <body>
 <div id="scrollBar"></div>
-<div id="stickyHeader" style="width:100%;">
+<div id="stickyHeader" style="position:sticky;top:0;z-index:500;width:100%;">
 <!-- ══ UPGRADE BANNER (shown after login) ══ -->
 <div id="upgradeBanner" style="display:none;background:linear-gradient(90deg,#0f0c29,#2d0060,#5a0fbf,#7b2fff,#9d4fff,#7b2fff,#5a0fbf,#2d0060,#0f0c29);background-size:300% 100%;animation:bannerGradShift 8s ease infinite;overflow:hidden;position:relative;z-index:999;box-shadow:0 3px 16px rgba(123,47,255,0.5);">
   <div style="display:flex;align-items:center;white-space:nowrap;animation:bannerScroll 22s linear infinite;padding:10px 0;gap:0;">
-    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; AI Practice Exercises — Every Lesson &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
-    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; AI Practice Exercises — Every Lesson &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
-    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; AI Practice Exercises — Every Lesson &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
+    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; <span style="color:var(--aqua);">✔</span> Daily AI Updates &nbsp;·&nbsp; AI Practice Exercises — Every Lesson &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
+    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; <span style="color:var(--aqua);">✔</span> Daily AI Updates &nbsp;·&nbsp; AI Practice Exercises — Every Lesson &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
+    <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; <span style="color:var(--aqua);">✔</span> Daily AI Updates &nbsp;·&nbsp; AI Practice Exercises — Every Lesson &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
   </div>
 </div>
 <style>
@@ -1731,31 +1731,34 @@ footer{
     <!-- 3 plan mini-cards -->
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;">
 
-      <!-- Free -->
+      <!-- Starter -->
       <div style="border:1.5px solid #e2e8f0;border-radius:14px;padding:16px 12px;text-align:center;">
-        <div style="font-weight:800;font-size:.95rem;margin:6px 0 2px;">Free</div>
-        <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Students / Beginners</div>
+        <div style="font-size:1.4rem;">🌱</div>
+        <div style="font-weight:800;font-size:.85rem;margin:6px 0 2px;">Starter</div>
+        <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Students</div>
         <div style="font-size:1.2rem;font-weight:900;color:#1a202c;margin-bottom:4px;">₹399</div><div style="font-size:.65rem;color:#718096;">6 months</div>
         <div style="font-size:.62rem;color:#94a3b8;margin-bottom:10px;">Practice Exercises Included</div>
         <button onclick="curCat='student';closePricingPopup();openPayModal();" style="width:100%;background:#f1f5f9;color:#475569;border:none;border-radius:8px;padding:8px;font-size:.7rem;font-weight:700;cursor:pointer;">Choose →</button>
       </div>
 
-      <!-- Pro -->
+      <!-- Professional -->
       <div style="border:2px solid var(--aqua);border-radius:14px;padding:16px 12px;text-align:center;background:linear-gradient(135deg,#f0fdff,#fff);position:relative;">
-        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--aqua);color:#fff;font-size:.58rem;font-weight:800;padding:3px 12px;border-radius:100px;white-space:nowrap;">BEST SELLER</div>
-        <div style="font-weight:800;font-size:.95rem;margin:6px 0 2px;">Pro</div>
-        <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Job Seekers / Professionals</div>
+        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--aqua);color:#fff;font-size:.58rem;font-weight:800;padding:3px 12px;border-radius:100px;white-space:nowrap;">⭐ BEST SELLER</div>
+        <div style="font-size:1.4rem;">🚀</div>
+        <div style="font-weight:800;font-size:.85rem;margin:6px 0 2px;">Professional</div>
+        <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Job Seekers</div>
         <div style="font-size:1.2rem;font-weight:900;color:#1a202c;margin-bottom:4px;">₹999</div><div style="font-size:.65rem;color:#718096;">1 year</div>
         <div style="font-size:.62rem;color:#0891b2;font-weight:600;margin-bottom:10px;">Deep Practice Library</div>
         <button onclick="curCat='business';closePricingPopup();openPayModal();" style="width:100%;background:var(--aqua);color:#fff;border:none;border-radius:8px;padding:8px;font-size:.7rem;font-weight:700;cursor:pointer;">Choose →</button>
       </div>
 
-      <!-- Lifetime -->
+      <!-- Elite -->
       <div style="border:1.5px solid #fbbf24;border-radius:14px;padding:16px 12px;text-align:center;background:linear-gradient(135deg,#fffbeb,#fff);">
-        <div style="font-weight:800;font-size:.95rem;margin:6px 0 2px;">Lifetime</div>
-        <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Entrepreneurs / Power Users</div>
-        <div style="font-size:1.2rem;font-weight:900;color:#1a202c;margin-bottom:4px;">₹2,499</div><div style="font-size:.65rem;color:#718096;">Forever</div>
-        <div style="font-size:.62rem;color:#d97706;font-weight:600;margin-bottom:10px;">Curated AI Prompts — Every Use Case</div>
+        <div style="font-size:1.4rem;">👑</div>
+        <div style="font-weight:800;font-size:.85rem;margin:6px 0 2px;">Elite Mastery</div>
+        <div style="font-size:.65rem;color:#94a3b8;margin-bottom:8px;">Entrepreneurs</div>
+        <div style="font-size:1.2rem;font-weight:900;color:#1a202c;margin-bottom:4px;">₹2,499</div><div style="font-size:.65rem;color:#718096;">Lifetime ✔</div>
+        <div style="font-size:.62rem;color:#d97706;font-weight:600;margin-bottom:10px;">Deep Practice Library — Every Use Case</div>
         <button onclick="curCat='unemployed';closePricingPopup();openPayModal();" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:8px;padding:8px;font-size:.7rem;font-weight:700;cursor:pointer;">Choose →</button>
       </div>
 
@@ -1767,25 +1770,25 @@ footer{
         <td style="padding:8px 12px;color:#64748b;font-weight:600;">Practice Library</td>
         <td style="padding:8px;text-align:center;color:#94a3b8;">Limited</td>
         <td style="padding:8px;text-align:center;color:#0891b2;font-weight:700;">Deep Practice Library</td>
-        <td style="padding:8px;text-align:center;color:#d97706;font-weight:700;">Curated AI Prompts — Every Use Case</td>
+        <td style="padding:8px;text-align:center;color:#d97706;font-weight:700;">Deep Practice Library — VIP</td>
       </tr>
       <tr>
         <td style="padding:8px 12px;color:#64748b;font-weight:600;">Community</td>
-        <td style="padding:8px;text-align:center;">❌</td>
-        <td style="padding:8px;text-align:center;">✅ WhatsApp</td>
-        <td style="padding:8px;text-align:center;">✅ VIP Discord</td>
+        <td style="padding:8px;text-align:center;">✖</td>
+        <td style="padding:8px;text-align:center;">✔ WhatsApp</td>
+        <td style="padding:8px;text-align:center;">✔ VIP Discord</td>
       </tr>
       <tr style="background:#f8fafc;">
         <td style="padding:8px 12px;color:#64748b;font-weight:600;">Certificate</td>
-        <td style="padding:8px;text-align:center;">❌</td>
-        <td style="padding:8px;text-align:center;">✅ Professional</td>
-        <td style="padding:8px;text-align:center;">✅ Gold-Tier</td>
+        <td style="padding:8px;text-align:center;">✖</td>
+        <td style="padding:8px;text-align:center;">✔ Professional</td>
+        <td style="padding:8px;text-align:center;">✔ Gold-Tier</td>
       </tr>
       <tr>
         <td style="padding:8px 12px;color:#64748b;font-weight:600;">Future Courses</td>
-        <td style="padding:8px;text-align:center;">❌</td>
-        <td style="padding:8px;text-align:center;">❌</td>
-        <td style="padding:8px;text-align:center;">✅ Free Forever</td>
+        <td style="padding:8px;text-align:center;">✖</td>
+        <td style="padding:8px;text-align:center;">✖</td>
+        <td style="padding:8px;text-align:center;">✔ Free Forever</td>
       </tr>
     </table>
     <p style="text-align:center;font-size:.65rem;color:#94a3b8;margin-top:16px;">One-time payment · No subscription · Lifetime access</p>
@@ -1800,7 +1803,7 @@ footer{
       <span style="opacity:.4;">✦</span>
       <span>🎓 Module 1 is 100% FREE — No credit card needed!</span>
       <span style="opacity:.4;">✦</span>
-      <span>🎙️ Voice-guided lessons in clear India-English — learn hands-free</span>
+      <span>🎙️ Voice-guided lessons in clear English — learn hands-free</span>
       <span style="opacity:.4;">✦</span>
       <span>⚡ Starts at ₹399 · One-time payment · No subscription</span>
       <span style="opacity:.4;">✦</span>
@@ -1812,7 +1815,7 @@ footer{
       <span style="opacity:.4;">✦</span>
       <span>🎓 Module 1 is 100% FREE — No credit card needed!</span>
       <span style="opacity:.4;">✦</span>
-      <span>🎙️ Voice-guided lessons in clear India-English — learn hands-free</span>
+      <span>🎙️ Voice-guided lessons in clear English — learn hands-free</span>
       <span style="opacity:.4;">✦</span>
       <span>⚡ Starts at ₹399 · One-time payment · No subscription</span>
       <span style="opacity:.4;">✦</span>
@@ -1836,7 +1839,6 @@ footer{
     <span class="nav-lnk" onclick="scrollTo2('featSection')">Features</span>
     <span class="nav-lnk" onclick="scrollTo2('faqSection')">FAQ</span>
     <span class="nav-lnk" onclick="scrollTo2('howSection')">How It Works</span>
-    <span class="nav-lnk" onclick="openFeedbackModal()" style="color:var(--aqua);font-weight:600;">Feedback</span>
   </div>
   <div class="nav-r">
     <div class="nav-user" id="navUser">
@@ -1865,7 +1867,7 @@ footer{
   <div class="hero-left">
     <div class="h-tag anim-r"><span class="h-tag-dot"></span>aikatrukko.in — Your AI Learning Buddy</div>
     <h1 class="anim-up anim-d1">Learn <span class="aq">AI Skills</span> That Actually Work For You</h1>
-    <p class="hero-sub anim-up anim-d2">Voice-guided lessons in clear India-English. Structured curriculum with quizzes, projects and live AI coaching. One-time payment — no subscriptions. Start free today.</p>
+    <p class="hero-sub anim-up anim-d2">Voice-guided lessons in clear English. Structured curriculum with quizzes, projects and live AI coaching. One-time payment — no subscriptions. Start free today.</p>
     <div class="hero-btns anim-up anim-d3">
       <button class="hbtn-p" onclick="openFreeTrial()">Start Free — No Card Needed →</button>
       <button class="hbtn-s" onclick="scrollTo2('catsSection')">Explore Courses →</button>
@@ -1888,7 +1890,7 @@ footer{
         </div>
       </div>
       <div class="h-stats">
-        <div class="h-stat"><div class="h-stat-n">3</div><div class="h-stat-l">Categories</div></div>
+        <div class="h-stat"><div class="h-stat-n">3</div><div class="h-stat-l">Courses</div></div>
         <div class="h-stat"><div class="h-stat-n">36+</div><div class="h-stat-l">Lessons</div></div>
         <div class="h-stat"><div class="h-stat-n">🎙️</div><div class="h-stat-l">Voice</div></div>
       </div>
@@ -1925,7 +1927,7 @@ footer{
       <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
         <div style="font-size:1.3rem;margin-bottom:6px;">🎙️</div>
         <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--white);margin-bottom:4px;">Voice-First Learning</div>
-        <div style="font-size:.7rem;color:var(--gray1);line-height:1.6;">Every lesson is voice-guided by Pooja in clear India-English. Learn hands-free, anywhere.</div>
+        <div style="font-size:.7rem;color:var(--gray1);line-height:1.6;">Every lesson is voice-guided by Pooja in clear English. Learn hands-free, anywhere.</div>
       </div>
       <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
         <div style="font-size:1.3rem;margin-bottom:6px;">🤖</div>
@@ -2015,9 +2017,9 @@ footer{
       <!-- STARTER -->
       <div class="cat-card" data-scroll="anim-up" data-delay="0" onclick="pick('student')" style="display:flex;flex-direction:column;">
         <div class="unlock-badge" id="badge-student">✓ Unlocked</div>
-        <div class="cat-ic">📖</div>
-        <div class="cat-title">Free</div>
-        <div style="font-size:.7rem;font-weight:700;letter-spacing:.5px;color:var(--aqua);text-transform:uppercase;margin-bottom:6px;">₹399 · 6 months</div>
+        <div class="cat-ic">🌱</div>
+        <div class="cat-title">Starter</div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.5px;color:var(--aqua);text-transform:uppercase;margin-bottom:6px;">Entry</div>
         <div class="cat-desc">Perfect for Students & Beginners taking their first step into AI. <span style="font-size:.68rem;color:#e53e3e;font-weight:600;">6 months access.</span></div>
         <div class="cat-pr-row"><span class="cat-new">₹399</span><span class="cat-period">/ 6 months</span></div>
         <div class="cat-feats" style="flex:1;">
@@ -2025,8 +2027,8 @@ footer{
           <div class="cat-feat"><div class="cat-feat-dot"></div>Voice-guided lessons by Pooja</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>AI Practice Built Into Every Lesson</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Quiz after every lesson</div>
-          <div class="cat-feat" style="color:#aaa;"><span style="margin-right:6px;">❌</span>Certificate</div>
-          <div class="cat-feat" style="color:#aaa;"><span style="margin-right:6px;">❌</span>Community & Support Group</div>
+          <div class="cat-feat" style="color:#aaa;"><span style="margin-right:6px;">✖</span>Certificate</div>
+          <div class="cat-feat" style="color:#aaa;"><span style="margin-right:6px;">✖</span>Community & Support Group</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Email Support (48hr reply)</div>
         </div>
         <button class="cat-cta" style="margin-top:auto;" onclick="event.stopPropagation();curCat='student';openPayModal();">Get Started — ₹399 →</button>
@@ -2036,41 +2038,41 @@ footer{
       <div class="cat-card featured" data-scroll="anim-up" data-delay="200" onclick="pick('business')" style="display:flex;flex-direction:column;border-color:var(--aqua);box-shadow:var(--aqua-glow);position:relative;">
         <div class="unlock-badge" id="badge-business">✓ Unlocked</div>
         <div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:var(--aqua);color:#fff;font-size:.65rem;font-weight:800;padding:4px 16px;border-radius:100px;letter-spacing:.8px;white-space:nowrap;">⭐ BEST SELLER</div>
-        <div class="cat-ic">⚡</div>
-        <div class="cat-title">Pro</div>
-        <div style="font-size:.7rem;font-weight:700;letter-spacing:.5px;color:var(--aqua);text-transform:uppercase;margin-bottom:6px;">₹999 · 1 year</div>
+        <div class="cat-ic">🚀</div>
+        <div class="cat-title">Professional</div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.5px;color:var(--aqua);text-transform:uppercase;margin-bottom:6px;">Best Seller</div>
         <div class="cat-desc">Ideal for Job Seekers & Professionals ready to level up with AI. <span style="font-size:.68rem;color:var(--aqua);font-weight:600;">1 year access.</span></div>
         <div class="cat-pr-row"><span class="cat-new">₹999</span><span class="cat-period">/ year</span></div>
         <div class="cat-feats" style="flex:1;">
           <div class="cat-feat"><div class="cat-feat-dot"></div>All 6 Modules · 18+ Full Lessons</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Voice Lessons + Quizzes + AI Coach</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Deep Practice Library — Every Use Case</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Weekly Live AI Trend Updates</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Professional Certificate</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ WhatsApp Community Access</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✔ Weekly Live AI Trend Updates</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✔ Professional Certificate</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✔ WhatsApp Community Access</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Priority Support (24hr reply)</div>
         </div>
-        <button class="cat-cta" style="margin-top:auto;" onclick="event.stopPropagation();curCat='business';openPayModal();">Get Pro — ₹999 →</button>
+        <button class="cat-cta" style="margin-top:auto;" onclick="event.stopPropagation();curCat='business';openPayModal();">Get Professional — ₹999 →</button>
       </div>
 
       <!-- ELITE MASTERY -->
       <div class="cat-card" data-scroll="anim-up" data-delay="100" onclick="pick('unemployed')" style="display:flex;flex-direction:column;background:linear-gradient(135deg,#fff5f7,#fff);">
         <div class="unlock-badge" id="badge-unemployed">✓ Unlocked</div>
-        <div class="cat-ic">♾️</div>
-        <div class="cat-title">Lifetime</div>
-        <div style="font-size:.7rem;font-weight:700;letter-spacing:.5px;color:var(--aqua);text-transform:uppercase;margin-bottom:6px;">₹2,499 · Forever</div>
-        <div class="cat-desc">For Entrepreneurs &amp; Power Users who want the ultimate AI edge — forever. <span style="font-size:.68rem;color:var(--aqua);font-weight:700;">True Lifetime Access.</span></div>
+        <div class="cat-ic">👑</div>
+        <div class="cat-title">Elite Mastery</div>
+        <div style="font-size:.7rem;font-weight:700;letter-spacing:.5px;color:var(--aqua);text-transform:uppercase;margin-bottom:6px;">Lifetime</div>
+        <div class="cat-desc">For Entrepreneurs & VIPs who want the ultimate AI edge — forever. <span style="font-size:.68rem;color:var(--aqua);font-weight:700;">✔ True Lifetime Access.</span></div>
         <div class="cat-pr-row"><span class="cat-new">₹2,499</span><span class="cat-period">/ lifetime</span></div>
         <div class="cat-feats" style="flex:1;">
           <div class="cat-feat"><div class="cat-feat-dot"></div>ALL 3 Courses · 36 Lessons Lifetime</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Deep Practice Library — Every Use Case</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Daily Priority AI Trend Updates</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ Gold-Tier Certificate</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>Private Discord Community</div>
-          <div class="cat-feat"><div class="cat-feat-dot"></div>✅ All Future Courses — Free Forever</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✔ Daily Priority AI Trend Updates</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✔ Gold-Tier Certificate</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✔ VIP Private Discord Community</div>
+          <div class="cat-feat"><div class="cat-feat-dot"></div>✔ All Future Courses — Free Forever</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>1-on-1 Direct Support with Pooja</div>
         </div>
-        <button class="cat-cta" style="margin-top:auto;background:linear-gradient(135deg,var(--aqua),var(--aqua2));" onclick="event.stopPropagation();curCat='unemployed';openPayModal();">Get Lifetime Access — ₹2,499 →</button>
+        <button class="cat-cta" style="margin-top:auto;background:linear-gradient(135deg,var(--aqua),var(--aqua2));" onclick="event.stopPropagation();curCat='unemployed';openPayModal();">Get Elite Access — ₹2,499 →</button>
       </div>
 
     </div>
@@ -2081,9 +2083,9 @@ footer{
         <thead>
           <tr style="background:var(--aqua);color:#fff;">
             <th style="padding:14px 18px;text-align:left;font-weight:700;">Features</th>
-            <th style="padding:14px 12px;text-align:center;">Free<br><span style="font-size:.85em;font-weight:400;">₹399 / 6mo</span></th>
-            <th style="padding:14px 12px;text-align:center;background:rgba(0,0,0,0.15);">Pro<br><span style="font-size:.85em;font-weight:400;">₹999 / year</span></th>
-            <th style="padding:14px 12px;text-align:center;">Lifetime<br><span style="font-size:.85em;font-weight:400;">₹2,499 / forever</span></th>
+            <th style="padding:14px 12px;text-align:center;">🌱 Starter<br><span style="font-size:.85em;font-weight:400;">₹399 / 6mo</span></th>
+            <th style="padding:14px 12px;text-align:center;background:rgba(0,0,0,0.15);">🚀 Professional<br><span style="font-size:.85em;font-weight:400;">₹999 / year</span></th>
+            <th style="padding:14px 12px;text-align:center;">👑 Elite Mastery<br><span style="font-size:.85em;font-weight:400;">₹2,499 / lifetime</span></th>
           </tr>
         </thead>
         <tbody>
@@ -2091,25 +2093,25 @@ footer{
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Target</td>
             <td style="padding:12px;text-align:center;color:#718096;">Students / Beginners</td>
             <td style="padding:12px;text-align:center;background:#fff5f7;color:#4a5568;font-weight:600;">Job Seekers / Professionals</td>
-            <td style="padding:12px;text-align:center;color:#718096;">Entrepreneurs / Power Users</td>
+            <td style="padding:12px;text-align:center;color:#718096;">Entrepreneurs / VIPs</td>
           </tr>
           <tr style="border-bottom:1px solid #f0f4f8;background:#fafafa;">
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Course Access</td>
             <td style="padding:12px;text-align:center;color:#718096;">Basic Modules<br><span style="font-size:.65rem;color:#e53e3e;">6 months only</span></td>
             <td style="padding:12px;text-align:center;background:#fff5f7;color:#4a5568;font-weight:600;">Full Course Library<br><span style="font-size:.65rem;color:var(--aqua);">1 year access</span></td>
-            <td style="padding:12px;text-align:center;color:#4a5568;font-weight:600;">Lifetime All Access<br><span style="font-size:.65rem;color:var(--aqua);">Forever ✅</span></td>
+            <td style="padding:12px;text-align:center;color:#4a5568;font-weight:600;">Lifetime All Access<br><span style="font-size:.65rem;color:var(--aqua);">Forever ✔</span></td>
           </tr>
           <tr style="border-bottom:1px solid #f0f4f8;">
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">AI Live Trends</td>
-            <td style="padding:12px;text-align:center;">❌</td>
-            <td style="padding:12px;text-align:center;background:#fff5f7;">✅ Weekly Updates</td>
-            <td style="padding:12px;text-align:center;">✅ Daily Priority</td>
+            <td style="padding:12px;text-align:center;">✖</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;">✔ Weekly Updates</td>
+            <td style="padding:12px;text-align:center;">✔ Daily Priority</td>
           </tr>
           <tr style="border-bottom:1px solid #f0f4f8;background:#fafafa;">
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Certification</td>
-            <td style="padding:12px;text-align:center;">❌</td>
-            <td style="padding:12px;text-align:center;background:#fff5f7;">✅ Professional Cert</td>
-            <td style="padding:12px;text-align:center;">✅ Gold-Tier Cert</td>
+            <td style="padding:12px;text-align:center;">✖</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;">✔ Professional Cert</td>
+            <td style="padding:12px;text-align:center;">✔ Gold-Tier Cert</td>
           </tr>
           <tr style="border-bottom:1px solid #f0f4f8;">
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Practice Library</td>
@@ -2119,15 +2121,15 @@ footer{
           </tr>
           <tr style="border-bottom:1px solid #f0f4f8;background:#fafafa;">
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Community</td>
-            <td style="padding:12px;text-align:center;">❌</td>
-            <td style="padding:12px;text-align:center;background:#fff5f7;">✅ WhatsApp Group</td>
-            <td style="padding:12px;text-align:center;">✅ VIP Private Discord</td>
+            <td style="padding:12px;text-align:center;">✖</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;">✔ WhatsApp Group</td>
+            <td style="padding:12px;text-align:center;">✔ VIP Private Discord</td>
           </tr>
           <tr style="border-bottom:1px solid #f0f4f8;">
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Future Courses</td>
-            <td style="padding:12px;text-align:center;">❌</td>
-            <td style="padding:12px;text-align:center;background:#fff5f7;">❌</td>
-            <td style="padding:12px;text-align:center;">✅ Free Forever</td>
+            <td style="padding:12px;text-align:center;">✖</td>
+            <td style="padding:12px;text-align:center;background:#fff5f7;">✖</td>
+            <td style="padding:12px;text-align:center;">✔ Free Forever</td>
           </tr>
           <tr>
             <td style="padding:12px 18px;color:#4a5568;font-weight:500;">Support</td>
@@ -2146,7 +2148,7 @@ footer{
 <!-- ══ WEEKLY AI UPDATES ══ -->
 <div class="sec" id="weeklySection" style="background:#fff;">
   <div class="sec-in">
-    <div class="sec-eye" data-scroll="anim-up">Updated Every Week</div>
+    <div class="sec-eye" data-scroll="anim-up">🗓️ Updated Every Week</div>
     <div class="sec-title">This Week's AI Tips</div>
     <div class="sec-sub">Weekly AI lessons and exercises — updated every Monday. New skill to practice every week.</div>
     <div id="homeWeeklyGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;"></div>
@@ -2233,6 +2235,11 @@ footer{
         </div>
         <div class="faq-a"><div class="faq-a-inner">Pooja Gunasekaran is a UX/UI Designer and AI Educator who built AI Katrukko to make practical AI education accessible and affordable for everyday Indians. This is not a generic AI course — every lesson is built around real Indian use cases, real tools, and real results. Try Module 1 free and judge for yourself.</div></div>
       </div>
+
+    <div style="text-align:center;margin-top:28px;">
+      <p style="font-size:.78rem;color:#718096;margin-bottom:10px;">Still have questions?</p>
+      <button onclick="openAkChat()" style="background:var(--aqua);color:#fff;border:none;border-radius:100px;padding:11px 26px;font-family:'Syne',sans-serif;font-weight:800;font-size:.8rem;cursor:pointer;letter-spacing:.3px;">💬 Chat with AI Coach →</button>
+    </div>
     </div>
   </div>
 </div>
@@ -2249,11 +2256,30 @@ footer{
     <span class="foot-lnk" onclick="openAuth('signup')">Sign Up Free</span>
     <a class="foot-lnk" href="mailto:aikatrukko@gmail.com?subject=Hi%20AI%20Katrukko%20%E2%80%94%20I%20have%20a%20question&body=Hi%20Pooja%2C%0A%0A">Contact</a>
     <a class="foot-lnk" href="https://www.linkedin.com/in/pooja-gunasekaran-a8a855260" target="_blank">LinkedIn</a>
+    <a class="foot-lnk" href="https://www.behance.net/poojagunasekaran" target="_blank">Behance</a>
+    <a class="foot-lnk" href="https://www.instagram.com/aikatrukko" target="_blank">Instagram</a>
   </div>
   <div style="font-size:.7rem;color:var(--aqua);font-weight:600;margin-bottom:8px;">📧 <a href="mailto:aikatrukko@gmail.com?subject=Hi%20AI%20Katrukko%20%E2%80%94%20I%20have%20a%20question&body=Hi%20Pooja%2C%0A%0A" style="color:var(--aqua);text-decoration:none;">aikatrukko@gmail.com</a></div>
   <div class="foot-copy">© 2026 AIKatrukko.in · Made in India 🇮🇳</div>
 
 </footer>
+
+<!-- ══ MOBILE STICKY CTA ══ -->
+<div class="mobile-sticky-cta" id="mobileStickyCTA">
+  <button class="ms-primary" onclick="openFreeTrial()">Start Free →</button>
+  <button class="ms-secondary" onclick="curCat='unemployed';openPayModal()">Get Elite ₹2,499</button>
+</div>
+<script>
+(function(){
+  var cta = document.getElementById('mobileStickyCTA');
+  if(!cta) return;
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 300){ cta.classList.remove('hidden'); }
+    else { cta.classList.add('hidden'); }
+  }, {passive:true});
+  cta.classList.add('hidden');
+})();
+</script>
 
 </div><!-- /homepage -->
 
@@ -2359,6 +2385,12 @@ footer{
       </div>
     </div>
     <div class="prof-body">
+      <!-- Upgrade nudge for free users -->
+      <div id="profUpgradeNudge" style="display:none;background:linear-gradient(135deg,#fff5f7,#fff);border:1.5px solid rgba(220,20,60,0.2);border-radius:12px;padding:14px 18px;margin-bottom:18px;text-align:center;">
+        <div style="font-size:.82rem;font-weight:700;color:#1a202c;margin-bottom:6px;">🔓 Unlock All 36 Lessons</div>
+        <div style="font-size:.72rem;color:#718096;margin-bottom:10px;">Get Elite access — lifetime, all 3 courses, gold certificate</div>
+        <button onclick="closeOv('profileOverlay');curCat='unemployed';openPayModal();" style="background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 22px;font-family:'Syne',sans-serif;font-weight:800;font-size:.76rem;cursor:pointer;">Upgrade to Elite — ₹2,499 →</button>
+      </div>
       <div class="prof-section">
         <div class="prof-sec-title">&#9998; Edit Details</div>
         <input class="prof-edit-field" id="profEditName" placeholder="Your name" />
@@ -2373,38 +2405,14 @@ footer{
         <div class="prof-sec-title">&#127919; Lesson Completion</div>
         <div class="lesson-prog-list" id="profLessonProg"></div>
       </div>
-      <!-- Certificate section — visible only for Elite users who completed all lessons -->
-      <div class="prof-section" id="profCertSection" style="display:none;">
-        <div class="prof-sec-title">Certificate of Completion</div>
-        <div style="background:linear-gradient(135deg,#0f0c29,#302b63);border:1.5px solid #FFD700;border-radius:14px;padding:20px;text-align:center;">
-          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#FFD700;margin-bottom:4px;">Gold-Tier Certificate</div>
-          <div style="font-size:.75rem;color:rgba(255,255,255,0.6);margin-bottom:16px;" id="profCertMsg">Complete all 36 lessons to unlock your certificate.</div>
-          <button id="profCertBtn" onclick="const tier=this.getAttribute('data-tier')||'elite';closeOv('profileOverlay');showCertificate(tier);" style="background:#FFD700;color:#0f0c29;border:none;border-radius:8px;padding:11px 28px;font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;display:none;">View &amp; Download Certificate →</button>
+      <!-- Certificate section removed -->
+      <!-- Streak counter -->
+      <div id="profStreakSection" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(255,140,0,0.08),rgba(255,200,0,0.06));border:1px solid rgba(255,140,0,0.2);border-radius:12px;padding:12px 16px;margin-bottom:18px;">
+        <div style="font-size:1.6rem;">🔥</div>
+        <div>
+          <div style="font-size:.88rem;font-weight:800;color:#1a202c;" id="streakCount">0 Day Streak</div>
+          <div style="font-size:.68rem;color:#718096;">Complete a lesson daily to keep your streak alive!</div>
         </div>
-      </div>
-
-      <!-- Certificate sample preview — always visible -->
-      <div class="prof-section">
-        <div class="prof-sec-title">Certificate Preview</div>
-        <div style="background:linear-gradient(135deg,#0f0c29,#302b63);border:1.5px solid rgba(255,215,0,0.35);border-radius:14px;padding:20px;position:relative;overflow:hidden;">
-          <div style="position:absolute;inset:0;background:rgba(0,0,0,0.35);border-radius:14px;display:flex;align-items:center;justify-content:center;z-index:2;">
-            <div style="text-align:center;">
-              <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:#FFD700;margin-bottom:8px;">Sample Certificate</div>
-              <button onclick="closeOv('profileOverlay');showCertificate('elite');" style="background:#FFD700;color:#0f0c29;border:none;border-radius:8px;padding:9px 22px;font-family:'Syne',sans-serif;font-weight:800;font-size:.78rem;cursor:pointer;">Preview Certificate →</button>
-            </div>
-          </div>
-          <!-- Mock certificate layout (blurred preview) -->
-          <div style="filter:blur(3px);pointer-events:none;padding:12px;">
-            <div style="font-size:.55rem;letter-spacing:2px;color:rgba(255,215,0,0.6);text-align:center;margin-bottom:6px;text-transform:uppercase;">AI Katrukko · Certificate of Completion</div>
-            <div style="text-align:center;font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:4px;">Your Name Here</div>
-            <div style="text-align:center;font-size:.6rem;color:rgba(255,255,255,0.5);margin-bottom:10px;">has successfully completed all 36 lessons across AI for Students · AI for Business · AI for Job Seekers</div>
-            <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:12px;">
-              <div><div style="font-size:.6rem;color:#FFD700;font-weight:700;">Pooja Gunasekaran</div><div style="font-size:.5rem;color:rgba(255,255,255,0.4);">Founder, AI Katrukko</div></div>
-              <div style="font-size:1.4rem;">🏅</div>
-            </div>
-          </div>
-        </div>
-        <p style="font-size:.68rem;color:var(--gray2);margin-top:8px;text-align:center;">Issued after completing all lessons. Shareable on LinkedIn &amp; resume.</p>
       </div>
       <div class="prof-section">
         <div class="prof-sec-title">&#129302; Live AI Prompt &#8212; Just For You</div>
@@ -2940,19 +2948,19 @@ const PROMPTS = {
       {t:'🎯 ATS Resume Optimiser',b:'Here is my resume: <em>[paste resume]</em>. Here is the job description: <em>[paste JD]</em>. Score match out of 10. List missing keywords. Rewrite my professional summary. Suggest 3 bullet rewrites with stronger action verbs.'}
     ],
     locked:[
-      {t:'🏆 Complete Job Hunt System (30 Days)',b:'I am looking for a <em>[job title]</em> in <em>[field]</em> in <em>[city/remote]</em>. Build a complete 30-day job hunting system: daily actions, weekly milestones, AI tools for resume tailoring, how to find and reach decision-makers, tracking system, and follow-up strategy. Step-by-step action plan, not generic advice.'},
-      {t:'🧠 Deep Skills Audit',b:'Conduct a detailed skills audit for a <em>[role]</em> in <em>[field]</em>. Step 1: Top 10 skills required in 2025. Step 2: For each skill — 30-day learning plan + best resource. Step 3: 3 portfolio projects to demonstrate them. Step 4: AI tools to accelerate each skill.'},
-      {t:'📐 Portfolio Project Blueprint',b:'Help me plan a portfolio project for <em>[role]</em> in <em>[field]</em>. It should: solve a real problem, demonstrate my top skills, be completable in <em>[X weeks]</em>, and impress interviewers. Full project brief, tech stack, structure, tools, and how to present it.'},
-      {t:'🔗 LinkedIn Profile Full Overhaul',b:'Rewrite my entire LinkedIn profile for <em>[target role]</em> in <em>[field]</em>. Current profile: <em>[paste or describe]</em>. Rewrite: Headline, About (storytelling, 250 words), all Experience bullets (STAR + metrics), Skills section, Featured section ideas. Make every word count.'},
-      {t:'🎯 Daily AI Productivity System',b:'Build a personalised daily AI productivity system for a <em>[role]</em> in <em>[field]</em>. Tasks I do daily: <em>[list]</em>. For each time block (morning / deep work / meetings / admin / review): best AI tool, ready-to-use prompt, and expected time saved. Format as a daily schedule I can start tomorrow.'},
-      {t:'🎤 Interview Mastery (10 Round Simulation)',b:'Act as a senior hiring manager at a top company in <em>[field]</em> interviewing me for <em>[job title]</em>. Run a full 10-round interview: 4 behavioural, 3 technical, 2 situational, 1 culture-fit. After each answer: score 1-10, strengths, weaknesses, model answer. At the end: overall feedback and top 3 areas to improve.'},
-      {t:'💰 Salary Negotiation + Offer Evaluation',b:'I received a job offer: <em>[paste offer details]</em> for <em>[role]</em> in <em>[field]</em>. Help me: evaluate if this is a good offer, research market rate, write a negotiation script, handle 3 possible employer responses, and decide when to accept. Full strategy, not just a script.'},
-      {t:'🌐 Personal Brand 90-Day Launch Plan',b:'I want to build a personal brand as a <em>[role]</em> in <em>[field]</em> in the next 90 days. Create: Week 1-4 foundation plan, content strategy (3 platforms), 12-week content calendar (4 posts/week), engagement strategy, and how to measure brand growth. Full actionable plan.'},
-      {t:'📊 Career Pivot Full Roadmap',b:'I want to transition from <em>[current field/role]</em> to <em>[target field/role]</em> in <em>[X months]</em>. Create a complete pivot roadmap: transferable skills map, skill gaps to fill, certifications to get, portfolio projects to build, networking strategy, job search approach, and monthly milestones. Be specific, not generic.'},
-      {t:'🔑 AI Tools Masterclass for My Role',b:'I am a <em>[role]</em> in <em>[field]</em>. Give me a complete AI tools masterclass: Top 10 tools for my role, exact use case for each, ready-to-use prompt template for each, how to integrate them into my workflow, and a 30-day adoption plan. Include both free and paid options.'},
-      {t:'📣 Content to Client Pipeline',b:'I want to use LinkedIn / social media to attract <em>[clients / employers / collaborators]</em> as a <em>[role]</em> in <em>[field]</em>. Build a complete system: content strategy, 8-week posting plan, DM templates for warm leads, follow-up sequence, and how to convert engagement into real opportunities.'},
-      {t:'🏗️ Six-Month Career Acceleration Plan',b:'I am a <em>[role]</em> in <em>[field]</em> with <em>[X years]</em> experience. My career goal: <em>[target]</em>. Build a 6-month acceleration plan with: monthly focus areas, skills to gain each month, projects to complete, people to connect with, and measurable milestones. Make it ambitious but achievable.'},
-      {t:'🧩 SWOT + Strategy Plan',b:'Do a comprehensive personal SWOT analysis for a <em>[role]</em> in <em>[field]</em>. 5+ points per quadrant. Then build a strategy: how to use strengths to seize opportunities, how to fix weaknesses before threats hit, and a 90-day action plan with weekly check-ins.'},
+      {t:'🏆 VIP: Complete Job Hunt System (30 Days)',b:'I am looking for a <em>[job title]</em> in <em>[field]</em> in <em>[city/remote]</em>. Build a complete 30-day job hunting system: daily actions, weekly milestones, AI tools for resume tailoring, how to find and reach decision-makers, tracking system, and follow-up strategy. Step-by-step action plan, not generic advice.'},
+      {t:'🧠 VIP: Deep Skills Audit',b:'Conduct a detailed skills audit for a <em>[role]</em> in <em>[field]</em>. Step 1: Top 10 skills required in 2025. Step 2: For each skill — 30-day learning plan + best resource. Step 3: 3 portfolio projects to demonstrate them. Step 4: AI tools to accelerate each skill.'},
+      {t:'📐 VIP: Portfolio Project Blueprint',b:'Help me plan a portfolio project for <em>[role]</em> in <em>[field]</em>. It should: solve a real problem, demonstrate my top skills, be completable in <em>[X weeks]</em>, and impress interviewers. Full project brief, tech stack, structure, tools, and how to present it.'},
+      {t:'🔗 VIP: LinkedIn Profile Full Overhaul',b:'Rewrite my entire LinkedIn profile for <em>[target role]</em> in <em>[field]</em>. Current profile: <em>[paste or describe]</em>. Rewrite: Headline, About (storytelling, 250 words), all Experience bullets (STAR + metrics), Skills section, Featured section ideas. Make every word count.'},
+      {t:'🎯 VIP: Daily AI Productivity System',b:'Build a personalised daily AI productivity system for a <em>[role]</em> in <em>[field]</em>. Tasks I do daily: <em>[list]</em>. For each time block (morning / deep work / meetings / admin / review): best AI tool, ready-to-use prompt, and expected time saved. Format as a daily schedule I can start tomorrow.'},
+      {t:'🎤 VIP: Interview Mastery (10 Round Simulation)',b:'Act as a senior hiring manager at a top company in <em>[field]</em> interviewing me for <em>[job title]</em>. Run a full 10-round interview: 4 behavioural, 3 technical, 2 situational, 1 culture-fit. After each answer: score 1-10, strengths, weaknesses, model answer. At the end: overall feedback and top 3 areas to improve.'},
+      {t:'💰 VIP: Salary Negotiation + Offer Evaluation',b:'I received a job offer: <em>[paste offer details]</em> for <em>[role]</em> in <em>[field]</em>. Help me: evaluate if this is a good offer, research market rate, write a negotiation script, handle 3 possible employer responses, and decide when to accept. Full strategy, not just a script.'},
+      {t:'🌐 VIP: Personal Brand 90-Day Launch Plan',b:'I want to build a personal brand as a <em>[role]</em> in <em>[field]</em> in the next 90 days. Create: Week 1-4 foundation plan, content strategy (3 platforms), 12-week content calendar (4 posts/week), engagement strategy, and how to measure brand growth. Full actionable plan.'},
+      {t:'📊 VIP: Career Pivot Full Roadmap',b:'I want to transition from <em>[current field/role]</em> to <em>[target field/role]</em> in <em>[X months]</em>. Create a complete pivot roadmap: transferable skills map, skill gaps to fill, certifications to get, portfolio projects to build, networking strategy, job search approach, and monthly milestones. Be specific, not generic.'},
+      {t:'🔑 VIP: AI Tools Masterclass for My Role',b:'I am a <em>[role]</em> in <em>[field]</em>. Give me a complete AI tools masterclass: Top 10 tools for my role, exact use case for each, ready-to-use prompt template for each, how to integrate them into my workflow, and a 30-day adoption plan. Include both free and paid options.'},
+      {t:'📣 VIP: Content to Client Pipeline',b:'I want to use LinkedIn / social media to attract <em>[clients / employers / collaborators]</em> as a <em>[role]</em> in <em>[field]</em>. Build a complete system: content strategy, 8-week posting plan, DM templates for warm leads, follow-up sequence, and how to convert engagement into real opportunities.'},
+      {t:'🏗️ VIP: Six-Month Career Acceleration Plan',b:'I am a <em>[role]</em> in <em>[field]</em> with <em>[X years]</em> experience. My career goal: <em>[target]</em>. Build a 6-month acceleration plan with: monthly focus areas, skills to gain each month, projects to complete, people to connect with, and measurable milestones. Make it ambitious but achievable.'},
+      {t:'🧩 VIP: SWOT + Strategy Plan',b:'Do a comprehensive personal SWOT analysis for a <em>[role]</em> in <em>[field]</em>. 5+ points per quadrant. Then build a strategy: how to use strengths to seize opportunities, how to fix weaknesses before threats hit, and a 90-day action plan with weekly check-ins.'},
       {t:'🤝 VIP: Networking System Builder',b:'Build a complete professional networking system for a <em>[role]</em> in <em>[field]</em>. Include: where to find the right people, 5 outreach templates for different scenarios, how to add value before asking for anything, a follow-up system, and how to maintain relationships long-term.'},
       {t:'📱 VIP: Social Proof Builder',b:'Help me build social proof as a <em>[role]</em> in <em>[field]</em> with limited experience. Strategy: how to get testimonials, what projects to do to build credibility, how to document and showcase results, which platforms to prioritise, and a 60-day visibility plan.'},
       {t:'🔔 VIP: Job Search Tracker + Follow-Up System',b:'Build me a complete job search tracking system. Include: spreadsheet structure (columns, statuses), daily / weekly action checklist, follow-up email templates for 7-day / 14-day / 30-day intervals, how to handle ghosting professionally, and a weekly review framework.'},
@@ -3110,7 +3118,7 @@ let fpStep = 0, fpEmail = '', fpCode = '';
    If BOTH keys are missing → AI chat shows friendly setup message.
 ══════════════════════════════════════════════ */
 const RZP_KEY  = 'rzp_test_XXXXXXXXXXXXXXXXXX';  // ⚠️ Replace with your Razorpay Live/Test key
-const WORKER_URL = 'https://ai-proxy.www-poojapoovi3.workers.dev'; // ✅ Cloudflare Worker proxy — API key safe on server
+const WORKER_URL = 'https://ai-proxy.www-poojapoovi3.workers.dev'; // ✔ Cloudflare Worker proxy — API key safe on server
 
 
 
@@ -3175,7 +3183,7 @@ function updateBannerForCat(cat){
     null,
     `💳 Unlock full access for just ${C.new}`,
     null,
-    `🎙️ Voice-guided lessons in clear India-English — learn hands-free`,
+    `🎙️ Voice-guided lessons in clear English — learn hands-free`,
     null,
     `🇮🇳 Built for Students, Job Seekers & Business Owners across India`,
     null,
@@ -3279,8 +3287,8 @@ function openLesson(mi,li){
         <div class="quiz-opts">
           ${qd.opts.map((o,i)=>`<button class="quiz-opt" onclick="ansQ('${quizId}',${i},${qd.ans},'${(qd.exp||'').replace(/'/g,"\\'")}',this)">${o}</button>`).join('')}
         </div>
-        <div class="quiz-fb ok" id="${quizId}-ok">✅ ${qd.exp}</div>
-        <div class="quiz-fb no" id="${quizId}-no">❌ Not quite. ${qd.exp}</div>
+        <div class="quiz-fb ok" id="${quizId}-ok">✔ ${qd.exp}</div>
+        <div class="quiz-fb no" id="${quizId}-no">✖ Not quite. ${qd.exp}</div>
       </div>`;
     }
   } else {
@@ -3489,6 +3497,14 @@ function markDone(key,mi,li){
   /* ── Check if Elite user has completed ALL lessons → show certificate ── */
   if(purchases.includes('unemployed')){
     checkAndShowCertificate();
+  }
+  /* ── Hot moment upsell: Module 1 last lesson completed ── */
+  if(!purchases.includes(curCat) && !purchases.includes('unemployed') && mi===0){
+    const mod1Total = CATS[curCat] && LESSONS && LESSONS[curCat] && LESSONS[curCat][0] ? LESSONS[curCat][0].length : 3;
+    const mod1Done = Object.keys(completed).filter(k=>k.startsWith(curCat+'_0_')).length;
+    if(mod1Done >= mod1Total){
+      setTimeout(()=>{ if(typeof showUpsellPopup==='function') showUpsellPopup(curCat); }, 900);
+    }
   }
 }
 
@@ -3870,7 +3886,7 @@ async function sendAkChat(){
   renderAkChatMsgs();
 
   const catLabel = {student:'students', business:'business owners', unemployed:'job seekers'}[curCat] || 'learners';
-  const systemPrompt = `You are Pooja's AI Coach for AI Katrukko — a Tamil Nadu-based AI learning platform for Indian learners. You help ${catLabel} understand and use AI tools practically. Keep answers clear, friendly, concise (under 150 words), and India-relevant. Use simple India-English. Add emojis for warmth. Give actionable tips.`;
+  const systemPrompt = `You are Pooja's AI Coach for AI Katrukko — a Tamil Nadu-based AI learning platform for Indian learners. You help ${catLabel} understand and use AI tools practically. Keep answers clear, friendly, concise (under 150 words), and India-relevant. Use simple English. Add emojis for warmth. Give actionable tips.`;
 
   const historyMsgs = akChatHistory.slice(0,-1)
     .filter(m=>!m.thinking)
@@ -3984,10 +4000,10 @@ function renderPricing(){
       '📖 Module 1 — AI Foundations (3 lessons)',
       '🎙️ Voice-guided lessons by Pooja',
       '💡 AI Practice Built Into Every Lesson',
-      '✅ Quiz after every lesson',
+      '✔ Quiz after every lesson',
       '📧 Email Support (48hr reply)',
-      '❌ No Certificate',
-      '❌ No Community Access'
+      '✖ No Certificate',
+      '✖ No Community Access'
     ],
     business:[
       '📚 All 6 Modules · 18+ Full Lessons',
@@ -4017,14 +4033,14 @@ function renderPricing(){
   ['student','business','unemployed'].forEach(cat=>{
     const C=CATS[cat], hasAcc=purchases.includes(cat), pop=cat==='business';
     html+=`<div class="price-card ${pop?'featured':''}">
-      ${pop?'<div class="feat-badge">BEST SELLER</div>':''}
+      ${pop?'<div class="feat-badge" style="background:var(--aqua);color:#fff;border:none;">BEST SELLER</div>':''}
       <div class="pc-icon">${C.icon}</div>
       <div class="pc-name">${C.label}</div>
       <div style="font-size:.65rem;font-weight:700;color:${pop?'var(--aqua)':'#94a3b8'};margin-bottom:6px;letter-spacing:.5px;">${planLabel[cat]}</div>
       <div class="pc-new">${C.new}</div>
       <div class="pc-period" id="pcPeriodText">/ see plan for duration</div>
       <div class="pc-feats">
-        ${planFeats[cat].map(f=>`<div class="pc-feat"><span>${f.startsWith('❌')?'':'✓'}</span><span style="${f.startsWith('❌')?'color:#94a3b8;':''}">${f.replace('❌ ','').replace('✅ ','')}</span></div>`).join('')}
+        ${planFeats[cat].map(f=>`<div class="pc-feat"><span>${f.startsWith('✖')?'':'✓'}</span><span style="${f.startsWith('✖')?'color:#94a3b8;':''}">${f.replace('✖ ','').replace('✔ ','')}</span></div>`).join('')}
       </div>
       ${hasAcc?
         `<button class="buy-btn" style="background:rgba(0,212,200,0.1);color:var(--aqua);border:1px solid var(--aqua);cursor:default;" disabled>✓ You have access</button>`:
@@ -4690,7 +4706,7 @@ function renderForgotStep(){
       <div style="text-align:center;margin-top:10px;"><span onclick="sendResetCode()" style="font-size:.72rem;color:var(--aqua);cursor:pointer;font-weight:600;">Resend Code</span></div>`;
   } else if(fpStep===2){
     c.innerHTML=`
-      <div style="background:rgba(0,200,100,.08);border:1px solid rgba(0,200,100,.25);border-radius:10px;padding:12px;margin-bottom:18px;font-size:.75rem;color:#2d8a5e;font-weight:600;">✅ Code verified! Now set your new password.</div>
+      <div style="background:rgba(0,200,100,.08);border:1px solid rgba(0,200,100,.25);border-radius:10px;padding:12px;margin-bottom:18px;font-size:.75rem;color:#2d8a5e;font-weight:600;">✔ Code verified! Now set your new password.</div>
       <div class="field"><label>New Password</label><input type="password" id="fpNewPass" placeholder="Min 6 characters"></div>
       <div class="field"><label>Confirm Password</label><input type="password" id="fpConfPass" placeholder="Confirm new password"></div>
       <button class="submit-btn" onclick="doResetPassword()">Update Password ✓</button>`;
@@ -4785,7 +4801,7 @@ function savePhoto(){
   photoSrc=newPhoto;
   setLoggedIn(user,purchases);
   closeOv('photoOverlay');
-  toast('Photo updated! ✅','ok');
+  toast('Photo updated! ✔','ok');
   /* Refresh profile avatar if open */
   const av=document.getElementById('profAvatar');
   if(av){av.innerHTML='<img src="'+userPhotoSrc+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">';}
@@ -4928,7 +4944,7 @@ function renderProfileContent(){
   document.getElementById('profEditEmail').value=user.email||'';
   const owned=purchases.filter(p=>CATS_INFO[p]);
   const badge=document.getElementById('profBadge');
-  badge.innerHTML=owned.length>0?'\u2705 '+owned.map(p=>CATS_INFO[p].icon+' '+CATS_INFO[p].label).join(' \u00B7 ')+' Access':'\u{1F393} Free Member';
+  badge.innerHTML=owned.length>0?'✔ '+owned.map(p=>CATS_INFO[p].icon+' '+CATS_INFO[p].label).join(' \u00B7 ')+' Access':'\u{1F393} Free Member';
 
   // courses grid
   let g='';
@@ -5003,6 +5019,20 @@ function renderProfileContent(){
   } else if(certSection){
     certSection.style.display = 'none';
   }
+
+  /* Upgrade nudge for free users */
+  const nudge = document.getElementById('profUpgradeNudge');
+  if(nudge){
+    const hasAny = purchases.filter(p=>CATS_INFO[p]).length > 0;
+    nudge.style.display = hasAny ? 'none' : 'block';
+  }
+
+  /* Streak counter */
+  const streakEl = document.getElementById('streakCount');
+  if(streakEl){
+    const streak = parseInt(localStorage.getItem('ak_streak')||'0');
+    streakEl.textContent = streak > 0 ? streak + ' Day Streak' : 'Start your streak today!';
+  }
 }
 
 function saveProfileDetails(){
@@ -5015,7 +5045,7 @@ function saveProfileDetails(){
   localStorage.setItem('ak_user',JSON.stringify(user));
   document.getElementById('navName').textContent=n.split(' ')[0];
   document.getElementById('profName').textContent=n;
-  toast('Profile updated! \u2705','ok');
+  toast('Profile updated! ✔','ok');
 }
 
 let profPromptCache='';
@@ -5355,8 +5385,8 @@ function openLessonMerged(mi, li){
         <div class="quiz-opts">
           ${qd.opts.map((o,i) => `<button class="quiz-opt" onclick="ansQ('${quizId}',${i},${qd.ans},'${(qd.exp||'').replace(/'/g,"\\'")}',this)">${o}</button>`).join('')}
         </div>
-        <div class="quiz-fb ok" id="${quizId}-ok">✅ ${qd.exp}</div>
-        <div class="quiz-fb no" id="${quizId}-no">❌ Not quite. ${qd.exp}</div>
+        <div class="quiz-fb ok" id="${quizId}-ok">✔ ${qd.exp}</div>
+        <div class="quiz-fb no" id="${quizId}-no">✖ Not quite. ${qd.exp}</div>
       </div>`;
     }
   } else {
@@ -5658,7 +5688,7 @@ async function sendPracticeMessage(){
   const systemPrompt = `You are Pooja's AI Practice Coach for AI Katrukko — a Tamil Nadu-based AI learning platform. 
 You help Indian students, job seekers, and business owners learn AI skills in a friendly, simple way. 
 Keep answers concise (under 120 words), practical, and India-relevant. 
-Use clear India-English. Add emojis occasionally for warmth.
+Use clear English. Add emojis occasionally for warmth.
 You're in a "14-day free trial" limited practice space — mention upgrade perks naturally if relevant.`;
 
   const historyMsgs = practiceMessages.slice(0,-1)
@@ -5935,6 +5965,71 @@ function toggleSbMod(mi){
   </div>
 </div>
 
+
+<!-- ══ MODULE 1 UPSELL POPUP ══ -->
+<style>
+#upsellOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:99999;display:none;align-items:center;justify-content:center;padding:16px;}
+#upsellOverlay.show{display:flex;}
+.upsell-wrap{background:#fff;border-radius:20px;max-width:380px;width:100%;overflow:hidden;animation:upsellIn .35s ease;}
+@keyframes upsellIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+.upsell-top{background:linear-gradient(135deg,#dc143c,#ff4566);padding:28px 24px 20px;text-align:center;}
+.upsell-emoji{font-size:2.8rem;margin-bottom:8px;}
+.upsell-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#fff;margin-bottom:4px;}
+.upsell-sub{font-size:.75rem;color:rgba(255,255,255,0.85);}
+.upsell-body{padding:20px 24px;}
+.upsell-feat{display:flex;align-items:center;gap:10px;font-size:.78rem;color:#1a202c;margin-bottom:10px;}
+.upsell-feat-dot{width:7px;height:7px;border-radius:50%;background:#00d4e8;flex-shrink:0;}
+.upsell-price{text-align:center;margin:16px 0 12px;}
+.upsell-price-main{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:900;color:#1a202c;}
+.upsell-price-sub{font-size:.7rem;color:#718096;margin-top:2px;}
+.upsell-cta{width:100%;padding:14px;background:#dc143c;color:#fff;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;letter-spacing:.3px;margin-bottom:10px;}
+.upsell-skip{width:100%;padding:8px;background:transparent;border:none;color:#94a3b8;font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.upsell-skip:hover{color:#64748b;}
+</style>
+
+<div id="upsellOverlay">
+  <div class="upsell-wrap">
+    <div class="upsell-top">
+      <div class="upsell-emoji">🎉</div>
+      <div class="upsell-title">You completed Module 1!</div>
+      <div class="upsell-sub">You've taken the first step. Now go all the way.</div>
+    </div>
+    <div class="upsell-body">
+      <div class="upsell-feat"><div class="upsell-feat-dot"></div>36+ lessons — all 3 courses unlock</div>
+      <div class="upsell-feat"><div class="upsell-feat-dot"></div>Voice-guided lessons + AI coach access</div>
+      <div class="upsell-feat"><div class="upsell-feat-dot"></div>Quizzes, projects & live AI trend updates</div>
+      <div class="upsell-feat"><div class="upsell-feat-dot"></div>Certificate shareable on LinkedIn</div>
+      <div class="upsell-price">
+        <div class="upsell-price-main">₹399</div>
+        <div class="upsell-price-sub">One-time · No subscription · Lifetime access</div>
+      </div>
+      <button class="upsell-cta" id="upsellCtaBtn" onclick="closeUpsell(true)">Unlock Full Course →</button>
+      <button class="upsell-skip" onclick="closeUpsell(false)">Maybe later — I'll stay on free</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showUpsellPopup(cat){
+  if(purchases.includes(cat)||purchases.includes('unemployed')) return;
+  var prices={'student':'₹399','business':'₹999','unemployed':'₹2,499'};
+  var labels={'student':'AI for Students','business':'AI for Business','unemployed':'Elite — All 3 Courses'};
+  var el=document.getElementById('upsellOverlay');
+  var btn=document.getElementById('upsellCtaBtn');
+  if(!el) return;
+  if(btn){
+    btn.onclick=function(){ closeUpsell(true,cat); };
+  }
+  el.classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeUpsell(goToPay, cat){
+  var el=document.getElementById('upsellOverlay');
+  if(el){ el.classList.remove('show'); document.body.style.overflow=''; }
+  if(goToPay && cat){ curCat=cat; openPayModal(); }
+}
+</script>
+
 <!-- ══ GOLD CERTIFICATE OVERLAY ══ -->
 <style>
 #certOverlay{
@@ -6170,289 +6265,6 @@ function toggleSbMod(mi){
   }, { threshold: 0.5 });
   document.querySelectorAll('.h-stat-n').forEach(function(el){ statsObs.observe(el); });
 })();
-</script>
-<!-- ══ FEEDBACK MODAL ══ -->
-<style>
-#feedbackOverlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,0.65);z-index:9999;
-  align-items:center;justify-content:center;padding:16px;
-  backdrop-filter:blur(4px);
-}
-#feedbackOverlay.show{display:flex;}
-.fb-modal{
-  background:#1a1a1a;border:1px solid #2a2a2a;border-radius:18px;
-  width:100%;max-width:520px;max-height:92vh;overflow-y:auto;
-  position:relative;animation:fbSlideUp .28s ease;
-}
-@keyframes fbSlideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-.fb-header{display:flex;align-items:center;gap:12px;padding:24px 24px 0;}
-.fb-icon-box{
-  width:38px;height:38px;border-radius:9px;
-  background:#252525;border:1px solid #333;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.fb-header h2{color:#fff;font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;letter-spacing:-.3px;}
-.fb-header p{font-size:.72rem;color:#666;margin-top:2px;}
-.fb-close{
-  position:absolute;top:16px;right:16px;
-  width:30px;height:30px;border-radius:50%;
-  background:#252525;border:1px solid #333;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;color:#777;font-size:.85rem;transition:all .2s;
-}
-.fb-close:hover{background:#333;color:#fff;}
-.fb-body{padding:20px 24px 24px;}
-.fb-label{
-  font-size:.65rem;font-weight:700;letter-spacing:1.5px;
-  color:#666;text-transform:uppercase;margin-bottom:8px;
-  display:flex;align-items:center;gap:4px;
-}
-.fb-label .req{color:#e05a5a;}
-.fb-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;}
-.fb-type-btn{
-  background:#111;border:1px solid #2e2e2e;border-radius:10px;
-  padding:12px 6px;display:flex;flex-direction:column;
-  align-items:center;gap:6px;cursor:pointer;transition:all .2s;
-  color:#666;font-size:.68rem;font-weight:600;font-family:'Syne',sans-serif;
-}
-.fb-type-btn:hover{border-color:#555;color:#ccc;}
-.fb-type-btn.active{border-color:#dc143c;color:#fff;background:#1f1518;}
-.fb-type-btn svg{width:20px;height:20px;}
-.fb-input{
-  width:100%;background:#111;border:1px solid #2e2e2e;
-  border-radius:8px;padding:10px 13px;color:#ddd;font-size:.82rem;
-  outline:none;transition:border-color .2s;font-family:'DM Sans',sans-serif;
-  box-sizing:border-box;
-}
-.fb-input::placeholder{color:#444;}
-.fb-input:focus{border-color:#555;}
-.fb-textarea{resize:none;height:110px;line-height:1.6;}
-.fb-char-row{display:flex;justify-content:flex-end;margin-bottom:4px;}
-.fb-char{font-size:.62rem;color:#444;}
-.fb-stars-row{display:flex;gap:6px;margin-top:8px;margin-bottom:20px;}
-.fb-star{width:28px;height:28px;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;}
-.fb-star svg{width:24px;height:24px;transition:transform .15s;}
-.fb-star:hover svg{transform:scale(1.18);}
-.fb-star.filled svg path{fill:#FFD700;stroke:#FFD700;}
-.fb-star.filled svg{filter:drop-shadow(0 0 3px rgba(255,215,0,0.55));}
-.fb-spark-c{position:absolute;pointer-events:none;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;}
-.fb-spark{position:absolute;border-radius:50%;opacity:0;}
-@keyframes fbSparkFly{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0;}}
-.fb-send-row{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:8px;}
-.fb-send-btn{
-  display:flex;align-items:center;gap:7px;
-  background:#dc143c;color:#fff;border:none;
-  padding:10px 22px;border-radius:8px;
-  font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;
-  cursor:pointer;transition:all .2s;
-}
-.fb-send-btn:hover{background:#ff2952;transform:translateY(-1px);}
-.fb-send-btn svg{width:14px;height:14px;}
-.fb-success{
-  display:none;text-align:center;padding:40px 24px;
-}
-.fb-success.show{display:block;}
-.fb-success-icon{font-size:2.5rem;margin-bottom:12px;}
-.fb-success-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#fff;margin-bottom:6px;}
-.fb-success-msg{font-size:.78rem;color:#666;line-height:1.6;}
-@media(max-width:500px){
-  .fb-type-grid{grid-template-columns:repeat(2,1fr);}
-  .fb-modal{border-radius:14px;}
-}
-</style>
-
-<div id="feedbackOverlay" onclick="if(event.target===this)closeFeedbackModal()">
-  <div class="fb-modal">
-    <div class="fb-close" onclick="closeFeedbackModal()">✕</div>
-
-    <!-- Header -->
-    <div class="fb-header">
-      <div class="fb-icon-box">
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="#888" stroke-width="1.5">
-          <path d="M3 4h14a1 1 0 011 1v8a1 1 0 01-1 1H6l-4 3V5a1 1 0 011-1z"/>
-        </svg>
-      </div>
-      <div>
-        <h2>Feedback</h2>
-        <p>Help us make AI Katrukko better for you.</p>
-      </div>
-    </div>
-
-    <!-- Form body -->
-    <div class="fb-body" id="fbFormBody">
-
-      <!-- Type -->
-      <div class="fb-label">Type <span class="req">*</span></div>
-      <div class="fb-type-grid" id="fbTypeGrid">
-        <button class="fb-type-btn" data-type="Bug Report" onclick="fbSelectType(this)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="9" cy="9" r="2"/><circle cx="15" cy="9" r="2"/>
-            <path d="M4 7c0-1 1-3 8-3s8 2 8 3M4 17c0 1 1 3 8 3s8-2 8-3M4 7v10M20 7v10M7 5V3M17 5V3M7 19v2M17 19v2"/>
-          </svg>
-          Bug
-        </button>
-        <button class="fb-type-btn" data-type="Feature Request" onclick="fbSelectType(this)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M12 2l2.9 6.3 6.8.6-5 4.7 1.5 6.7L12 17.3l-6.2 3 1.5-6.7-5-4.7 6.8-.6z"/>
-          </svg>
-          Feature
-        </button>
-        <button class="fb-type-btn" data-type="Improvement" onclick="fbSelectType(this)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-          </svg>
-          Improve
-        </button>
-        <button class="fb-type-btn" data-type="Other" onclick="fbSelectType(this)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>
-          </svg>
-          Other
-        </button>
-      </div>
-
-      <!-- Subject -->
-      <div class="fb-label" style="margin-bottom:8px;">Subject <span class="req">*</span></div>
-      <input class="fb-input" id="fbSubject" type="text" placeholder="Brief summary of your feedback" style="margin-bottom:16px;">
-
-      <!-- Message -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div class="fb-label" style="margin-bottom:0;">Message <span class="req">*</span></div>
-        <span class="fb-char" id="fbCharCount">0 / 2000</span>
-      </div>
-      <textarea class="fb-input fb-textarea" id="fbMessage" placeholder="Describe your feedback..." oninput="fbUpdateCount()"></textarea>
-
-      <!-- Rating -->
-      <div class="fb-label" style="margin-top:16px;margin-bottom:0;text-transform:none;letter-spacing:.5px;font-size:.65rem;">How are you finding AI Katrukko? <span style="color:#444;font-weight:400;">(optional)</span></div>
-      <div class="fb-stars-row" id="fbStarsRow">
-        <div class="fb-star" data-i="1" onmouseenter="fbHoverStar(1)" onmouseleave="fbUnhover()" onclick="fbClickStar(1)"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.8.6-5 4.7 1.5 6.7L12 17.3l-6.2 3 1.5-6.7-5-4.7 6.8-.6z" fill="none" stroke="#333" stroke-width="1.5"/></svg><div class="fb-spark-c" id="fbspark1"></div></div>
-        <div class="fb-star" data-i="2" onmouseenter="fbHoverStar(2)" onmouseleave="fbUnhover()" onclick="fbClickStar(2)"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.8.6-5 4.7 1.5 6.7L12 17.3l-6.2 3 1.5-6.7-5-4.7 6.8-.6z" fill="none" stroke="#333" stroke-width="1.5"/></svg><div class="fb-spark-c" id="fbspark2"></div></div>
-        <div class="fb-star" data-i="3" onmouseenter="fbHoverStar(3)" onmouseleave="fbUnhover()" onclick="fbClickStar(3)"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.8.6-5 4.7 1.5 6.7L12 17.3l-6.2 3 1.5-6.7-5-4.7 6.8-.6z" fill="none" stroke="#333" stroke-width="1.5"/></svg><div class="fb-spark-c" id="fbspark3"></div></div>
-        <div class="fb-star" data-i="4" onmouseenter="fbHoverStar(4)" onmouseleave="fbUnhover()" onclick="fbClickStar(4)"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.8.6-5 4.7 1.5 6.7L12 17.3l-6.2 3 1.5-6.7-5-4.7 6.8-.6z" fill="none" stroke="#333" stroke-width="1.5"/></svg><div class="fb-spark-c" id="fbspark4"></div></div>
-        <div class="fb-star" data-i="5" onmouseenter="fbHoverStar(5)" onmouseleave="fbUnhover()" onclick="fbClickStar(5)"><svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.8.6-5 4.7 1.5 6.7L12 17.3l-6.2 3 1.5-6.7-5-4.7 6.8-.6z" fill="none" stroke="#333" stroke-width="1.5"/></svg><div class="fb-spark-c" id="fbspark5"></div></div>
-      </div>
-
-      <!-- Send -->
-      <div class="fb-send-row">
-        <span style="font-size:.65rem;color:#444;">Sent privately to Pooja</span>
-        <button class="fb-send-btn" onclick="fbSend()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          Send Feedback
-        </button>
-      </div>
-    </div>
-
-    <!-- Success state -->
-    <div class="fb-success" id="fbSuccess">
-      <div class="fb-success-icon">✅</div>
-      <div class="fb-success-title">Feedback sent!</div>
-      <div class="fb-success-msg">Thank you — Pooja will read this personally.<br>Response within 1–2 days.</div>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ── Feedback Modal ── */
-var _fbType = '';
-var _fbRating = 0;
-var _fbHover = 0;
-
-function openFeedbackModal(){
-  var el = document.getElementById('feedbackOverlay');
-  if(el){ el.classList.add('show'); document.body.style.overflow='hidden'; }
-  document.getElementById('fbFormBody').style.display='block';
-  document.getElementById('fbSuccess').classList.remove('show');
-  /* reset */
-  _fbType=''; _fbRating=0; _fbHover=0;
-  document.querySelectorAll('.fb-type-btn').forEach(function(b){ b.classList.remove('active'); });
-  document.getElementById('fbSubject').value='';
-  document.getElementById('fbMessage').value='';
-  document.getElementById('fbCharCount').textContent='0 / 2000';
-  fbRenderStars(0);
-}
-function closeFeedbackModal(){
-  var el = document.getElementById('feedbackOverlay');
-  if(el){ el.classList.remove('show'); document.body.style.overflow=''; }
-}
-function fbSelectType(btn){
-  document.querySelectorAll('.fb-type-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  _fbType = btn.getAttribute('data-type');
-}
-function fbUpdateCount(){
-  var v = document.getElementById('fbMessage').value.length;
-  document.getElementById('fbCharCount').textContent = v + ' / 2000';
-}
-function fbRenderStars(n){
-  document.querySelectorAll('.fb-star').forEach(function(s){
-    var i = parseInt(s.getAttribute('data-i'));
-    var path = s.querySelector('path');
-    if(i <= n){
-      s.classList.add('filled');
-      path.setAttribute('fill','#FFD700');
-      path.setAttribute('stroke','#FFD700');
-    } else {
-      s.classList.remove('filled');
-      path.setAttribute('fill','none');
-      path.setAttribute('stroke','#333');
-    }
-  });
-}
-function fbHoverStar(n){ _fbHover=n; fbRenderStars(n); }
-function fbUnhover(){ _fbHover=0; fbRenderStars(_fbRating); }
-function fbSpawnSparks(n){
-  var c = document.getElementById('fbspark'+n);
-  c.innerHTML='';
-  var cols=['#FFD700','#FFF176','#FFAB00','#fff','#FFE066'];
-  for(var i=0;i<10;i++){
-    var el=document.createElement('div');
-    el.className='fb-spark';
-    var angle=(i/10)*360;
-    var dist=16+Math.random()*12;
-    var tx=Math.cos(angle*Math.PI/180)*dist;
-    var ty=Math.sin(angle*Math.PI/180)*dist;
-    el.style.cssText='--tx:'+tx+'px;--ty:'+ty+'px;background:'+cols[i%cols.length]+';width:'+(3+Math.random()*3)+'px;height:'+(3+Math.random()*3)+'px;animation:fbSparkFly '+(0.35+Math.random()*0.2)+'s ease-out forwards;animation-delay:'+(Math.random()*0.05)+'s;';
-    c.appendChild(el);
-  }
-  setTimeout(function(){ c.innerHTML=''; }, 700);
-}
-function fbClickStar(n){
-  _fbRating=n;
-  fbRenderStars(n);
-  for(var i=1;i<=n;i++){
-    (function(idx){ setTimeout(function(){ fbSpawnSparks(idx); }, idx*65); })(i);
-  }
-}
-
-function fbSend(){
-  var subject = document.getElementById('fbSubject').value.trim();
-  var message = document.getElementById('fbMessage').value.trim();
-
-  if(!_fbType){ toast('Please select a feedback type','info'); return; }
-  if(!subject){ toast('Please enter a subject','info'); return; }
-  if(!message){ toast('Please enter a message','info'); return; }
-
-  var stars = _fbRating > 0 ? '\n\nRating: ' + _fbRating + '/5 stars' : '';
-  var userName = (window.user && window.user.name) ? window.user.name : 'Anonymous';
-  var userEmail = (window.user && window.user.email) ? window.user.email : 'Not logged in';
-
-  var emailSubject = encodeURIComponent('[AI Katrukko Feedback] ' + _fbType + ': ' + subject);
-  var emailBody = encodeURIComponent(
-    'Type: ' + _fbType +
-    '\nFrom: ' + userName + ' (' + userEmail + ')' +
-    stars +
-    '\n\n--- Message ---\n' + message
-  );
-
-  var mailtoLink = 'mailto:poojagunasekaran.ux@gmail.com?subject=' + emailSubject + '&body=' + emailBody;
-  window.open(mailtoLink);
-
-  /* Show success state */
-  document.getElementById('fbFormBody').style.display='none';
-  document.getElementById('fbSuccess').classList.add('show');
-  setTimeout(function(){ closeFeedbackModal(); }, 3200);
-}
 </script>
 </body>
 </html>
