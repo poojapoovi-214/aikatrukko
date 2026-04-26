@@ -1508,50 +1508,57 @@ footer{
 .aim-new::before{content:'NEW';position:absolute;top:9px;right:10px;background:var(--aqua);color:#fff;font-size:.5rem;font-weight:800;padding:2px 6px;border-radius:100px;}
 
 /* ══ FEEDBACK OVERLAY ══ */
-.fb-type-btn{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:11px 6px;cursor:pointer;transition:all .2s;text-align:center;width:100%;}
-.fb-type-btn:hover{border-color:#dc143c;background:rgba(220,20,60,0.04);}
-.fb-type-btn.selected{border-color:#dc143c;background:rgba(220,20,60,0.07);box-shadow:0 0 0 3px rgba(220,20,60,0.1);}
+.fb-type-btn{background:rgba(255,255,255,0.30);border:1.5px solid rgba(255,255,255,0.45);border-radius:10px;padding:11px 6px;cursor:pointer;transition:all .2s;text-align:center;width:100%;backdrop-filter:blur(8px);}
+.fb-type-btn:hover{border-color:#dc143c;background:rgba(220,20,60,0.08);}
+.fb-type-btn.selected{border-color:#dc143c;background:rgba(220,20,60,0.12);box-shadow:0 0 0 3px rgba(220,20,60,0.1);}
 .fb-type-btn.selected .fb-type-label{color:#dc143c;}
 .fb-type-gif-box{width:34px;height:34px;border-radius:9px;margin:0 auto 6px;overflow:hidden;}
 .fb-type-label{font-size:.65rem;font-weight:700;color:#4a5568;}
 .fb-star{background:none;border:none;font-size:1.6rem;color:#cbd5e1;cursor:pointer;transition:color .15s;padding:2px;}
 .fb-star.hovered,.fb-star.active{color:#f59e0b;}
-.fb-sidebar-item{display:flex;align-items:flex-start;gap:10px;padding:10px;background:#fff;border-radius:10px;border:1.5px solid #e2e8f0;cursor:pointer;transition:all .2s;}
+.fb-sidebar-item{display:flex;align-items:flex-start;gap:10px;padding:10px;background:rgba(255,255,255,0.25);border-radius:10px;border:1.5px solid rgba(255,255,255,0.40);cursor:pointer;transition:all .2s;backdrop-filter:blur(8px);}
 
 /* ══ FEEDBACK MODAL — Responsive ══ */
 .fb-modal{
-  background:#fff;border-radius:20px 20px 0 0;
+  background:rgba(255,255,255,0.50);
+  backdrop-filter:blur(40px) saturate(180%);
+  -webkit-backdrop-filter:blur(40px) saturate(180%);
+  border:1.5px solid rgba(255,255,255,0.60);
+  border-radius:20px 20px 0 0;
   width:100%;max-width:100%;
   max-height:95vh;overflow-y:auto;
   animation:slideUp .28s ease;
   display:flex;flex-direction:column;
+  box-shadow:0 -8px 60px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8);
 }
 .fb-modal-hdr{
   padding:18px 20px 16px;
   display:flex;align-items:center;justify-content:space-between;
-  border-bottom:1px solid #e2e8f0;
-  position:sticky;top:0;background:#fff;z-index:2;
+  border-bottom:1px solid rgba(255,255,255,0.25);
+  position:sticky;top:0;background:rgba(255,255,255,0.20);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);z-index:2;
 }
 .fb-hdr-gifbox{
   width:48px;height:48px;border-radius:12px;
-  background:#f1f5f9;border:1px solid #e2e8f0;
+  background:rgba(255,255,255,0.30);border:1px solid rgba(255,255,255,0.40);
   display:flex;align-items:center;justify-content:center;
   font-size:1.4rem;overflow:hidden;flex-shrink:0;
 }
 .fb-close-btn{
   width:30px;height:30px;border-radius:8px;
-  background:#f1f5f9;border:1px solid #e2e8f0;
-  color:#4a5568;font-size:.9rem;cursor:pointer;
+  background:rgba(255,255,255,0.25);border:1px solid rgba(255,255,255,0.35);
+  color:#1a202c;font-size:.9rem;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
+  flex-shrink:0;transition:background .2s;
 }
-.fb-modal-body{display:flex;flex-direction:column;}
-.fb-form-col{padding:18px 20px;}
+.fb-close-btn:hover{background:rgba(255,255,255,0.45);}
+.fb-modal-body{display:flex;flex-direction:column;background:transparent;}
+.fb-form-col{padding:18px 20px;background:transparent;}
 .fb-sidebar-col{display:none;}
 .fb-field-group{margin-bottom:16px;}
-.fb-label{font-family:'Syne',sans-serif;font-weight:700;font-size:.63rem;color:#4a5568;letter-spacing:.8px;margin-bottom:7px;}
+.fb-label{font-family:'Syne',sans-serif;font-weight:700;font-size:.63rem;color:#2d3748;letter-spacing:.8px;margin-bottom:7px;}
 .fb-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
-.fb-input{width:100%;padding:10px 13px;border-radius:9px;background:#f8fafc;border:1.5px solid #e2e8f0;color:#1a202c;font-family:'DM Sans',sans-serif;font-size:.83rem;transition:border-color .2s;box-sizing:border-box;}
+.fb-input{width:100%;padding:10px 13px;border-radius:9px;background:rgba(255,255,255,0.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,0.50);color:#1a202c;font-family:'DM Sans',sans-serif;font-size:.83rem;transition:border-color .2s,background .2s;box-sizing:border-box;}
+.fb-input:focus{background:rgba(255,255,255,0.55);border-color:rgba(220,20,60,0.6);}
 .fb-textarea{resize:vertical;line-height:1.6;min-height:90px;}
 .fb-submit-btn{display:flex;align-items:center;gap:7px;padding:10px 22px;border-radius:9px;background:#dc143c;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;border:none;cursor:pointer;transition:all .2s;}
 
@@ -1559,17 +1566,18 @@ footer{
 .fb-gif-banner{
   display:none;
   width:100%;
-  background:linear-gradient(135deg,#fafafa,#f1f5f9);
-  border-bottom:1px solid #e2e8f0;
+  background:rgba(255,255,255,0.15);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,0.25);
   align-items:center;justify-content:center;
-  padding:20px 0 16px;
+  padding:28px 0 22px;
   flex-direction:column;
   gap:10px;
   transition:all .3s;
 }
 .fb-gif-banner.show{display:flex;}
 .fb-gif-banner img{
-  width:140px;height:140px;
+  width:196px;height:196px;
   object-fit:contain;
   border-radius:20px;
   box-shadow:0 8px 32px rgba(0,0,0,0.12);
@@ -1595,16 +1603,16 @@ footer{
     max-height:90vh;
     align-self:center;
   }
-  .fb-gif-banner img{width:160px;height:160px;}
+  .fb-gif-banner img{width:224px;height:224px;}
   .fb-modal-body{flex-direction:row;}
-  .fb-form-col{flex:1;padding:20px 22px;border-right:1px solid #e2e8f0;}
-  .fb-sidebar-col{display:block;width:240px;padding:20px 18px;background:#f8fafc;border-radius:0 0 20px 0;flex-shrink:0;}
+  .fb-form-col{flex:1;padding:20px 22px;border-right:1px solid rgba(255,255,255,0.25);}
+  .fb-sidebar-col{display:block;width:240px;padding:20px 18px;background:rgba(255,255,255,0.18);border-radius:0 0 20px 0;flex-shrink:0;}
 }
 
 /* Desktop: 900px+ → wider */
 @media(min-width:900px){
   .fb-modal{max-width:860px;}
-  .fb-gif-banner img{width:180px;height:180px;}
+  .fb-gif-banner img{width:252px;height:252px;}
   .fb-sidebar-col{width:260px;}
   .fb-form-col{padding:22px 26px;}
   .fb-sidebar-col{padding:22px 20px;}
@@ -2489,18 +2497,7 @@ footer{
           <button id="profCertBtn" onclick="const tier=this.getAttribute('data-tier')||'elite';closeOv('profileOverlay');showCertificate(tier);" style="background:#FFD700;color:#0f0c29;border:none;border-radius:8px;padding:11px 28px;font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;display:none;">View &amp; Download Certificate →</button>
         </div>
       </div>
-      <!-- ── Feedback Button (replaces Live AI Prompt) ── -->
-      <div class="prof-section" id="profFeedbackSection">
-        <div class="prof-sec-title">💬 Share Your Feedback</div>
-        <div style="background:linear-gradient(135deg,rgba(220,20,60,0.06),rgba(220,20,60,0.01));border:1px solid rgba(220,20,60,0.18);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;">
-          <div style="width:42px;height:42px;border-radius:11px;background:var(--aqua-dim);border:1px solid rgba(220,20,60,0.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">💬</div>
-          <div style="flex:1;">
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--white);margin-bottom:2px;">Help us improve Kanakkupaaru</div>
-            <div style="font-size:.68rem;color:var(--gray2);line-height:1.4;">Your feedback matters to us!</div>
-          </div>
-          <button onclick="closeOv('profileOverlay');openFeedbackOverlay();" style="padding:9px 16px;border-radius:8px;background:var(--aqua);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;border:none;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0;" onmouseover="this.style.background='var(--aqua3)'" onmouseout="this.style.background='var(--aqua)'">Give Feedback →</button>
-        </div>
-      </div>
+
 
       <div class="prof-section">
         <div class="prof-sec-title">⚡ Latest AI Modules — Auto Updated</div>
@@ -2538,7 +2535,7 @@ footer{
 </div>
 
 <!-- ══ FEEDBACK OVERLAY ══ -->
-<div class="overlay" id="feedbackOverlay" style="display:none;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);align-items:flex-end;justify-content:center;">
+<div class="overlay" id="feedbackOverlay" style="display:none;background:rgba(0,0,0,0.25);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);align-items:flex-end;justify-content:center;">
   <div class="fb-modal">
 
     <!-- ── HEADER ── -->
@@ -2550,7 +2547,7 @@ footer{
         </div>
         <div>
           <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#1a202c;letter-spacing:-0.2px;">FEEDBACK</div>
-          <div id="fbHeaderSub" style="font-size:.72rem;color:#718096;margin-top:1px;">Help us make Kanakkupaaru better for you.</div>
+          <div id="fbHeaderSub" style="font-size:.72rem;color:#718096;margin-top:1px;">Help us make AI Katrukko better for you.</div>
         </div>
       </div>
       <button onclick="closeFeedbackOverlay()" class="fb-close-btn">✕</button>
@@ -2574,25 +2571,25 @@ footer{
           <div class="fb-type-grid">
             <button class="fb-type-btn" data-type="bug" onclick="selectFbType('bug',this)">
               <div class="fb-type-gif-box" style="background:#fef2f2;">
-                <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_bug.gif" alt="bug" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+                <img src="gifs/courage_bug.gif" alt="bug" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
               </div>
               <div class="fb-type-label">Bug Report</div>
             </button>
             <button class="fb-type-btn" data-type="feature" onclick="selectFbType('feature',this)">
               <div class="fb-type-gif-box" style="background:#f0fdf4;">
-                <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_feature.gif" alt="feature" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+                <img src="gifs/courage_feature.gif" alt="feature" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
               </div>
               <div class="fb-type-label">Feature Request</div>
             </button>
             <button class="fb-type-btn" data-type="improvement" onclick="selectFbType('improvement',this)">
               <div class="fb-type-gif-box" style="background:#fffbeb;">
-                <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_improve.gif" alt="improve" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+                <img src="gifs/courage_improve.gif" alt="improve" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
               </div>
               <div class="fb-type-label">Improvement</div>
             </button>
             <button class="fb-type-btn" data-type="other" onclick="selectFbType('other',this)">
               <div class="fb-type-gif-box" style="background:#f5f3ff;">
-                <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_other.gif" alt="other" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
+                <img src="gifs/courage_other.gif" alt="other" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">
               </div>
               <div class="fb-type-label">Other</div>
             </button>
@@ -2616,7 +2613,7 @@ footer{
 
         <!-- RATING -->
         <div class="fb-field-group">
-          <div class="fb-label">HOW ARE YOU FINDING KANAKKUPAARU? <span style="font-weight:400;color:#94a3b8;font-size:.6rem;">(OPTIONAL)</span></div>
+          <div class="fb-label">HOW ARE YOU FINDING AI KATRUKKO? <span style="font-weight:400;color:#94a3b8;font-size:.6rem;">(OPTIONAL)</span></div>
           <div style="display:flex;gap:4px;">
             <button class="fb-star" data-v="1" onclick="setFbStar(1)" onmouseenter="hoverFbStar(1)" onmouseleave="unhoverFbStar()">★</button>
             <button class="fb-star" data-v="2" onclick="setFbStar(2)" onmouseenter="hoverFbStar(2)" onmouseleave="unhoverFbStar()">★</button>
@@ -2635,8 +2632,8 @@ footer{
         </div>
 
         <!-- Success -->
-        <div id="fbSuccess" style="display:none;margin-top:14px;padding:13px 16px;background:#f0fdf4;border:1px solid #86efac;border-radius:10px;align-items:center;gap:12px;">
-          <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_payment.gif" alt="" style="height:48px;border-radius:8px;flex-shrink:0;">
+        <div id="fbSuccess" style="display:none;margin-top:14px;padding:13px 16px;background:rgba(240,253,244,0.55);backdrop-filter:blur(12px);border:1px solid rgba(134,239,172,0.6);border-radius:10px;align-items:center;gap:12px;">
+          <img src="gifs/courage_payment.gif" alt="" style="height:48px;border-radius:8px;flex-shrink:0;">
           <div>
             <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:#166534;">🎉 Feedback sent! Thank you!</div>
             <div style="font-size:.68rem;color:#16a34a;margin-top:2px;">We read every message. Response: 1–2 days.</div>
@@ -2650,23 +2647,23 @@ footer{
         <div class="fb-label" style="margin-bottom:13px;">WHAT TO SHARE</div>
         <div style="display:flex;flex-direction:column;gap:9px;">
           <div class="fb-sidebar-item" onclick="selectFbType('bug',document.querySelector('[data-type=bug]'))" onmouseover="this.style.borderColor='#dc143c'" onmouseout="this.style.borderColor='#e2e8f0'">
-            <div style="width:32px;height:32px;border-radius:8px;background:#fef2f2;overflow:hidden;flex-shrink:0;"><img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_bug.gif" style="width:100%;height:100%;object-fit:cover;"></div>
+            <div style="width:32px;height:32px;border-radius:8px;background:#fef2f2;overflow:hidden;flex-shrink:0;"><img src="gifs/courage_bug.gif" style="width:100%;height:100%;object-fit:cover;"></div>
             <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;color:#1a202c;">Bug Report</div><div style="font-size:.64rem;color:#718096;margin-top:1px;">Something broken or unexpected</div></div>
           </div>
           <div class="fb-sidebar-item" onclick="selectFbType('feature',document.querySelector('[data-type=feature]'))" onmouseover="this.style.borderColor='#dc143c'" onmouseout="this.style.borderColor='#e2e8f0'">
-            <div style="width:32px;height:32px;border-radius:8px;background:#f0fdf4;overflow:hidden;flex-shrink:0;"><img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_feature.gif" style="width:100%;height:100%;object-fit:cover;"></div>
+            <div style="width:32px;height:32px;border-radius:8px;background:#f0fdf4;overflow:hidden;flex-shrink:0;"><img src="gifs/courage_feature.gif" style="width:100%;height:100%;object-fit:cover;"></div>
             <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;color:#1a202c;">Feature Request</div><div style="font-size:.64rem;color:#718096;margin-top:1px;">Something you wish existed</div></div>
           </div>
           <div class="fb-sidebar-item" onclick="selectFbType('improvement',document.querySelector('[data-type=improvement]'))" onmouseover="this.style.borderColor='#dc143c'" onmouseout="this.style.borderColor='#e2e8f0'">
-            <div style="width:32px;height:32px;border-radius:8px;background:#fffbeb;overflow:hidden;flex-shrink:0;"><img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_improve.gif" style="width:100%;height:100%;object-fit:cover;"></div>
+            <div style="width:32px;height:32px;border-radius:8px;background:#fffbeb;overflow:hidden;flex-shrink:0;"><img src="gifs/courage_improve.gif" style="width:100%;height:100%;object-fit:cover;"></div>
             <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;color:#1a202c;">Improvement</div><div style="font-size:.64rem;color:#718096;margin-top:1px;">Something that could be better</div></div>
           </div>
           <div class="fb-sidebar-item" onclick="selectFbType('other',document.querySelector('[data-type=other]'))" onmouseover="this.style.borderColor='#dc143c'" onmouseout="this.style.borderColor='#e2e8f0'">
-            <div style="width:32px;height:32px;border-radius:8px;background:#f5f3ff;overflow:hidden;flex-shrink:0;"><img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_other.gif" style="width:100%;height:100%;object-fit:cover;"></div>
+            <div style="width:32px;height:32px;border-radius:8px;background:#f5f3ff;overflow:hidden;flex-shrink:0;"><img src="gifs/courage_other.gif" style="width:100%;height:100%;object-fit:cover;"></div>
             <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;color:#1a202c;">Other</div><div style="font-size:.64rem;color:#718096;margin-top:1px;">Anything else on your mind</div></div>
           </div>
         </div>
-        <div style="margin-top:14px;padding:11px 13px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">
+        <div style="margin-top:14px;padding:11px 13px;background:rgba(255,255,255,0.25);border-radius:10px;border:1px solid rgba(255,255,255,0.40);backdrop-filter:blur(8px);">
           <div style="font-size:.65rem;color:#94a3b8;line-height:1.6;">We read every piece of feedback. Response time: usually 1–2 days.</div>
         </div>
       </div>
@@ -5167,7 +5164,6 @@ function openProfile(){
   renderProfileContent();
   renderNewModuleFeed();
   setTimeout(restoreProfileStar, 150);
-  setTimeout(checkTrialForFeedbackBtn, 200);
 }
 
 function renderProfileContent(){
@@ -6473,13 +6469,13 @@ var _fbStarVal = 0;
 
 /* GIF map for each feedback type & state */
 var FB_GIFS = {
-  bug:         'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_bug.gif',
-  feature:     'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_feature.gif',
-  improvement: 'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_improve.gif',
-  other:       'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_other.gif',
-  typing:      'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_typing.gif',
-  waiting:     'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_waiting.gif',
-  payment:     'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_payment.gif'
+  bug:         'gifs/courage_bug.gif',
+  feature:     'gifs/courage_feature.gif',
+  improvement: 'gifs/courage_improve.gif',
+  other:       'gifs/courage_other.gif',
+  typing:      'gifs/courage_typing.gif',
+  waiting:     'gifs/courage_waiting.gif',
+  payment:     'gifs/courage_payment.gif'
 };
 
 function openFeedbackOverlay(){
@@ -6506,7 +6502,7 @@ function openFeedbackOverlay(){
   if(gifImg){ gifImg.style.display = 'none'; gifImg.src = ''; }
   if(emoji){ emoji.style.display = 'block'; }
   if(gifBox){ gifBox.style.background='#f1f5f9'; gifBox.style.border='1px solid #e2e8f0'; gifBox.style.borderRadius='14px'; }
-  if(headerSub) headerSub.textContent = 'Help us make Kanakkupaaru better for you.';
+  if(headerSub) headerSub.textContent = 'Help us make AI Katrukko better for you.';
   /* Reset big banner */
   var banner = document.getElementById('fbGifBanner');
   var bigGif = document.getElementById('fbBigGif');
@@ -6673,40 +6669,6 @@ function submitFeedback(){
   }, 1200);
 }
 
-/* ══ TRIAL CHECK — show feedback button after 14 days ══ */
-function checkTrialForFeedbackBtn(){
-  var trialStart = localStorage.getItem('ak_trial_start');
-  if(!trialStart) return;
-  var started = new Date(trialStart);
-  var daysElapsed = Math.floor((Date.now() - started) / 86400000);
-  var sec = document.getElementById('profFeedbackSection');
-  if(sec && daysElapsed >= 14){
-    sec.style.display = 'block';
-  }
-}
-
-/* Hook into profile open */
-var _origOpenProfile = window.openProfile || null;
-document.addEventListener('DOMContentLoaded', function(){
-  /* Patch profile open to also check trial */
-  var profOverlay = document.getElementById('profileOverlay');
-  if(profOverlay){
-    var observer = new MutationObserver(function(muts){
-      muts.forEach(function(m){
-        if(m.type === 'attributes' && m.attributeName === 'style'){
-          var el = m.target;
-          if(el.style.display !== 'none'){
-            checkTrialForFeedbackBtn();
-          }
-        }
-      });
-    });
-    observer.observe(profOverlay, { attributes: true, attributeFilter: ['style'] });
-  }
-  /* Also run immediately */
-  checkTrialForFeedbackBtn();
-});
-
 /* ── Restore saved star rating when profile opens ── */
 function restoreProfileStar(){
   try{
@@ -6813,5 +6775,65 @@ function restoreProfileStar(){
   document.querySelectorAll('.h-stat-n').forEach(function(el){ statsObs.observe(el); });
 })();
 </script>
+<!-- ══ FLOATING FEEDBACK BUTTON ══ -->
+<style>
+#floatFeedbackBtn{
+  position:fixed;
+  bottom:24px;
+  right:24px;
+  z-index:9000;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:11px 18px 11px 14px;
+  background:rgba(220,20,60,0.82);
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border:1px solid rgba(255,255,255,0.28);
+  border-radius:50px;
+  box-shadow:0 4px 24px rgba(220,20,60,0.30), 0 2px 8px rgba(0,0,0,0.10);
+  cursor:pointer;
+  font-family:'Syne',sans-serif;
+  font-weight:700;
+  font-size:.75rem;
+  color:#fff;
+  letter-spacing:.3px;
+  transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+  animation:floatIn .5s cubic-bezier(.22,1,.36,1) both;
+  animation-delay:.8s;
+  opacity:0;
+}
+#floatFeedbackBtn:hover{
+  transform:translateY(-3px) scale(1.04);
+  box-shadow:0 8px 32px rgba(220,20,60,0.40), 0 4px 12px rgba(0,0,0,0.14);
+  background:rgba(192,18,52,0.92);
+}
+#floatFeedbackBtn:active{
+  transform:scale(0.97);
+}
+#floatFeedbackBtn .ffb-icon{
+  font-size:1rem;
+  line-height:1;
+  flex-shrink:0;
+}
+@keyframes floatIn{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@media(max-width:480px){
+  #floatFeedbackBtn{
+    bottom:16px;
+    right:16px;
+    padding:10px 15px 10px 12px;
+    font-size:.7rem;
+  }
+}
+</style>
+
+<button id="floatFeedbackBtn" onclick="openFeedbackOverlay()" aria-label="Give Feedback">
+  <span class="ffb-icon">💬</span>
+  Feedback
+</button>
+
 </body>
 </html>
