@@ -1504,138 +1504,17 @@ footer{
 .prof-regen-btn:hover{background:var(--aqua);color:#fff;}
 .prof-copy-btn{padding:7px 14px;border-radius:7px;background:#f8fafc;border:1px solid var(--border2);color:var(--gray1);font-size:.68rem;font-weight:600;cursor:pointer;transition:all .2s;}
 .prof-copy-btn:hover{border-color:var(--aqua);color:var(--aqua);}
-
-/* ══ TRIAL EXPIRY BANNER IN PROFILE ══ */
-.prof-trial-banner{
-  display:none;
-  background:rgba(255,247,247,0.3);
-  backdrop-filter:blur(10px) saturate(140%);
-  -webkit-backdrop-filter:blur(10px) saturate(140%);
-  border:1.5px solid rgba(220,20,60,0.2);
-  border-radius:12px;
-  padding:16px 18px;
-  margin-bottom:18px;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 4px 16px rgba(220,20,60,0.06);
-}
-.prof-trial-banner::before{
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;height:3px;
-  background:linear-gradient(90deg,#dc143c,#ff2952);
-}
-.prof-trial-banner.expired{display:block;}
-.prof-trial-banner.active{display:block;}
-.ptb-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.ptb-icon{
-  width:36px;height:36px;border-radius:9px;
-  background:rgba(220,20,60,0.08);
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.1rem;flex-shrink:0;
-}
-.ptb-title{font-family:'Syne',sans-serif;font-weight:800;font-size:.85rem;color:#1a202c;}
-.ptb-sub{font-size:.68rem;color:#718096;margin-top:2px;line-height:1.5;}
-.ptb-progress-wrap{height:6px;background:#f0e8e8;border-radius:100px;overflow:hidden;margin-bottom:10px;}
-.ptb-progress-bar{height:100%;border-radius:100px;background:linear-gradient(90deg,#dc143c,#ff2952);transition:width .6s cubic-bezier(.22,1,.36,1);}
-.ptb-days-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.ptb-days-label{font-size:.65rem;color:#718096;}
-.ptb-days-count{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;color:#dc143c;}
-.ptb-upgrade-btn{
-  width:100%;padding:10px;border-radius:8px;
-  background:linear-gradient(135deg,#dc143c,#ff2952);
-  color:#fff;border:none;font-family:'Syne',sans-serif;
-  font-weight:800;font-size:.76rem;cursor:pointer;
-  transition:all .2s;letter-spacing:.2px;
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.ptb-upgrade-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(220,20,60,0.28);}
-.ptb-expired-icon{font-size:1.4rem;margin-bottom:4px;display:block;text-align:center;}
-
 .aim-card{background:#fff;border:1px solid var(--border);border-radius:11px;padding:13px;position:relative;margin-bottom:9px;}
-
-/* ══ PROFILE FEEDBACK FORM ══ */
-.pfb-wrap{
-  background:rgba(255,255,255,0.3);
-  backdrop-filter:blur(10px) saturate(140%);
-  -webkit-backdrop-filter:blur(10px) saturate(140%);
-  border:1px solid rgba(255,255,255,0.5);
-  border-radius:14px;padding:18px;
-  box-shadow:0 4px 20px rgba(220,20,60,0.06),0 1px 4px rgba(0,0,0,0.04);
-}
-.pfb-label{font-family:'Syne',sans-serif;font-weight:700;font-size:.66rem;color:#4a5568;letter-spacing:.6px;margin-bottom:8px;}
-.pfb-req{color:var(--aqua);}
-.pfb-type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
-@media(max-width:480px){.pfb-type-grid{grid-template-columns:repeat(2,1fr);}}
-.pfb-type-btn{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  padding:12px 8px;border-radius:10px;
-  border:1.5px solid rgba(255,255,255,0.55);
-  background:rgba(255,255,255,0.3);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
-  cursor:pointer;transition:all .18s;
-  font-family:'DM Sans',sans-serif;
-  box-shadow:0 2px 8px rgba(0,0,0,0.04);
-}
-.pfb-type-btn:hover{
-  border-color:rgba(220,20,60,0.35);
-  background:rgba(255,255,255,0.5);
-  box-shadow:0 4px 14px rgba(220,20,60,0.10);
-}
-.pfb-type-btn.active{
-  border-color:rgba(220,20,60,0.4);
-  background:rgba(255,240,242,0.55);
-  box-shadow:0 0 0 3px rgba(220,20,60,0.08),0 4px 14px rgba(220,20,60,0.10);
-}
-.pfb-type-ic{font-size:1.2rem;line-height:1;}
-.pfb-type-nm{font-size:.65rem;font-weight:600;color:#4a5568;text-align:center;}
-.pfb-type-btn.active .pfb-type-nm{color:var(--aqua);}
-.pfb-input{
-  width:100%;padding:10px 13px;border:1.5px solid rgba(203,213,225,0.7);border-radius:8px;
-  background:rgba(255,255,255,0.55);
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  color:#1a202c;font-family:'DM Sans',sans-serif;font-size:.82rem;
-  outline:none;transition:border-color .18s,background .18s;
-}
-.pfb-input:focus{border-color:var(--aqua);background:rgba(255,255,255,0.8);}
-.pfb-char-count{font-size:.62rem;color:#94a3b8;font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0;}
-.pfb-textarea{
-  width:100%;padding:10px 13px;border:1.5px solid rgba(203,213,225,0.7);border-radius:8px;
-  background:rgba(255,255,255,0.55);
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter:blur(6px);
-  color:#1a202c;font-family:'DM Sans',sans-serif;font-size:.82rem;
-  outline:none;resize:vertical;min-height:110px;line-height:1.6;
-  transition:border-color .18s,background .18s;margin-top:0;
-}
-.pfb-textarea:focus{border-color:var(--aqua);background:rgba(255,255,255,0.8);}
-.pfb-mini-stars{display:flex;gap:6px;margin-top:4px;}
-.pfb-mini-star{
-  background:none;border:none;cursor:pointer;font-size:1.4rem;
-  color:#d1d5db;transition:color .15s,transform .15s;padding:2px;line-height:1;
-}
-.pfb-mini-star.active,.pfb-mini-star.hovered{color:#f59e0b;}
-.pfb-mini-star:hover{transform:scale(1.2);}
-.pfb-footer{display:flex;justify-content:flex-end;margin-top:16px;}
-.pfb-send-btn{
-  display:flex;align-items:center;gap:7px;padding:10px 22px;
-  background:linear-gradient(135deg,#dc143c,#ff2952);color:#fff;
-  border:none;border-radius:8px;font-family:'Syne',sans-serif;
-  font-weight:800;font-size:.76rem;cursor:pointer;transition:all .2s;
-  letter-spacing:.2px;
-}
-.pfb-send-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(220,20,60,0.28);}
-.pfb-send-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
-.pfb-success{
-  margin-top:12px;padding:12px 14px;border-radius:8px;
-  background:rgba(240,253,244,0.7);
-  backdrop-filter:blur(6px);
-  border:1px solid rgba(187,247,208,0.8);
-  font-size:.75rem;color:#166534;line-height:1.6;
-}
 .aim-new::before{content:'NEW';position:absolute;top:9px;right:10px;background:var(--aqua);color:#fff;font-size:.5rem;font-weight:800;padding:2px 6px;border-radius:100px;}
+
+/* ══ FEEDBACK OVERLAY ══ */
+.fb-type-btn{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:13px 8px;cursor:pointer;transition:all .2s;text-align:center;width:100%;}
+.fb-type-btn:hover{border-color:#dc143c;background:rgba(220,20,60,0.04);}
+.fb-type-btn.selected{border-color:#dc143c;background:rgba(220,20,60,0.07);box-shadow:0 0 0 3px rgba(220,20,60,0.1);}
+.fb-type-btn.selected div{color:#dc143c !important;font-weight:700;}
+.fb-star{background:none;border:none;font-size:1.6rem;color:#cbd5e1;cursor:pointer;transition:color .15s;padding:2px;}
+.fb-star.hovered,.fb-star.active{color:#f59e0b;}
+.fb-sidebar-item{display:flex;align-items:flex-start;gap:10px;padding:11px;background:#fff;border-radius:10px;border:1.5px solid #e2e8f0;cursor:pointer;transition:all .2s;}
 
 /* ══ WEEKLY CONTENT WIDGET ══ */
 .weekly-widget{
@@ -2491,28 +2370,6 @@ footer{
       </div>
     </div>
     <div class="prof-body">
-
-      <!-- ── Trial Expiry Banner ── -->
-      <div class="prof-trial-banner" id="profTrialBanner">
-        <div class="ptb-top">
-          <div class="ptb-icon" id="ptbIcon">⏰</div>
-          <div>
-            <div class="ptb-title" id="ptbTitle">Free Trial</div>
-            <div class="ptb-sub" id="ptbSub">Your 14-day free trial is active</div>
-          </div>
-        </div>
-        <div class="ptb-days-row">
-          <span class="ptb-days-label" id="ptbDaysLabel">Days used</span>
-          <span class="ptb-days-count" id="ptbDaysCount">0 / 14 days</span>
-        </div>
-        <div class="ptb-progress-wrap">
-          <div class="ptb-progress-bar" id="ptbProgressBar" style="width:0%;"></div>
-        </div>
-        <button class="ptb-upgrade-btn" onclick="closeOv('profileOverlay');curCat='unemployed';openPayModal();">
-          ⚡ Upgrade to Full Access →
-        </button>
-      </div>
-
       <div class="prof-section">
         <div class="prof-sec-title">&#9998; Edit Details</div>
         <input class="prof-edit-field" id="profEditName" placeholder="Your name" />
@@ -2579,77 +2436,176 @@ footer{
         </div>
       </div>
 
-      <!-- ── Full Feedback Form ── -->
-      <div class="prof-section" id="profFeedbackSection">
-        <div class="prof-sec-title">💬 Send Feedback</div>
-
-        <!-- Courage GIF display -->
-        <div class="pfb-gif-wrap" id="pfbGifWrap">
-          <img class="pfb-gif" id="pfbGifImg" src="" alt="Courage" />
-          <div class="pfb-gif-label" id="pfbGifLabel"></div>
-        </div>
-
-        <div class="pfb-wrap">
-
-          <!-- Type selector -->
-          <div class="pfb-label">TYPE <span class="pfb-req">*</span></div>
-          <div class="pfb-type-grid" id="pfbTypeGrid">
-            <button class="pfb-type-btn active" data-type="bug" data-gif="bug" data-label="Something broken? Tell us!" onclick="selectFeedbackType(this)">
-              <span class="pfb-type-ic">🐞</span>
-              <span class="pfb-type-nm">Bug Report</span>
-            </button>
-            <button class="pfb-type-btn" data-type="feature" data-gif="feature" data-label="Got a wish? We're listening!" onclick="selectFeedbackType(this)">
-              <span class="pfb-type-ic">🎯</span>
-              <span class="pfb-type-nm">Feature Request</span>
-            </button>
-            <button class="pfb-type-btn" data-type="improvement" data-gif="improve" data-label="Make it better!" onclick="selectFeedbackType(this)">
-              <span class="pfb-type-ic">⚡</span>
-              <span class="pfb-type-nm">Improvement</span>
-            </button>
-            <button class="pfb-type-btn" data-type="other" data-gif="other" data-label="Anything on your mind!" onclick="selectFeedbackType(this)">
-              <span class="pfb-type-ic">💬</span>
-              <span class="pfb-type-nm">Other</span>
-            </button>
+      <!-- ── Feedback Button (visible after 14-day trial) ── -->
+      <div class="prof-section" id="profFeedbackSection" style="display:none;">
+        <div class="prof-sec-title">💬 Share Your Feedback</div>
+        <div style="background:linear-gradient(135deg,rgba(220,20,60,0.06),rgba(220,20,60,0.01));border:1px solid rgba(220,20,60,0.18);border-radius:14px;padding:18px;display:flex;align-items:center;gap:14px;">
+          <div style="width:46px;height:46px;border-radius:12px;background:var(--aqua-dim);border:1px solid rgba(220,20,60,0.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">💬</div>
+          <div style="flex:1;">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--white);margin-bottom:3px;">Help us improve Kanakkupaaru</div>
+            <div style="font-size:.7rem;color:var(--gray2);line-height:1.5;">You've been with us for 14+ days — your feedback matters!</div>
           </div>
-
-          <!-- Subject -->
-          <div class="pfb-label" style="margin-top:14px;">SUBJECT <span class="pfb-req">*</span></div>
-          <input class="pfb-input" id="pfbSubject" type="text" placeholder="Brief summary of your feedback" maxlength="120" />
-
-          <!-- Message -->
-          <div class="pfb-label" style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
-            <span>MESSAGE <span class="pfb-req">*</span></span>
-            <span class="pfb-char-count"><span id="pfbCharCount">0</span> / 2000</span>
-          </div>
-          <textarea class="pfb-textarea" id="pfbMessage" placeholder="Describe your feedback…" maxlength="2000" oninput="document.getElementById('pfbCharCount').textContent=this.value.length;onPfbTyping();"></textarea>
-
-          <!-- Star rating row (inline, light) -->
-          <div class="pfb-label" style="margin-top:14px;">HOW ARE YOU FINDING <span style="color:var(--aqua);font-weight:800;">KANAKKUPAARU</span>? <span style="color:var(--gray2);font-weight:400;">(OPTIONAL)</span></div>
-          <div class="pfb-mini-stars" id="pfbMiniStars">
-            <button class="pfb-mini-star" data-v="1" onclick="setPfbStar(1)" onmouseenter="hoverPfbStar(1)" onmouseleave="unhoverPfbStar()">★</button>
-            <button class="pfb-mini-star" data-v="2" onclick="setPfbStar(2)" onmouseenter="hoverPfbStar(2)" onmouseleave="unhoverPfbStar()">★</button>
-            <button class="pfb-mini-star" data-v="3" onclick="setPfbStar(3)" onmouseenter="hoverPfbStar(3)" onmouseleave="unhoverPfbStar()">★</button>
-            <button class="pfb-mini-star" data-v="4" onclick="setPfbStar(4)" onmouseenter="hoverPfbStar(4)" onmouseleave="unhoverPfbStar()">★</button>
-            <button class="pfb-mini-star" data-v="5" onclick="setPfbStar(5)" onmouseenter="hoverPfbStar(5)" onmouseleave="unhoverPfbStar()">★</button>
-          </div>
-
-          <!-- Submit -->
-          <div class="pfb-footer">
-            <button class="pfb-send-btn" id="pfbSendBtn" onclick="submitProfileFeedback()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-              Send Feedback
-            </button>
-          </div>
-
-          <!-- Success message -->
-          <div class="pfb-success" id="pfbSuccess" style="display:none;">
-            ✅ Thank you! Your feedback has been received. We read every message — usually reply in 1–2 days.
-          </div>
-
+          <button onclick="closeOv('profileOverlay');openFeedbackOverlay();" style="padding:9px 18px;border-radius:8px;background:var(--aqua);color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;border:none;cursor:pointer;transition:all .2s;white-space:nowrap;" onmouseover="this.style.background='var(--aqua3)'" onmouseout="this.style.background='var(--aqua)'">Give Feedback →</button>
         </div>
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- ══ FEEDBACK OVERLAY ══ -->
+<div class="overlay" id="feedbackOverlay" style="display:none;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);">
+  <div style="background:#ffffff;border-radius:20px;width:100%;max-width:800px;margin:16px;max-height:92vh;overflow-y:auto;animation:slideUp .25s ease;display:flex;flex-direction:column;">
+
+    <!-- Header: GIF changes here based on type -->
+    <div style="padding:22px 28px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <!-- GIF container — default shows emoji icon, switches to GIF on type select -->
+        <div id="fbHeaderGifBox" style="width:56px;height:56px;border-radius:14px;background:#f1f5f9;border:1px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:1.6rem;overflow:hidden;flex-shrink:0;transition:all .25s;">
+          <span id="fbHeaderEmoji">💬</span>
+          <img id="fbHeaderGif" src="" alt="" style="display:none;width:100%;height:100%;object-fit:cover;border-radius:13px;">
+        </div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;color:#1a202c;letter-spacing:-0.3px;">FEEDBACK</div>
+          <div id="fbHeaderSub" style="font-size:.75rem;color:#718096;margin-top:2px;">Help us make Kanakkupaaru better for you.</div>
+        </div>
+      </div>
+      <button onclick="closeFeedbackOverlay()" style="width:32px;height:32px;border-radius:8px;background:#f1f5f9;border:1px solid #e2e8f0;color:#4a5568;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">✕</button>
+    </div>
+
+    <!-- Body: two columns -->
+    <div style="display:grid;grid-template-columns:1fr 280px;gap:0;">
+
+      <!-- LEFT: Form -->
+      <div style="padding:22px 26px;border-right:1px solid #e2e8f0;">
+
+        <!-- TYPE SELECTOR -->
+        <div style="margin-bottom:20px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.66rem;color:#4a5568;letter-spacing:.9px;margin-bottom:10px;">TYPE <span style="color:#dc143c;">*</span></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+
+            <!-- Bug -->
+            <button class="fb-type-btn" data-type="bug" onclick="selectFbType('bug',this)">
+              <div style="width:36px;height:36px;border-radius:10px;background:#fef2f2;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;overflow:hidden;" id="fbTypePic_bug">
+                <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_bug.gif" alt="bug" style="width:100%;height:100%;object-fit:cover;border-radius:9px;">
+              </div>
+              <div style="font-size:.68rem;font-weight:700;color:#4a5568;">Bug Report</div>
+            </button>
+
+            <!-- Feature -->
+            <button class="fb-type-btn" data-type="feature" onclick="selectFbType('feature',this)">
+              <div style="width:36px;height:36px;border-radius:10px;background:#f0fdf4;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;overflow:hidden;" id="fbTypePic_feature">
+                <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_feature.gif" alt="feature" style="width:100%;height:100%;object-fit:cover;border-radius:9px;">
+              </div>
+              <div style="font-size:.68rem;font-weight:700;color:#4a5568;">Feature Request</div>
+            </button>
+
+            <!-- Improvement -->
+            <button class="fb-type-btn" data-type="improvement" onclick="selectFbType('improvement',this)">
+              <div style="width:36px;height:36px;border-radius:10px;background:#fffbeb;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;overflow:hidden;" id="fbTypePic_improvement">
+                <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_improve.gif" alt="improve" style="width:100%;height:100%;object-fit:cover;border-radius:9px;">
+              </div>
+              <div style="font-size:.68rem;font-weight:700;color:#4a5568;">Improvement</div>
+            </button>
+
+            <!-- Other -->
+            <button class="fb-type-btn" data-type="other" onclick="selectFbType('other',this)">
+              <div style="width:36px;height:36px;border-radius:10px;background:#f5f3ff;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;overflow:hidden;" id="fbTypePic_other">
+                <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_other.gif" alt="other" style="width:100%;height:100%;object-fit:cover;border-radius:9px;">
+              </div>
+              <div style="font-size:.68rem;font-weight:700;color:#4a5568;">Other</div>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- SUBJECT -->
+        <div style="margin-bottom:14px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.66rem;color:#4a5568;letter-spacing:.9px;margin-bottom:8px;">SUBJECT <span style="color:#dc143c;">*</span></div>
+          <input id="fbSubject" placeholder="Brief summary of your feedback" style="width:100%;padding:11px 14px;border-radius:9px;background:#f8fafc;border:1.5px solid #e2e8f0;color:#1a202c;font-family:'DM Sans',sans-serif;font-size:.83rem;transition:border-color .2s;box-sizing:border-box;" onfocus="this.style.borderColor='#dc143c'" onblur="this.style.borderColor='#e2e8f0'" oninput="updateFbGif()">
+        </div>
+
+        <!-- MESSAGE -->
+        <div style="margin-bottom:18px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.66rem;color:#4a5568;letter-spacing:.9px;">MESSAGE <span style="color:#dc143c;">*</span></div>
+            <div style="font-size:.62rem;color:#94a3b8;" id="fbCharCount">0 / 2000</div>
+          </div>
+          <textarea id="fbMessage" placeholder="Describe your feedback…" rows="5" maxlength="2000" style="width:100%;padding:11px 14px;border-radius:9px;background:#f8fafc;border:1.5px solid #e2e8f0;color:#1a202c;font-family:'DM Sans',sans-serif;font-size:.83rem;resize:vertical;transition:border-color .2s;box-sizing:border-box;line-height:1.6;" onfocus="this.style.borderColor='#dc143c'" onblur="this.style.borderColor='#e2e8f0'" oninput="document.getElementById('fbCharCount').textContent=this.value.length+' / 2000';updateFbGif();"></textarea>
+        </div>
+
+        <!-- RATING -->
+        <div style="margin-bottom:22px;">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.66rem;color:#4a5568;letter-spacing:.9px;margin-bottom:10px;">HOW ARE YOU FINDING KANAKKUPAARU? <span style="font-weight:400;color:#94a3b8;">(OPTIONAL)</span></div>
+          <div style="display:flex;gap:4px;" id="fbStarRow">
+            <button class="fb-star" data-v="1" onclick="setFbStar(1)" onmouseenter="hoverFbStar(1)" onmouseleave="unhoverFbStar()">★</button>
+            <button class="fb-star" data-v="2" onclick="setFbStar(2)" onmouseenter="hoverFbStar(2)" onmouseleave="unhoverFbStar()">★</button>
+            <button class="fb-star" data-v="3" onclick="setFbStar(3)" onmouseenter="hoverFbStar(3)" onmouseleave="unhoverFbStar()">★</button>
+            <button class="fb-star" data-v="4" onclick="setFbStar(4)" onmouseenter="hoverFbStar(4)" onmouseleave="unhoverFbStar()">★</button>
+            <button class="fb-star" data-v="5" onclick="setFbStar(5)" onmouseenter="hoverFbStar(5)" onmouseleave="unhoverFbStar()">★</button>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <div style="display:flex;justify-content:flex-end;">
+          <button id="fbSubmitBtn" onclick="submitFeedback()" style="display:flex;align-items:center;gap:8px;padding:11px 24px;border-radius:9px;background:#dc143c;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;border:none;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#c01235'" onmouseout="this.style.background='#dc143c'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Feedback
+          </button>
+        </div>
+
+        <!-- Success state — courage_payment GIF -->
+        <div id="fbSuccess" style="display:none;margin-top:16px;padding:14px 18px;background:#f0fdf4;border:1px solid #86efac;border-radius:10px;align-items:center;gap:12px;">
+          <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_payment.gif" alt="" style="height:54px;border-radius:9px;flex-shrink:0;">
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:#166534;">🎉 Feedback sent! Thank you!</div>
+            <div style="font-size:.7rem;color:#4ade80;margin-top:3px;">We read every message. Response: 1–2 days.</div>
+          </div>
+        </div>
+
+      </div><!-- /LEFT -->
+
+      <!-- RIGHT: What to Share -->
+      <div style="padding:22px 20px;background:#f8fafc;border-radius:0 0 20px 0;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.66rem;color:#4a5568;letter-spacing:.9px;margin-bottom:14px;">WHAT TO SHARE</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+
+          <!-- Each sidebar item shows the GIF thumbnail inline -->
+          <div class="fb-sidebar-item" onclick="selectFbType('bug',document.querySelector('[data-type=bug]'))" onmouseover="this.style.borderColor='#dc143c'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <div style="width:34px;height:34px;border-radius:9px;background:#fef2f2;overflow:hidden;flex-shrink:0;">
+              <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_bug.gif" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.74rem;color:#1a202c;margin-bottom:1px;">Bug Report</div><div style="font-size:.66rem;color:#718096;">Something broken or unexpected</div></div>
+          </div>
+
+          <div class="fb-sidebar-item" onclick="selectFbType('feature',document.querySelector('[data-type=feature]'))" onmouseover="this.style.borderColor='#dc143c'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <div style="width:34px;height:34px;border-radius:9px;background:#f0fdf4;overflow:hidden;flex-shrink:0;">
+              <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_feature.gif" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.74rem;color:#1a202c;margin-bottom:1px;">Feature Request</div><div style="font-size:.66rem;color:#718096;">Something you wish existed</div></div>
+          </div>
+
+          <div class="fb-sidebar-item" onclick="selectFbType('improvement',document.querySelector('[data-type=improvement]'))" onmouseover="this.style.borderColor='#dc143c'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <div style="width:34px;height:34px;border-radius:9px;background:#fffbeb;overflow:hidden;flex-shrink:0;">
+              <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_improve.gif" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.74rem;color:#1a202c;margin-bottom:1px;">Improvement</div><div style="font-size:.66rem;color:#718096;">Something that could be better</div></div>
+          </div>
+
+          <div class="fb-sidebar-item" onclick="selectFbType('other',document.querySelector('[data-type=other]'))" onmouseover="this.style.borderColor='#dc143c'" onmouseout="this.style.borderColor='#e2e8f0'">
+            <div style="width:34px;height:34px;border-radius:9px;background:#f5f3ff;overflow:hidden;flex-shrink:0;">
+              <img src="https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_other.gif" style="width:100%;height:100%;object-fit:cover;">
+            </div>
+            <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.74rem;color:#1a202c;margin-bottom:1px;">Other</div><div style="font-size:.66rem;color:#718096;">Anything else on your mind</div></div>
+          </div>
+
+        </div>
+        <div style="margin-top:16px;padding:12px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">
+          <div style="font-size:.67rem;color:#94a3b8;line-height:1.65;">We read every piece of feedback. Response time: usually 1–2 days.</div>
+        </div>
+      </div><!-- /RIGHT -->
+
+    </div><!-- /grid -->
   </div>
 </div>
 
@@ -5143,57 +5099,10 @@ function openProfile(){
   if(!user){openAuth('login');return;}
   document.getElementById('profileOverlay').classList.add('show');
   renderProfileContent();
-  renderProfileTrialBanner();
   genProfilePrompt();
   renderNewModuleFeed();
   setTimeout(restoreProfileStar, 150);
-}
-
-function renderProfileTrialBanner(){
-  const banner = document.getElementById('profTrialBanner');
-  if(!banner) return;
-
-  // If user has any purchase, hide the banner
-  if(purchases && purchases.length > 0){
-    banner.style.display = 'none';
-    return;
-  }
-
-  const trialStart = localStorage.getItem('ak_trial_start') || new Date().toISOString().split('T')[0];
-  if(!localStorage.getItem('ak_trial_start')) localStorage.setItem('ak_trial_start', trialStart);
-
-  const started = new Date(trialStart);
-  const daysUsed = Math.min(14, Math.floor((Date.now() - started) / 86400000));
-  const daysLeft = Math.max(0, 14 - daysUsed);
-  const isExpired = daysLeft === 0;
-  const pct = Math.min(100, Math.round((daysUsed / 14) * 100));
-
-  banner.style.display = 'block';
-  banner.style.background = isExpired ? '#fff3f3' : '#fff7f7';
-  banner.style.borderColor = isExpired ? 'rgba(220,20,60,0.4)' : 'rgba(220,20,60,0.2)';
-
-  const icon = document.getElementById('ptbIcon');
-  const title = document.getElementById('ptbTitle');
-  const sub = document.getElementById('ptbSub');
-  const daysLabel = document.getElementById('ptbDaysLabel');
-  const daysCount = document.getElementById('ptbDaysCount');
-  const bar = document.getElementById('ptbProgressBar');
-
-  if(isExpired){
-    if(icon) icon.textContent = '🔒';
-    if(title){ title.textContent = 'Trial Ended'; title.style.color = '#dc143c'; }
-    if(sub) sub.textContent = 'Your 14-day free trial has ended. Upgrade now to keep learning!';
-    if(daysLabel) daysLabel.textContent = 'Trial completed';
-    if(daysCount){ daysCount.textContent = '14 / 14 days used'; daysCount.style.color = '#dc143c'; }
-    if(bar){ bar.style.width = '100%'; bar.style.background = 'linear-gradient(90deg,#dc143c,#ff2952)'; }
-  } else {
-    if(icon) icon.textContent = '⏰';
-    if(title){ title.textContent = 'Free Trial Active'; title.style.color = '#1a202c'; }
-    if(sub) sub.textContent = daysLeft + ' day' + (daysLeft===1?'':'s') + ' left in your 14-day free trial';
-    if(daysLabel) daysLabel.textContent = 'Days used';
-    if(daysCount){ daysCount.textContent = daysUsed + ' / 14 days'; daysCount.style.color = '#dc143c'; }
-    if(bar){ bar.style.width = pct + '%'; bar.style.background = daysLeft <= 3 ? 'linear-gradient(90deg,#dc143c,#ff2952)' : 'linear-gradient(90deg,#dc143c,#ff6b6b)'; }
-  }
+  setTimeout(checkTrialForFeedbackBtn, 200);
 }
 
 function renderProfileContent(){
@@ -6491,6 +6400,226 @@ function spawnSparkles(parentEl, count){
   }
 }
 
+/* ════════════════════════════════════
+   FEEDBACK OVERLAY — Full Logic
+════════════════════════════════════ */
+var _fbSelectedType = '';
+var _fbStarVal = 0;
+
+/* GIF map for each feedback type & state */
+var FB_GIFS = {
+  bug:         'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_bug.gif',
+  feature:     'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_feature.gif',
+  improvement: 'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_improve.gif',
+  other:       'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_other.gif',
+  typing:      'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_typing.gif',
+  waiting:     'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_waiting.gif',
+  payment:     'https://raw.githubusercontent.com/poojapoovi-214/aikatrukko/main/gifs/courage_payment.gif'
+};
+
+function openFeedbackOverlay(){
+  var ov = document.getElementById('feedbackOverlay');
+  if(ov){ ov.style.display = 'flex'; }
+  /* Reset form */
+  _fbSelectedType = '';
+  _fbStarVal = 0;
+  document.querySelectorAll('.fb-type-btn').forEach(function(b){ b.classList.remove('selected'); });
+  document.querySelectorAll('.fb-star').forEach(function(s){ s.classList.remove('active','hovered'); });
+  var sub = document.getElementById('fbSubject');
+  var msg = document.getElementById('fbMessage');
+  var cnt = document.getElementById('fbCharCount');
+  var suc = document.getElementById('fbSuccess');
+  if(sub) sub.value = '';
+  if(msg) msg.value = '';
+  if(cnt) cnt.textContent = '0 / 2000';
+  if(suc) suc.style.display = 'none';
+  /* Reset header GIF to default emoji */
+  var gifImg = document.getElementById('fbHeaderGif');
+  var emoji = document.getElementById('fbHeaderEmoji');
+  var gifBox = document.getElementById('fbHeaderGifBox');
+  var headerSub = document.getElementById('fbHeaderSub');
+  if(gifImg){ gifImg.style.display = 'none'; gifImg.src = ''; }
+  if(emoji){ emoji.style.display = 'block'; }
+  if(gifBox){ gifBox.style.background='#f1f5f9'; gifBox.style.border='1px solid #e2e8f0'; gifBox.style.borderRadius='14px'; }
+  if(headerSub) headerSub.textContent = 'Help us make Kanakkupaaru better for you.';
+  /* Reset submit button */
+  var btn = document.getElementById('fbSubmitBtn');
+  if(btn){ btn.disabled=false; btn.style.background='#dc143c'; btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Feedback'; }
+}
+
+function closeFeedbackOverlay(){
+  var ov = document.getElementById('feedbackOverlay');
+  if(ov){ ov.style.display = 'none'; }
+}
+
+function selectFbType(type, btn){
+  _fbSelectedType = type;
+  document.querySelectorAll('.fb-type-btn').forEach(function(b){ b.classList.remove('selected'); });
+  if(btn) btn.classList.add('selected');
+
+  /* ── Switch header GIF ── */
+  var emoji = document.getElementById('fbHeaderEmoji');
+  var gifImg = document.getElementById('fbHeaderGif');
+  var gifBox = document.getElementById('fbHeaderGifBox');
+  var sub = document.getElementById('fbHeaderSub');
+
+  var gifMap = {
+    bug:         { url: FB_GIFS.bug,         sub: 'Something broken or unexpected' },
+    feature:     { url: FB_GIFS.feature,     sub: 'Something you wish existed' },
+    improvement: { url: FB_GIFS.improvement, sub: 'Something that could be better' },
+    other:       { url: FB_GIFS.other,       sub: 'Anything else on your mind' }
+  };
+
+  var info = gifMap[type];
+  if(info && gifImg && emoji){
+    gifImg.src = info.url;
+    gifImg.style.display = 'block';
+    emoji.style.display = 'none';
+    if(gifBox){
+      gifBox.style.background = 'transparent';
+      gifBox.style.border = 'none';
+      gifBox.style.borderRadius = '0';
+    }
+    if(sub) sub.textContent = info.sub;
+  }
+}
+
+function updateFbGif(){
+  var msg = document.getElementById('fbMessage');
+  var sub = document.getElementById('fbSubject');
+  var hasText = (msg && msg.value.length > 0) || (sub && sub.value.length > 0);
+  var gifImg = document.getElementById('fbHeaderGif');
+  var emoji = document.getElementById('fbHeaderEmoji');
+  if(!gifImg) return;
+
+  if(hasText){
+    /* Switch to typing GIF while user types */
+    gifImg.src = FB_GIFS['typing'];
+    gifImg.style.display = 'block';
+    if(emoji) emoji.style.display = 'none';
+  } else if(_fbSelectedType && FB_GIFS[_fbSelectedType]){
+    /* Revert to type GIF if text is cleared */
+    gifImg.src = FB_GIFS[_fbSelectedType];
+    gifImg.style.display = 'block';
+    if(emoji) emoji.style.display = 'none';
+  } else {
+    /* No type selected, no text — show default emoji */
+    gifImg.style.display = 'none';
+    if(emoji) emoji.style.display = 'block';
+  }
+}
+
+function setFbStar(val){
+  _fbStarVal = val;
+  document.querySelectorAll('.fb-star').forEach(function(s){
+    var v = parseInt(s.getAttribute('data-v'));
+    if(v <= val){ s.classList.add('active'); s.classList.remove('hovered'); }
+    else { s.classList.remove('active','hovered'); }
+  });
+}
+function hoverFbStar(val){
+  document.querySelectorAll('.fb-star').forEach(function(s){
+    var v = parseInt(s.getAttribute('data-v'));
+    if(v <= val) s.classList.add('hovered'); else s.classList.remove('hovered');
+  });
+}
+function unhoverFbStar(){
+  document.querySelectorAll('.fb-star').forEach(function(s){ s.classList.remove('hovered'); });
+}
+
+function submitFeedback(){
+  var type = _fbSelectedType;
+  var subject = (document.getElementById('fbSubject')||{}).value || '';
+  var message = (document.getElementById('fbMessage')||{}).value || '';
+
+  if(!type){ alert('Please select a feedback type.'); return; }
+  if(!subject.trim()){ alert('Please enter a subject.'); return; }
+  if(!message.trim()){ alert('Please describe your feedback.'); return; }
+
+  var btn = document.getElementById('fbSubmitBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  /* Show waiting gif in header */
+  var gifImg = document.getElementById('fbHeaderGif');
+  var emoji = document.getElementById('fbHeaderEmoji');
+  var headerSub = document.getElementById('fbHeaderSub');
+  if(gifImg){ gifImg.src = FB_GIFS['waiting']; gifImg.style.display = 'block'; }
+  if(emoji) emoji.style.display = 'none';
+  if(headerSub) headerSub.textContent = 'Sending your feedback…';
+
+  /* Save to localStorage */
+  var entry = {
+    type: type,
+    subject: subject,
+    message: message,
+    rating: _fbStarVal,
+    user: (window.user && window.user.email) || 'anonymous',
+    timestamp: new Date().toISOString()
+  };
+  try{
+    var all = JSON.parse(localStorage.getItem('ak_feedback') || '[]');
+    all.push(entry);
+    localStorage.setItem('ak_feedback', JSON.stringify(all));
+  }catch(e){}
+
+  /* Try Firestore if available */
+  setTimeout(function(){
+    try{
+      if(window._fbDoc && window._fbSetDoc && window.user){
+        var ref = window._fbDoc('feedback', window.user.uid + '_' + Date.now());
+        window._fbSetDoc(ref, entry).catch(function(){});
+      }
+    }catch(e){}
+
+    /* Show success */
+    var suc = document.getElementById('fbSuccess');
+    if(suc){ suc.style.removeProperty('display'); suc.style.display = 'flex'; }
+    /* Switch header to payment/success GIF */
+    var gifImg2 = document.getElementById('fbHeaderGif');
+    var headerSub2 = document.getElementById('fbHeaderSub');
+    if(gifImg2){ gifImg2.src = FB_GIFS['payment']; }
+    if(headerSub2) headerSub2.textContent = 'Thank you! We\'ll get back to you soon 🎉';
+    if(btn){ btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Sent!'; btn.style.background='#16a34a'; }
+
+    /* Auto close after 3s */
+    setTimeout(function(){ closeFeedbackOverlay(); }, 3000);
+  }, 1200);
+}
+
+/* ══ TRIAL CHECK — show feedback button after 14 days ══ */
+function checkTrialForFeedbackBtn(){
+  var trialStart = localStorage.getItem('ak_trial_start');
+  if(!trialStart) return;
+  var started = new Date(trialStart);
+  var daysElapsed = Math.floor((Date.now() - started) / 86400000);
+  var sec = document.getElementById('profFeedbackSection');
+  if(sec && daysElapsed >= 14){
+    sec.style.display = 'block';
+  }
+}
+
+/* Hook into profile open */
+var _origOpenProfile = window.openProfile || null;
+document.addEventListener('DOMContentLoaded', function(){
+  /* Patch profile open to also check trial */
+  var profOverlay = document.getElementById('profileOverlay');
+  if(profOverlay){
+    var observer = new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        if(m.type === 'attributes' && m.attributeName === 'style'){
+          var el = m.target;
+          if(el.style.display !== 'none'){
+            checkTrialForFeedbackBtn();
+          }
+        }
+      });
+    });
+    observer.observe(profOverlay, { attributes: true, attributeFilter: ['style'] });
+  }
+  /* Also run immediately */
+  checkTrialForFeedbackBtn();
+});
+
 /* ── Restore saved star rating when profile opens ── */
 function restoreProfileStar(){
   try{
@@ -6504,95 +6633,6 @@ function restoreProfileStar(){
       if(lbl) lbl.textContent = _profStarLabels[saved] || '';
     }
   }catch(e){}
-}
-
-/* ── Profile Feedback Form ── */
-var _pfbStarVal = 0;
-var _pfbSelectedType = 'bug';
-
-function selectFeedbackType(btn){
-  document.querySelectorAll('.pfb-type-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  _pfbSelectedType = btn.getAttribute('data-type');
-}
-
-function hoverPfbStar(val){
-  document.querySelectorAll('.pfb-mini-star').forEach(function(b){
-    var v = parseInt(b.getAttribute('data-v'));
-    b.classList.toggle('hovered', v <= val);
-  });
-}
-
-function unhoverPfbStar(){
-  document.querySelectorAll('.pfb-mini-star').forEach(function(b){ b.classList.remove('hovered'); });
-}
-
-function setPfbStar(val){
-  _pfbStarVal = val;
-  document.querySelectorAll('.pfb-mini-star').forEach(function(b){
-    var v = parseInt(b.getAttribute('data-v'));
-    b.classList.toggle('active', v <= val);
-    b.classList.remove('hovered');
-  });
-}
-
-function submitProfileFeedback(){
-  var subject = (document.getElementById('pfbSubject')||{}).value||'';
-  var message = (document.getElementById('pfbMessage')||{}).value||'';
-  if(!subject.trim()){ alert('Please enter a subject.'); return; }
-  if(!message.trim()){ alert('Please describe your feedback.'); return; }
-
-  var btn = document.getElementById('pfbSendBtn');
-  if(btn){ btn.disabled = true; btn.innerHTML = '⏳ Sending…'; }
-
-  /* Save feedback locally */
-  try{
-    var entry = {
-      type: _pfbSelectedType,
-      subject: subject.trim(),
-      message: message.trim(),
-      rating: _pfbStarVal,
-      email: (user && user.email) || '',
-      name: (user && user.name) || '',
-      ts: new Date().toISOString()
-    };
-    var existing = JSON.parse(localStorage.getItem('ak_feedback_log')||'[]');
-    existing.push(entry);
-    localStorage.setItem('ak_feedback_log', JSON.stringify(existing));
-  }catch(e){}
-
-  /* Send to Firestore if available */
-  (function(){
-    try{
-      var ref = window._fbDoc('feedback', Date.now()+'_'+(Math.random().toString(36).slice(2)));
-      window._fbSetDoc(ref, {
-        type: _pfbSelectedType,
-        subject: subject.trim(),
-        message: message.trim(),
-        rating: _pfbStarVal,
-        email: (user && user.email) || '',
-        name: (user && user.name) || '',
-        ts: new Date().toISOString()
-      });
-    }catch(e){}
-  })();
-
-  setTimeout(function(){
-    if(btn){ btn.disabled = false; btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Send Feedback'; }
-    /* Reset form */
-    document.getElementById('pfbSubject').value = '';
-    document.getElementById('pfbMessage').value = '';
-    document.getElementById('pfbCharCount').textContent = '0';
-    _pfbStarVal = 0;
-    _pfbSelectedType = 'bug';
-    document.querySelectorAll('.pfb-type-btn').forEach(function(b){ b.classList.remove('active'); });
-    var firstType = document.querySelector('.pfb-type-btn[data-type="bug"]');
-    if(firstType) firstType.classList.add('active');
-    document.querySelectorAll('.pfb-mini-star').forEach(function(b){ b.classList.remove('active','hovered'); });
-    /* Show success */
-    var suc = document.getElementById('pfbSuccess');
-    if(suc){ suc.style.display='block'; setTimeout(function(){ suc.style.display='none'; }, 5000); }
-  }, 700);
 }
 </script>
 
@@ -6686,135 +6726,5 @@ function submitProfileFeedback(){
   document.querySelectorAll('.h-stat-n').forEach(function(el){ statsObs.observe(el); });
 })();
 </script>
-
-<script>
-/* ── Courage GIF data ── */
-var COURAGE_GIFS = {
-  bug:     'gifs/courage_bug.gif',
-  feature: 'gifs/courage_feature.gif',
-  improve: 'gifs/courage_improve.gif',
-  other:   'gifs/courage_other.gif',
-  waiting: 'gifs/courage_waiting.gif',
-  payment: 'gifs/courage_payment.gif',
-  typing:  'gifs/courage_typing.gif'
-}
-;
-
-var _pfbTypingTimer = null;
-var _pfbGifVisible = false;
-
-function showPfbGif(key, label){
-  var img = document.getElementById('pfbGifImg');
-  var lbl = document.getElementById('pfbGifLabel');
-  var wrap = document.getElementById('pfbGifWrap');
-  if(!img || !wrap) return;
-  img.src = COURAGE_GIFS[key] || '';
-  if(lbl) lbl.textContent = label || '';
-  wrap.style.display = 'flex';
-  _pfbGifVisible = true;
-}
-
-function hidePfbGif(){
-  var wrap = document.getElementById('pfbGifWrap');
-  var img = document.getElementById('pfbGifImg');
-  if(wrap) wrap.style.display = 'none';
-  if(img) img.src = '';
-  _pfbGifVisible = false;
-}
-
-function onPfbTyping(){
-  var wrap = document.getElementById('pfbGifWrap');
-  if(!wrap || wrap.style.display === 'none') return; // only show if section already visible
-  var img = document.getElementById('pfbGifImg');
-  var lbl = document.getElementById('pfbGifLabel');
-  if(img) img.src = COURAGE_GIFS['typing'];
-  if(lbl) lbl.textContent = 'Courage is reading your message… 👀';
-  clearTimeout(_pfbTypingTimer);
-  _pfbTypingTimer = setTimeout(function(){
-    var activeBtn = document.querySelector('.pfb-type-btn.active');
-    if(activeBtn){
-      var key = activeBtn.getAttribute('data-gif') || 'bug';
-      var label = activeBtn.getAttribute('data-label') || '';
-      showPfbGif(key, label);
-    }
-  }, 1500);
-}
-
-/* Override selectFeedbackType to update gif */
-window.selectFeedbackType = function(btn){
-  document.querySelectorAll('.pfb-type-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  window._pfbSelectedType = btn.getAttribute('data-type');
-  var gifKey = btn.getAttribute('data-gif');
-  var label  = btn.getAttribute('data-label') || '';
-  if(gifKey) showPfbGif(gifKey, label);
-};
-
-/* Show waiting gif after submit */
-var _origSubmitProfileFeedback = window.submitProfileFeedback;
-window.submitProfileFeedback = function(){
-  showPfbGif('waiting', 'Sending your feedback… Courage is waiting! 🐕');
-  _origSubmitProfileFeedback && _origSubmitProfileFeedback();
-};
-
-/* IntersectionObserver — show gif only when feedback section scrolls into view */
-(function(){
-  function initPfbObserver(){
-    var section = document.getElementById('profFeedbackSection');
-    if(!section){ setTimeout(initPfbObserver, 500); return; }
-    var obs = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if(e.isIntersecting){
-          // Section came into view — show the active type's gif
-          var activeBtn = document.querySelector('.pfb-type-btn.active');
-          if(activeBtn){
-            var key = activeBtn.getAttribute('data-gif') || 'bug';
-            var label = activeBtn.getAttribute('data-label') || '';
-            showPfbGif(key, label);
-          }
-        } else {
-          // Section scrolled out — hide gif & clear src to save memory
-          hidePfbGif();
-        }
-      });
-    }, { threshold: 0.15 });
-    obs.observe(section);
-  }
-  // Run when profile opens
-  document.addEventListener('click', function(e){
-    var t = e.target;
-    if(t && (t.id === 'navName' || t.classList.contains('nb-o') || t.closest && t.closest('[onclick*="openProfile"]'))){
-      setTimeout(initPfbObserver, 300);
-    }
-  }, true);
-  // Also run on DOMContentLoaded for safety
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(initPfbObserver, 800);
-  });
-})();
-</script>
-
-<style>
-.pfb-gif-wrap{
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  margin-bottom:14px;
-  gap:6px;
-}
-.pfb-gif{
-  width:120px;height:90px;
-  object-fit:cover;
-  border-radius:12px;
-  border:2px solid rgba(220,20,60,0.15);
-  box-shadow:0 4px 16px rgba(220,20,60,0.10);
-  background:#f8fafc;
-}
-.pfb-gif-label{
-  font-size:.68rem;color:var(--gray2);
-  font-style:italic;text-align:center;
-}
-</style>
-
 </body>
 </html>
