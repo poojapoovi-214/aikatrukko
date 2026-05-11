@@ -2320,20 +2320,15 @@ footer{
 
     <div class="video-wrap" data-scroll="anim-up" data-delay="180">
       <div class="video-container">
-        <video
-          controls
-          playsinline
-          preload="metadata"
-          style="width:100%;border-radius:16px;outline:none;display:block;"
-          onerror="this.style.display='none';document.getElementById('videoFallback').style.display='flex';"
-        >
-          <source src="https://media.githubusercontent.com/media/poojapoovi-214/poojapoovi-214/main/Prompt%20Engineering%20Basics%20with%20Pooja_720p.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <div id="videoFallback" style="display:none;width:100%;aspect-ratio:16/9;border-radius:16px;background:#1a1a1a;border:1px solid #333;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:32px;text-align:center;">
-          <div style="font-size:2.5rem;">🎬</div>
-          <p style="color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin:0;">Video loading failed</p>
-          <p style="color:#aaa;font-size:.8rem;margin:0;">Please upload your video to YouTube and replace the link in the HTML.</p>
+        <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:16px;overflow:hidden;">
+          <iframe
+            src="https://www.youtube.com/embed/kIwK7m6FwA8?rel=0&modestbranding=1&color=white"
+            title="Prompt Engineering Basics with Pooja — Module 1 Preview"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+            style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:16px;"
+          ></iframe>
         </div>
         <div class="video-label">
           <span>📚 Module 1 Preview</span>
