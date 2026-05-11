@@ -2324,12 +2324,17 @@ footer{
           controls
           playsinline
           preload="metadata"
-          poster=""
-          style="width:100%;border-radius:16px;outline:none;"
+          style="width:100%;border-radius:16px;outline:none;display:block;"
+          onerror="this.style.display='none';document.getElementById('videoFallback').style.display='flex';"
         >
-          <source src="https://poojapoovi-214.github.io/poojapoovi-214/Prompt%20Engineering%20Basics%20with%20Pooja_720p.mp4" type="video/mp4">
+          <source src="https://media.githubusercontent.com/media/poojapoovi-214/poojapoovi-214/main/Prompt%20Engineering%20Basics%20with%20Pooja_720p.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
+        <div id="videoFallback" style="display:none;width:100%;aspect-ratio:16/9;border-radius:16px;background:#1a1a1a;border:1px solid #333;align-items:center;justify-content:center;flex-direction:column;gap:16px;padding:32px;text-align:center;">
+          <div style="font-size:2.5rem;">🎬</div>
+          <p style="color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin:0;">Video loading failed</p>
+          <p style="color:#aaa;font-size:.8rem;margin:0;">Please upload your video to YouTube and replace the link in the HTML.</p>
+        </div>
         <div class="video-label">
           <span>📚 Module 1 Preview</span>
           <span>Prompt Engineering Basics · 2 min</span>
