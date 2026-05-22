@@ -2609,16 +2609,16 @@ footer{
 
     <div class="video-wrap" data-scroll="anim-up" data-delay="180">
       <div class="video-container">
-        <video
-          controls
-          playsinline
-          preload="metadata"
-          poster=""
-          style="width:100%;border-radius:16px;outline:none;"
-        >
-          <source src="https://poojapoovi-214.github.io/poojapoovi-214/Prompt%20Engineering%20Basics%20with%20Pooja_720p.mp4" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
+        <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:16px;overflow:hidden;background:#000;">
+          <iframe
+            src="https://www.youtube.com/embed/YOUR_VIDEO_ID?rel=0&modestbranding=1"
+            title="AI Katrukko — Prompt Engineering Basics"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:16px;"
+          ></iframe>
+        </div>
         <div class="video-label">
           <span>📚 Module 1 Preview</span>
           <span>Prompt Engineering Basics · 2 min</span>
@@ -3459,7 +3459,7 @@ footer{
         </div>
         <div id="dovAiMsgs" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
           <div style="background:#f8fafc;border-radius:10px;padding:12px 14px;font-size:.78rem;color:#1a202c;max-width:85%;align-self:flex-start;border:1px solid #e2e8f0;">
-            👋 Vanakkam! I'm your AI Coach. Ask me anything about AI, prompt engineering, or your lessons. I'll answer in simple India-English! 🇮🇳
+            👋 Hello! I'm your AI Coach. Ask me anything about AI, prompt engineering, or your lessons — I'll answer clearly! 🇮🇳
           </div>
         </div>
         <div style="padding:12px 16px;border-top:1px solid #e2e8f0;display:flex;gap:8px;">
@@ -5661,7 +5661,7 @@ function openAkChat(prefill){
   document.body.style.overflow = 'hidden';
   if(akChatHistory.length===0){
     // Welcome message
-    akChatHistory.push({role:'ai', text:'👋 Vanakkam! I\'m your AI Coach. Ask me anything about AI, or use one of the prompts from the list — I\'ll answer it right here!'});
+    akChatHistory.push({role:'ai', text:'👋 Hello! I\'m your AI Coach. Ask me anything about AI, or use one of the prompts from the list — I\'ll answer it right here!'});
   }
   renderAkChatMsgs();
   if(prefill){
@@ -6601,7 +6601,7 @@ function dovOpenLesson(key,mi,li){
       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#1a202c;">${les.icon} ${les.title}</div>
       <div style="display:flex;gap:8px;align-items:center;">
         ${canAccess?`<button onclick="dovMarkDone('${doneKey}','${key}',${mi},${li})" style="padding:7px 14px;border-radius:7px;background:#dcfce7;border:1.5px solid #bbf7d0;color:#16a34a;font-size:.72rem;font-weight:700;cursor:pointer;">Mark Complete ✓</button>`:''}
-        <button onclick="document.getElementById('dovLessonPanel').innerHTML='';document.querySelectorAll(\'[id^=\\"dovLesRow_\\"]\').forEach(r=>r.style.outline=\'none\')" style="padding:7px 14px;border-radius:7px;background:#f8fafc;border:1px solid #e2e8f0;color:#718096;font-size:.72rem;cursor:pointer;">✕ Close</button>
+        <button onclick="closeDovLesson()" style="padding:7px 14px;border-radius:7px;background:#f8fafc;border:1px solid #e2e8f0;color:#718096;font-size:.72rem;cursor:pointer;">✕ Close</button>
       </div>
     </div>`;
 
@@ -6647,6 +6647,12 @@ function dovMarkDone(key,catKey,mi,li){
 }
 
 /* ── EXPLORE COURSES: Plans pricing display ── */
+function closeDovLesson(){
+  var panel = document.getElementById('dovLessonPanel');
+  if(panel) panel.innerHTML = '';
+  document.querySelectorAll('[id^="dovLesRow_"]').forEach(function(r){ r.style.outline = 'none'; });
+}
+
 function renderDovExplore(){
   const el=document.getElementById('dov-explore-content');
   if(!el) return;
@@ -6952,7 +6958,7 @@ async function dovAiSend(){
   btn.disabled=false;
   msgs.scrollTop=msgs.scrollHeight;
 }
-function dovAiClear(){ dovAiHistory=[]; const m=document.getElementById('dovAiMsgs'); if(m) m.innerHTML=`<div style="background:#f8fafc;border-radius:10px;padding:12px 14px;font-size:.78rem;color:#1a202c;max-width:85%;align-self:flex-start;border:1px solid #e2e8f0;">👋 Vanakkam! I'm your AI Coach. Ask me anything! 🇮🇳</div>`; }
+function dovAiClear(){ dovAiHistory=[]; const m=document.getElementById('dovAiMsgs'); if(m) m.innerHTML=`<div style="background:#f8fafc;border-radius:10px;padding:12px 14px;font-size:.78rem;color:#1a202c;max-width:85%;align-self:flex-start;border:1px solid #e2e8f0;">👋 Hello! I'm your AI Coach. Ask me anything about AI! 🇮🇳</div>`; }
 function dovAiQuick(q){ const inp=document.getElementById('dovAiInput'); if(inp){inp.value=q;dovAiSend();} }
 
 /* ── PAYMENT ── */
@@ -8079,11 +8085,11 @@ function _showNewUserWelcome(name){
     <div style="background:#fff;border-radius:22px;max-width:420px;width:100%;padding:36px 28px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.2);animation:scaleIn .35s cubic-bezier(.34,1.56,.64,1);">
       <div style="font-size:3rem;margin-bottom:10px;">🎉</div>
       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#1a202c;margin-bottom:8px;">
-        Vanakkam, ${name}!
+        Welcome, ${name}! 🎉
       </div>
       <div style="font-size:.88rem;color:#64748b;line-height:1.7;margin-bottom:6px;">
-        AI Katrukko-க்கு welcome!<br>
-        <strong style="color:#1a202c;">Module 1 உங்களுக்கு 100% Free.</strong>
+        You're all set to start learning AI!<br>
+        <strong style="color:#1a202c;">Module 1 is 100% Free for you.</strong>
       </div>
       <div style="background:linear-gradient(135deg,rgba(220,20,60,0.06),#fff);border:1.5px solid rgba(220,20,60,0.2);border-radius:14px;padding:14px 16px;margin:16px 0;text-align:left;">
         <div style="font-size:.72rem;font-weight:700;color:#dc143c;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">🎓 Module 1 — AI Foundations</div>
@@ -8221,7 +8227,7 @@ function _showReturningUserDashboard(name){
       ${resumeBtn}
 
       <button onclick="document.getElementById('_akResumeBanner').remove();" style="width:100%;padding:11px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;color:#64748b;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;">
-        Dashboard பார்க்க →
+        Explore Dashboard →
       </button>
     </div>`;
   document.body.appendChild(banner);
