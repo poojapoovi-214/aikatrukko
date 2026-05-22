@@ -197,7 +197,7 @@ setTimeout(function(){
 
   const config = {
     apiKey: "AIzaSyAF-FUEXFxBNMCyNLErnTGoW8aEq8nNxMU",
-    authDomain: "aikatrukko-e49f9.firebaseapp.com",
+    authDomain: "aikatrukko.in",
     projectId: "aikatrukko-e49f9",
     storageBucket: "aikatrukko-e49f9.firebasestorage.app",
     messagingSenderId: "467227648026",
@@ -4895,7 +4895,7 @@ let fpStep = 0, fpEmail = '', fpCode = '';
    
    If BOTH keys are missing → AI chat shows friendly setup message.
 ══════════════════════════════════════════════ */
-const RZP_KEY  = 'rzp_test_XXXXXXXXXXXXXXXXXX';  // ⚠️ Replace with your Razorpay Live/Test key
+const RZP_KEY  = ''; // Key fetched securely from Cloudflare Worker
 const WORKER_URL = 'https://ai-proxy.www-poojapoovi3.workers.dev'; // ✅ Cloudflare Worker proxy — API key safe on server
 
 
@@ -6165,7 +6165,7 @@ async function doGoogleSignIn(){
     }
     if(c === 'auth/unauthorized-domain'){
       _authBusy = false;
-      toast('⚠️ Domain not authorized. Go to Firebase Console → Authentication → Settings → Authorized domains → Add: ailearn-o60u.onrender.com and aikatrukko.in','err');
+      toast('⚠️ Google Sign-In domain error. Add aikatrukko.in to Firebase Console → Authentication → Authorized domains','err');
       if(btn){ btn.innerHTML=_GBTN; btn.disabled=false; }
       return;
     }
@@ -6985,22 +6985,19 @@ async function doPayment(){
   const cat=curCat||'student', C=CATS[cat];
   if(!user){toast('Please login first','err');return;}
 
-  // Fetch key from Cloudflare Worker if placeholder
-  let rzpKey = RZP_KEY;
-  if(!rzpKey || rzpKey.includes('XXXX') || rzpKey.trim()===''){
-    try{
-      toast('Loading payment gateway…','info');
-      const res = await fetch(WORKER_URL+'/get-rzp-key');
-      const data = await res.json();
-      rzpKey = data.key;
-    }catch(e){
-      toast('Payment setup error. Contact aikatrukko@gmail.com','err');
-      return;
-    }
+  // Always fetch Razorpay key securely from Cloudflare Worker
+  let rzpKey = '';
+  try{
+    toast('Loading payment gateway…','info');
+    const res = await fetch(WORKER_URL+'/get-rzp-key');
+    const data = await res.json();
+    rzpKey = data.key || '';
+  }catch(e){
+    toast('Payment setup error. Contact aikatrukko@gmail.com','err');
+    return;
   }
-
-  if(!rzpKey || rzpKey.includes('XXXX') || rzpKey.trim()===''){
-    toast('Payment key not set. Contact aikatrukko@gmail.com','err');
+  if(!rzpKey || rzpKey.trim()===''){
+    toast('Payment key not configured. Contact aikatrukko@gmail.com','err');
     return;
   }
 
