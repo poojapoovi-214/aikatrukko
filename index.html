@@ -92,6 +92,14 @@
 /* ─── Step 1: Ready promise — set up BEFORE Firebase loads ─── */
 window._fbLoaded = false;
 window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
+/* Safety net — if Firebase module never loads (network block, CSP etc),
+   resolve after 5s so the rest of the app doesn't hang */
+setTimeout(function(){
+  if(!window._fbLoaded && typeof window._fbReadyResolve === 'function'){
+    console.warn('Firebase did not load in time — using local fallback.');
+    window._fbReadyResolve();
+  }
+}, 5000);
 
 /* ─── Step 2: Install a LOCAL-STORAGE fallback immediately ───
    This runs synchronously so doLogin/doSignup/doGoogleSignIn
@@ -338,6 +346,48 @@ window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
   transform:scale(2.5); opacity:1; transition:0s;
 }
 
+/* ══ 2026: AURORA MESH GRADIENT BACKGROUND ══ */
+@keyframes auroraShift1 {
+  0%,100% { transform:translate(0,0) scale(1); opacity:.55; }
+  50%     { transform:translate(40px,-30px) scale(1.12); opacity:.75; }
+}
+@keyframes auroraShift2 {
+  0%,100% { transform:translate(0,0) scale(1); opacity:.45; }
+  50%     { transform:translate(-35px,25px) scale(1.08); opacity:.65; }
+}
+@keyframes auroraShift3 {
+  0%,100% { transform:translate(0,0) scale(1); opacity:.35; }
+  33%     { transform:translate(20px,30px) scale(1.06); opacity:.5; }
+  66%     { transform:translate(-20px,-15px) scale(0.96); opacity:.4; }
+}
+#auroraCanvas { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden; }
+#auroraCanvas .orb { position:absolute;border-radius:50%;filter:blur(80px); }
+#auroraCanvas .orb1 { width:600px;height:600px;background:radial-gradient(circle,rgba(220,20,60,0.12) 0%,transparent 70%);top:-100px;right:-100px;animation:auroraShift1 12s ease-in-out infinite; }
+#auroraCanvas .orb2 { width:500px;height:500px;background:radial-gradient(circle,rgba(99,179,237,0.07) 0%,transparent 70%);bottom:-80px;left:-80px;animation:auroraShift2 16s ease-in-out infinite; }
+#auroraCanvas .orb3 { width:350px;height:350px;background:radial-gradient(circle,rgba(220,20,60,0.05) 0%,transparent 70%);top:40%;left:50%;animation:auroraShift3 20s ease-in-out infinite; }
+/* ══ 2026: BENTO GRID ══ */
+.bento-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:14px; }
+.bento-card { background:#fff;border:1px solid var(--border);border-radius:18px;padding:22px 20px;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s ease,border-color .2s;position:relative;overflow:hidden; }
+.bento-card::before { content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(220,20,60,0.03) 0%,transparent 60%);opacity:0;transition:opacity .3s; }
+.bento-card:hover { transform:translateY(-6px) scale(1.01);box-shadow:0 16px 40px rgba(220,20,60,0.1),0 4px 12px rgba(0,0,0,0.06);border-color:rgba(220,20,60,0.25); }
+.bento-card:hover::before { opacity:1; }
+.bento-wide { grid-column:span 2; }
+.bento-tall { grid-row:span 2; }
+.bento-ic { font-size:2rem;margin-bottom:12px;display:block; }
+.bento-ttl { font-family:"Syne",sans-serif;font-weight:800;font-size:.92rem;color:var(--white);margin-bottom:6px; }
+.bento-dsc { font-size:.73rem;color:var(--gray1);line-height:1.7; }
+.bento-tag { display:inline-block;margin-top:10px;background:var(--aqua-dim);color:var(--aqua);font-size:.58rem;font-weight:800;padding:3px 10px;border-radius:100px;letter-spacing:.4px; }
+.bento-stat { font-family:"Syne",sans-serif;font-weight:900;font-size:2.4rem;color:var(--aqua);line-height:1;margin-bottom:4px; }
+.bento-stat-label { font-size:.68rem;color:var(--gray2);font-weight:600; }
+/* ══ 2026: CURSOR GLOW ══ */
+#cursorGlow { position:fixed;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(220,20,60,0.055) 0%,transparent 70%);pointer-events:none;z-index:1;transform:translate(-50%,-50%);transition:left .15s ease,top .15s ease; }
+/* ══ 2026: SCROLL REVEAL ══ */
+[data-reveal] { opacity:0;transform:translateY(32px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1); }
+[data-reveal].revealed { opacity:1;transform:translateY(0); }
+[data-reveal-delay="1"]{transition-delay:.12s;}[data-reveal-delay="2"]{transition-delay:.24s;}[data-reveal-delay="3"]{transition-delay:.36s;}[data-reveal-delay="4"]{transition-delay:.48s;}
+@media(max-width:900px){.bento-grid{grid-template-columns:1fr 1fr;}.bento-wide{grid-column:span 2;}.bento-tall{grid-row:span 1;}}
+@media(max-width:600px){.bento-grid{grid-template-columns:1fr;}.bento-wide{grid-column:span 1;}#cursorGlow{display:none;}}
+
 /* ══ FLOATING aqua orb background (hero only) ══ */
 @keyframes floatOrb {
   0%,100% { transform: translate(0,0) scale(1); }
@@ -387,6 +437,61 @@ window._fbReady  = new Promise(function(res){ window._fbReadyResolve = res; });
 }
 .logo-mark:hover { animation: logoBeat .5s ease; cursor:pointer; }
 
+
+/* ══ EMAIL CAPTURE POPUP ══ */
+#emailPopupOverlay {
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99990;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+#emailPopupOverlay.show { display:flex;animation:fadeIn .35s ease; }
+.email-popup-box {
+  background:#fff;border-radius:24px;max-width:400px;width:100%;
+  padding:36px 28px;text-align:center;position:relative;
+  box-shadow:0 24px 80px rgba(0,0,0,0.2);
+  animation:scaleIn .35s cubic-bezier(.34,1.56,.64,1);
+}
+.email-popup-close {
+  position:absolute;top:14px;right:16px;background:none;border:none;
+  font-size:1.2rem;cursor:pointer;color:#94a3b8;
+}
+.email-popup-ic { font-size:2.8rem;margin-bottom:10px; }
+.email-popup-ttl {
+  font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;
+  color:#1a202c;margin-bottom:6px;
+}
+.email-popup-sub { font-size:.82rem;color:#64748b;line-height:1.65;margin-bottom:20px; }
+.email-popup-inp {
+  width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;
+  font-size:.88rem;color:#1a202c;outline:none;margin-bottom:10px;
+  transition:border-color .2s;box-sizing:border-box;
+}
+.email-popup-inp:focus { border-color:#dc143c; }
+.email-popup-btn {
+  width:100%;padding:13px;border:none;border-radius:10px;
+  background:#dc143c;color:#fff;font-family:'Syne',sans-serif;
+  font-weight:800;font-size:.88rem;cursor:pointer;transition:all .2s;
+}
+.email-popup-btn:hover { background:#c0392b;transform:translateY(-1px); }
+.email-popup-skip { font-size:.7rem;color:#94a3b8;margin-top:12px;cursor:pointer; }
+.email-popup-skip:hover { color:#dc143c; }
+
+/* ══ CURRICULUM PREVIEW ══ */
+.curr-mod { border:1px solid #e2e8f0;border-radius:10px;margin-bottom:8px;overflow:hidden; }
+.curr-mod-head {
+  padding:11px 14px;font-size:.78rem;font-weight:700;color:#1a202c;
+  cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:#f8fafc;transition:background .2s;
+}
+.curr-mod-head:hover { background:#f1f5f9; }
+.curr-arrow { font-size:.65rem;color:#94a3b8;transition:transform .25s;flex-shrink:0; }
+.curr-mod-body { padding:10px 14px;display:block; }
+.curr-lesson {
+  font-size:.73rem;color:#4a5568;padding:6px 0;
+  border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:8px;
+}
+.curr-lesson:last-child { border-bottom:none; }
+.curr-lesson::before { content:'▸';color:#dc143c;font-size:.65rem;flex-shrink:0; }
+@media(max-width:900px){ #curriculumGrid { grid-template-columns:1fr!important; } }
 /* ══ SCROLL PROGRESS BAR ══ */
 #scrollBar {
   position:fixed; top:0; left:0; height:2px; width:0%;
@@ -1817,11 +1922,44 @@ footer{
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
+
+<!-- ══ SOCIAL PROOF BAR ══ -->
+<div id="socialProofBar" style="background:linear-gradient(90deg,#fff5f7,#fff,#fff5f7);border-bottom:1px solid rgba(220,20,60,0.1);padding:10px clamp(16px,4vw,40px);display:none;">
+  <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;animation:blink 1.5s infinite;flex-shrink:0;"></div>
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;color:#1a202c;" id="spStudentCount">— students</span>
+      <span style="font-size:.75rem;color:#64748b;">enrolled so far</span>
+    </div>
+    <div style="width:1px;height:16px;background:#e2e8f0;"></div>
+    <div style="font-size:.75rem;color:#64748b;">🎓 Module 1 always free · No card needed</div>
+    <div style="width:1px;height:16px;background:#e2e8f0;"></div>
+    <div style="font-size:.75rem;color:#64748b;">⭐ Built by Pooja Gunasekaran · Chennai</div>
+  </div>
+</div>
+
+<!-- ══ BACK TO TOP ══ -->
+<button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:24px;right:24px;width:44px;height:44px;border-radius:50%;background:#dc143c;color:#fff;border:none;font-size:1.1rem;cursor:pointer;z-index:8990;display:none;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(220,20,60,0.35);transition:all .25s;opacity:0;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(220,20,60,0.45)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(220,20,60,0.35)'">↑</button>
+
+<!-- ══ EMAIL CAPTURE POPUP ══ -->
+<div id="emailPopupOverlay" onclick="if(event.target===this)closeEmailPopup()">
+  <div class="email-popup-box">
+    <button class="email-popup-close" onclick="closeEmailPopup()">✕</button>
+    <div class="email-popup-ic">🎁</div>
+    <div class="email-popup-ttl">Get Module 1 Free!</div>
+    <div class="email-popup-sub">Enter your email and start learning AI today — completely free. No credit card needed.</div>
+    <input class="email-popup-inp" id="emailPopupInput" type="email" placeholder="your@email.com" />
+    <button class="email-popup-btn" onclick="submitEmailPopup()">Start Learning Free →</button>
+    <div class="email-popup-skip" onclick="closeEmailPopup()">Maybe later</div>
+  </div>
+</div>
+<div id="auroraCanvas" aria-hidden="true"><div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div></div>
+<div id="cursorGlow" aria-hidden="true"></div>
 <div id="scrollBar"></div>
 <div id="stickyHeader" style="position:sticky;top:0;z-index:500;width:100%;">
 <!-- ══ UPGRADE BANNER (shown after login) ══ -->
 <div id="upgradeBanner" style="display:none;background:linear-gradient(90deg,#0f0c29,#2d0060,#5a0fbf,#7b2fff,#9d4fff,#7b2fff,#5a0fbf,#2d0060,#0f0c29);background-size:300% 100%;animation:bannerGradShift 8s ease infinite;overflow:hidden;position:relative;z-index:999;box-shadow:0 3px 16px rgba(123,47,255,0.5);">
-  <div style="display:flex;align-items:center;white-space:nowrap;animation:bannerScroll 22s linear infinite;padding:10px 0;gap:0;">
+  <div style="display:flex;align-items:center;white-space:nowrap;animation:bannerScroll 40s linear infinite;padding:10px 0;gap:0;">
     <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; AI Practice Exercises — Every Lesson &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
     <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; AI Practice Exercises — Every Lesson &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
     <span style="color:#fff;font-size:.72rem;font-weight:700;letter-spacing:.5px;padding:0 40px;">👑 Upgrade to Elite &amp; Get Lifetime Access for ₹2,499 &nbsp;·&nbsp; ✅ Daily AI Updates &nbsp;·&nbsp; AI Practice Exercises — Every Lesson &nbsp;·&nbsp; Gold Certificate &nbsp;·&nbsp; Free Future Courses Forever &nbsp;·&nbsp; 1-on-1 Support &nbsp;&nbsp;<span onclick="curCat='unemployed';openPayModal();" style="background:var(--aqua);color:#fff;padding:3px 12px;border-radius:100px;cursor:pointer;font-weight:800;margin-left:8px;">Upgrade Now →</span></span>
@@ -1909,7 +2047,7 @@ footer{
 
 <!-- ══ RUNNING ANNOUNCEMENT BANNER ══ -->
 <div id="announcementBanner" style="background:linear-gradient(90deg,#0f0c29,#2d0060,#5a0fbf,#7b2fff,#9d4fff,#7b2fff,#5a0fbf,#2d0060,#0f0c29);background-size:300% 100%;animation:bannerGradShift 8s ease infinite;overflow:hidden;height:38px;display:flex;align-items:center;position:relative;z-index:201;box-shadow:0 3px 16px rgba(123,47,255,0.5);">
-  <div style="display:flex;animation:marqueeScroll 32s linear infinite;white-space:nowrap;will-change:transform;">
+  <div style="display:flex;animation:marqueeScroll 55s linear infinite;white-space:nowrap;will-change:transform;">
     <span style="display:inline-flex;align-items:center;gap:32px;padding-right:60px;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:#fff;letter-spacing:.4px;">
       <span>🇮🇳 Built for Indian Students, Job Seekers &amp; Business Owners</span>
       <span style="opacity:.4;">✦</span>
@@ -2037,33 +2175,53 @@ footer{
 </div>
 
 
-<!-- ══ WHY AI KATRUKKO BANNER ══ -->
-<div style="background:linear-gradient(135deg,#fff5f7,#fff);border-top:1px solid rgba(220,20,60,0.12);border-bottom:1px solid rgba(220,20,60,0.12);padding:28px clamp(16px,4vw,40px);">
+<!-- ══ WHY AI KATRUKKO BENTO GRID ══ -->
+<div style="background:linear-gradient(135deg,#fff5f7,#fff);border-top:1px solid rgba(220,20,60,0.1);border-bottom:1px solid rgba(220,20,60,0.1);padding:36px clamp(16px,4vw,40px);">
   <div style="max-width:1100px;margin:0 auto;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px;">
       <div style="width:4px;height:22px;border-radius:2px;background:var(--aqua);"></div>
       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:var(--white);">Why AI Katrukko?</div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;">
-      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
-        <div style="font-size:1.3rem;margin-bottom:6px;">🎙️</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--white);margin-bottom:4px;">Voice-First Learning</div>
-        <div style="font-size:.7rem;color:var(--gray1);line-height:1.6;">Every lesson is voice-guided by Pooja in clear India-English. Learn hands-free, anywhere.</div>
+    <div class="bento-grid">
+      <!-- Wide card: Voice -->
+      <div class="bento-card bento-wide" data-reveal data-reveal-delay="1">
+        <span class="bento-ic">🎙️</span>
+        <div class="bento-ttl">Voice-First Learning — Learn Anywhere</div>
+        <div class="bento-dsc">Every lesson narrated by Pooja in clear India-English. Speed control built in. Learn on your commute, hands-free.</div>
+        <span class="bento-tag">INDIA-ENGLISH</span>
       </div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
-        <div style="font-size:1.3rem;margin-bottom:6px;">🤖</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--white);margin-bottom:4px;"> AI Practice Tools</div>
-        <div style="font-size:.7rem;color:var(--gray1);line-height:1.6;">Built-in exercises powered by Claude AI — practice real skills, updated with current trends.</div>
+      <!-- Stat card: lessons -->
+      <div class="bento-card" data-reveal data-reveal-delay="2" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div class="bento-stat">36+</div>
+        <div class="bento-stat-label">TOTAL LESSONS</div>
+        <div class="bento-dsc" style="margin-top:8px;text-align:center;">Across 3 categories · 4 modules each</div>
       </div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
-        <div style="font-size:1.3rem;margin-bottom:6px;">🇮🇳</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--white);margin-bottom:4px;">Built for India</div>
-        <div style="font-size:.7rem;color:var(--gray1);line-height:1.6;">Tamil Nadu-rooted examples, ₹-priced affordably, real Indian use cases — not generic AI fluff.</div>
+      <!-- Stat card: price -->
+      <div class="bento-card" data-reveal data-reveal-delay="3" style="text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div class="bento-stat">₹399</div>
+        <div class="bento-stat-label">STARTS FROM</div>
+        <div class="bento-dsc" style="margin-top:8px;text-align:center;">One-time · No subscription · Own forever</div>
       </div>
-      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 16px;">
-        <div style="font-size:1.3rem;margin-bottom:6px;">💳</div>
-        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--white);margin-bottom:4px;">Pay Once, Own Forever</div>
-        <div style="font-size:.7rem;color:var(--gray1);line-height:1.6;">Starting at ₹399 (6mo) · ₹999 (1yr) · ₹2,499 (lifetime). No hidden charges.</div>
+      <!-- Card: AI Tools -->
+      <div class="bento-card" data-reveal data-reveal-delay="1">
+        <span class="bento-ic">🤖</span>
+        <div class="bento-ttl">AI Practice Built In</div>
+        <div class="bento-dsc">Claude AI exercises inside every lesson. Practice real skills instantly — no extra tools needed.</div>
+        <span class="bento-tag">POWERED BY CLAUDE AI</span>
+      </div>
+      <!-- Card: India -->
+      <div class="bento-card" data-reveal data-reveal-delay="2">
+        <span class="bento-ic">🇮🇳</span>
+        <div class="bento-ttl">Built for India</div>
+        <div class="bento-dsc">Tamil Nadu examples, ₹-priced, real Indian use cases. Not generic AI fluff from the West.</div>
+        <span class="bento-tag">MADE IN INDIA</span>
+      </div>
+      <!-- Wide card: Pay once -->
+      <div class="bento-card bento-wide" data-reveal data-reveal-delay="3" style="background:linear-gradient(135deg,rgba(220,20,60,0.05),#fff);border-color:rgba(220,20,60,0.2);">
+        <span class="bento-ic">💳</span>
+        <div class="bento-ttl">Pay Once — Own Forever</div>
+        <div class="bento-dsc">₹399 for 6 months · ₹999 for 1 year · ₹2,499 lifetime. No renewals. No hidden charges. Yours forever.</div>
+        <span class="bento-tag">NO SUBSCRIPTION</span>
       </div>
     </div>
   </div>
@@ -2110,6 +2268,137 @@ footer{
   </div>
 </div>
 
+
+<!-- ══ CURRICULUM PREVIEW ══ -->
+<div class="sec" id="curriculumSection" style="background:#fff;">
+  <div class="sec-in">
+    <div class="sec-eye" data-scroll="anim-up">📚 What You'll Learn</div>
+    <div class="sec-title" data-scroll="anim-up">Full Curriculum — Nothing Hidden</div>
+    <div class="sec-sub" data-scroll="anim-up">See every lesson before you buy. Module 1 is free — no card needed.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:1100px;margin:0 auto;" id="curriculumGrid">
+
+      <!-- Starter -->
+      <div style="border:1px solid var(--border);border-radius:18px;overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#f0fff4,#fff);padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1.5rem;">🌱</span>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:#1a202c;">Starter</div>
+            <div style="font-size:.68rem;color:#64748b;">AI for Students · 12 Lessons</div>
+          </div>
+          <div style="margin-left:auto;font-family:'Syne',sans-serif;font-weight:900;font-size:1rem;color:#dc143c;">₹399</div>
+        </div>
+        <div style="padding:16px 20px;">
+          <div class="curr-mod" onclick="toggleCurrMod(this)">
+            <div class="curr-mod-head"><span style="color:#22c55e;font-weight:800;font-size:.7rem;">FREE</span> Module 1 — AI Foundations <span class="curr-arrow">▼</span></div>
+            <div class="curr-mod-body">
+              <div class="curr-lesson">1. What is AI? — How it actually works</div>
+              <div class="curr-lesson">2. ChatGPT basics — Your first AI conversation</div>
+              <div class="curr-lesson">3. Prompt Engineering — Getting better answers</div>
+            </div>
+          </div>
+          <div class="curr-mod" onclick="toggleCurrMod(this)">
+            <div class="curr-mod-head">🔒 Module 2 — AI for Studies <span class="curr-arrow">▶</span></div>
+            <div class="curr-mod-body" style="display:none;">
+              <div class="curr-lesson">4. AI for notes & summaries</div>
+              <div class="curr-lesson">5. AI for essay writing</div>
+              <div class="curr-lesson">6. AI for exam prep</div>
+            </div>
+          </div>
+          <div class="curr-mod" onclick="toggleCurrMod(this)">
+            <div class="curr-mod-head">🔒 Module 3 — AI Tools Deep Dive <span class="curr-arrow">▶</span></div>
+            <div class="curr-mod-body" style="display:none;">
+              <div class="curr-lesson">7. Image generation with AI</div>
+              <div class="curr-lesson">8. AI for presentations</div>
+              <div class="curr-lesson">9. Building your AI workflow</div>
+            </div>
+          </div>
+          <div class="curr-mod" onclick="toggleCurrMod(this)">
+            <div class="curr-mod-head">🔒 Module 4 — Real Projects <span class="curr-arrow">▶</span></div>
+            <div class="curr-mod-body" style="display:none;">
+              <div class="curr-lesson">10. AI project: College application</div>
+              <div class="curr-lesson">11. AI project: Research paper</div>
+              <div class="curr-lesson">12. Capstone + Certificate</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:0 20px 20px;"><button onclick="curCat='student';openPayModal();" style="width:100%;background:#dc143c;color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;">Get Starter — ₹399 →</button></div>
+      </div>
+
+      <!-- Professional -->
+      <div style="border:2px solid #dc143c;border-radius:18px;overflow:hidden;box-shadow:0 4px 24px rgba(220,20,60,0.12);position:relative;">
+        <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:#dc143c;color:#fff;font-size:.6rem;font-weight:800;padding:4px 16px;border-radius:0 0 10px 10px;letter-spacing:.5px;">⭐ BEST SELLER</div>
+        <div style="background:linear-gradient(135deg,#fff5f7,#fff);padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;margin-top:8px;">
+          <span style="font-size:1.5rem;">🚀</span>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:#1a202c;">Professional</div>
+            <div style="font-size:.68rem;color:#64748b;">AI for Job Seekers · 18 Lessons</div>
+          </div>
+          <div style="margin-left:auto;font-family:'Syne',sans-serif;font-weight:900;font-size:1rem;color:#dc143c;">₹999</div>
+        </div>
+        <div style="padding:16px 20px;">
+          <div class="curr-mod" onclick="toggleCurrMod(this)">
+            <div class="curr-mod-head"><span style="color:#22c55e;font-weight:800;font-size:.7rem;">FREE</span> Module 1 — AI Foundations <span class="curr-arrow">▼</span></div>
+            <div class="curr-mod-body">
+              <div class="curr-lesson">1. What is AI? Why job seekers need it now</div>
+              <div class="curr-lesson">2. ChatGPT for career tasks</div>
+              <div class="curr-lesson">3. Prompt Engineering for professionals</div>
+            </div>
+          </div>
+          <div class="curr-mod" onclick="toggleCurrMod(this)">
+            <div class="curr-mod-head">🔒 Module 2 — Resume & LinkedIn <span class="curr-arrow">▶</span></div>
+            <div class="curr-mod-body" style="display:none;">
+              <div class="curr-lesson">4. AI resume builder — ATS optimized</div>
+              <div class="curr-lesson">5. LinkedIn profile with AI</div>
+              <div class="curr-lesson">6. Cover letter in 5 minutes</div>
+            </div>
+          </div>
+          <div class="curr-mod" onclick="toggleCurrMod(this)">
+            <div class="curr-mod-head">🔒 Module 3 — Interview Prep <span class="curr-arrow">▶</span></div>
+            <div class="curr-mod-body" style="display:none;">
+              <div class="curr-lesson">7. Mock interview with AI</div>
+              <div class="curr-lesson">8. STAR answers using AI</div>
+              <div class="curr-lesson">9. Salary negotiation scripts</div>
+            </div>
+          </div>
+          <div class="curr-mod" onclick="toggleCurrMod(this)">
+            <div class="curr-mod-head">🔒 Module 4 — Land the Job <span class="curr-arrow">▶</span></div>
+            <div class="curr-mod-body" style="display:none;">
+              <div class="curr-lesson">10. Cold email outreach with AI</div>
+              <div class="curr-lesson">11. Follow-up strategy</div>
+              <div class="curr-lesson">12. Professional Certificate</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:0 20px 20px;"><button onclick="curCat='business';openPayModal();" style="width:100%;background:#dc143c;color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;">Get Professional — ₹999 →</button></div>
+      </div>
+
+      <!-- Elite -->
+      <div style="border:1.5px solid #f59e0b;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#fffbeb,#fff);">
+        <div style="background:linear-gradient(135deg,#fffbeb,#fff);padding:18px 20px;border-bottom:1px solid #fde68a;display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1.5rem;">👑</span>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.95rem;color:#1a202c;">Elite Mastery</div>
+            <div style="font-size:.68rem;color:#64748b;">All 3 Plans · 36+ Lessons · Lifetime</div>
+          </div>
+          <div style="margin-left:auto;font-family:'Syne',sans-serif;font-weight:900;font-size:1rem;color:#d97706;">₹2,499</div>
+        </div>
+        <div style="padding:20px;text-align:center;">
+          <div style="font-size:.82rem;color:#64748b;margin-bottom:12px;">Everything in Starter + Professional, plus:</div>
+          <div style="display:flex;flex-direction:column;gap:8px;text-align:left;">
+            <div style="font-size:.78rem;color:#1a202c;">✅ All 36+ lessons unlocked forever</div>
+            <div style="font-size:.78rem;color:#1a202c;">✅ 🥇 Gold Certificate</div>
+            <div style="font-size:.78rem;color:#1a202c;">✅ VIP Discord community</div>
+            <div style="font-size:.78rem;color:#1a202c;">✅ All future courses — free forever</div>
+            <div style="font-size:.78rem;color:#1a202c;">✅ 1-on-1 support access</div>
+            <div style="font-size:.78rem;color:#1a202c;">✅ Lifetime access — never expires</div>
+          </div>
+        </div>
+        <div style="padding:0 20px 20px;"><button onclick="curCat='unemployed';openPayModal();" style="width:100%;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;">Get Elite — ₹2,499 →</button></div>
+      </div>
+
+    </div>
+  </div>
+</div>
 <!-- HOW IT WORKS -->
 <div class="sec" id="howSection">
   <div class="sec-in">
@@ -2184,7 +2473,7 @@ footer{
           <div class="cat-feat" style="color:#aaa;"><span style="margin-right:6px;">❌</span>Community & Support Group</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Email Support (48hr reply)</div>
         </div>
-        <button class="cat-cta" style="margin-top:auto;" onclick="event.stopPropagation();pick('student');">Get Started — ₹399 →</button>
+        <button class="cat-cta" style="margin-top:auto;" onclick="event.stopPropagation();curCat='student';openPayModal();">Get Started — ₹399 →</button>
       </div>
 
       <!-- PROFESSIONAL -->
@@ -2205,7 +2494,7 @@ footer{
           <div class="cat-feat"><div class="cat-feat-dot"></div>✅ WhatsApp Community Access</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>Priority Support (24hr reply)</div>
         </div>
-        <button class="cat-cta" style="margin-top:auto;" onclick="event.stopPropagation();pick('business');">Get Professional — ₹999 →</button>
+        <button class="cat-cta" style="margin-top:auto;" onclick="event.stopPropagation();curCat='business';openPayModal();">Get Professional — ₹999 →</button>
       </div>
 
       <!-- ELITE MASTERY -->
@@ -2225,7 +2514,7 @@ footer{
           <div class="cat-feat"><div class="cat-feat-dot"></div>✅ All Future Courses — Free Forever</div>
           <div class="cat-feat"><div class="cat-feat-dot"></div>1-on-1 Direct Support with Pooja</div>
         </div>
-        <button class="cat-cta" style="margin-top:auto;background:linear-gradient(135deg,var(--aqua),var(--aqua2));" onclick="event.stopPropagation();pick('unemployed');">Get Elite Access — ₹2,499 →</button>
+        <button class="cat-cta" style="margin-top:auto;background:linear-gradient(135deg,var(--aqua),var(--aqua2));" onclick="event.stopPropagation();curCat='unemployed';openPayModal();">Get Elite Access — ₹2,499 →</button>
       </div>
 
     </div>
@@ -2320,16 +2609,16 @@ footer{
 
     <div class="video-wrap" data-scroll="anim-up" data-delay="180">
       <div class="video-container">
-        <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:16px;overflow:hidden;">
-          <iframe
-            src="https://www.youtube.com/embed/kIwK7m6FwA8?rel=0&modestbranding=1&color=white"
-            title="Prompt Engineering Basics with Pooja — Module 1 Preview"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-            style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:16px;"
-          ></iframe>
-        </div>
+        <video
+          controls
+          playsinline
+          preload="metadata"
+          poster=""
+          style="width:100%;border-radius:16px;outline:none;"
+        >
+          <source src="https://poojapoovi-214.github.io/poojapoovi-214/Prompt%20Engineering%20Basics%20with%20Pooja_720p.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
         <div class="video-label">
           <span>📚 Module 1 Preview</span>
           <span>Prompt Engineering Basics · 2 min</span>
@@ -4658,26 +4947,12 @@ function goToDashboard(){
 
 function pick(cat){
   curCat = cat;
-  /* If not logged in, show signup first then open dashboard */
-  if(!user){
-    window._openTrialAfterAuth = true;
-    openAuth('signup');
-    return;
-  }
   /* Always route through dashOverview → My Courses panel */
   document.getElementById('homepage').style.display='none';
   const plat = document.getElementById('platform');
   plat.style.display='block';
   const dashOv = document.getElementById('dashOverview');
   if(dashOv) dashOv.style.display='block';
-  document.body.classList.add('dash-open');
-  /* Update user name in dashboard */
-  var uname = (user && user.name) ? user.name.split(' ')[0] : 'Learner';
-  var uEl = document.getElementById('dovName');
-  if(uEl) uEl.textContent = uname;
-  var uAv = document.getElementById('dovAva');
-  if(uAv) uAv.textContent = uname.charAt(0).toUpperCase();
-  if(typeof updateDovMobTopbar === 'function') updateDovMobTopbar();
   window.scrollTo(0,0);
   const C=CATS[cat];
   document.getElementById('bcCat').textContent=C.label;
@@ -5019,6 +5294,48 @@ function markDone(key,mi,li){
   if(purchases.includes('unemployed')){
     checkAndShowCertificate();
   }
+  /* ── Module 1 done (free tier) → show upgrade nudge ── */
+  if(mi===0 && li===2 && !purchases.includes(key)){
+    setTimeout(()=>showModule1UpgradePopup(key), 1200);
+  }
+}
+
+/* ══ MODULE 1 COMPLETION UPGRADE POPUP ══ */
+function showModule1UpgradePopup(cat){
+  var existing=document.getElementById('mod1UpgradeOverlay');
+  if(existing) existing.remove();
+  var catNames={student:'Starter',business:'Professional',unemployed:'Elite Mastery'};
+  var catPrices={student:'₹399',business:'₹999',unemployed:'₹2,499'};
+  var catEmojis={student:'🌱',business:'🚀',unemployed:'👑'};
+  var overlay=document.createElement('div');
+  overlay.id='mod1UpgradeOverlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn .3s ease;';
+  overlay.innerHTML=`
+    <div style="background:#fff;border-radius:24px;max-width:420px;width:100%;padding:32px 28px;text-align:center;position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.25);">
+      <button onclick="document.getElementById('mod1UpgradeOverlay').remove()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#94a3b8;">✕</button>
+      <div style="font-size:3rem;margin-bottom:8px;">🎉</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#1a202c;margin-bottom:6px;">You finished Module 1!</div>
+      <div style="font-size:.85rem;color:#64748b;line-height:1.65;margin-bottom:24px;">You've completed your free lessons. Ready to unlock the full course and keep learning?</div>
+      <div style="background:linear-gradient(135deg,#f0fdff,#fff);border:2px solid #0891b2;border-radius:16px;padding:20px;margin-bottom:20px;">
+        <div style="font-size:1.6rem;margin-bottom:4px;">${catEmojis[cat]||'🚀'}</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#1a202c;margin-bottom:4px;">${catNames[cat]||'Professional'} Plan</div>
+        <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:1.8rem;color:#0891b2;margin-bottom:4px;">${catPrices[cat]||'₹999'}</div>
+        <div style="font-size:.72rem;color:#64748b;margin-bottom:14px;">One-time · No subscription · Lifetime access</div>
+        <div style="display:flex;flex-direction:column;gap:6px;text-align:left;margin-bottom:16px;">
+          <div style="font-size:.75rem;color:#1a202c;">✅ Unlock all 9 remaining lessons</div>
+          <div style="font-size:.75rem;color:#1a202c;">✅ Voice-guided + AI practice each lesson</div>
+          <div style="font-size:.75rem;color:#1a202c;">✅ Certificate on completion</div>
+          <div style="font-size:.75rem;color:#1a202c;">✅ WhatsApp community access</div>
+        </div>
+        <button onclick="document.getElementById('mod1UpgradeOverlay').remove();curCat='${cat}';openPayModal();" style="width:100%;background:#0891b2;color:#fff;border:none;border-radius:10px;padding:14px;font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;cursor:pointer;transition:all .2s;" onmouseover="this.style.background='#0e7490'" onmouseout="this.style.background='#0891b2'">
+          Continue Learning — ${catPrices[cat]||'₹999'} →
+        </button>
+      </div>
+      <div style="font-size:.72rem;color:#94a3b8;">Not ready yet? <span onclick="document.getElementById('mod1UpgradeOverlay').remove()" style="color:#0891b2;cursor:pointer;font-weight:600;">Maybe later</span></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.remove();});
 }
 
 /* ══ GOLD CERTIFICATE ══ */
@@ -5672,6 +5989,7 @@ async function doLogin(){
     document.getElementById('liEmail').value = '';
     document.getElementById('liPass').value = '';
     toast('Welcome back, ' + found.name.split(' ')[0] + '! 👋', 'ok');
+    if(window._postLoginAction === 'openDashboard'){ window._postLoginAction = null; openDashboard(); }
   }catch(err){
     _authBusy = false;
     const c = err.code || '';
@@ -5736,6 +6054,7 @@ async function doSignup(){
     document.getElementById('suEmail').value='';
     document.getElementById('suPass').value='';
     toast('Account created! Module 1 is free — start learning 🎉','ok');
+    if(window._postLoginAction === 'openDashboard'){ window._postLoginAction = null; openDashboard(); }
   }catch(err){
     _authBusy = false;
     const c = err.code || '';
@@ -5794,6 +6113,7 @@ async function _finishGoogleLogin(result){
   clrAllErrs();
   const isNew = result.additionalUserInfo?.isNewUser ?? false;
   toast(isNew ? 'Welcome to AI Katrukko, '+u.name.split(' ')[0]+'! 🎉' : 'Welcome back, '+u.name.split(' ')[0]+'! 👋', 'ok');
+  if(window._postLoginAction === 'openDashboard'){ window._postLoginAction = null; openDashboard(); }
   return true;
 }
 
@@ -6257,12 +6577,6 @@ function dovToggleMod(key,mi){
   if(arrow) arrow.style.transform=isOpen?'':'rotate(180deg)';
 }
 
-function dovCloseLesson(){
-  var panel = document.getElementById('dovLessonPanel');
-  if(panel) panel.innerHTML = '';
-  document.querySelectorAll('[id^="dovLesRow_"]').forEach(function(r){ r.style.outline='none'; });
-}
-
 function dovOpenLesson(key,mi,li){
   curCat=key;
   // Highlight selected row
@@ -6287,7 +6601,7 @@ function dovOpenLesson(key,mi,li){
       <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#1a202c;">${les.icon} ${les.title}</div>
       <div style="display:flex;gap:8px;align-items:center;">
         ${canAccess?`<button onclick="dovMarkDone('${doneKey}','${key}',${mi},${li})" style="padding:7px 14px;border-radius:7px;background:#dcfce7;border:1.5px solid #bbf7d0;color:#16a34a;font-size:.72rem;font-weight:700;cursor:pointer;">Mark Complete ✓</button>`:''}
-        <button onclick="dovCloseLesson()" style="padding:7px 14px;border-radius:7px;background:#f8fafc;border:1px solid #e2e8f0;color:#718096;font-size:.72rem;cursor:pointer;">✕ Close</button>
+        <button onclick="document.getElementById('dovLessonPanel').innerHTML='';document.querySelectorAll(\'[id^=\\"dovLesRow_\\"]\').forEach(r=>r.style.outline=\'none\')" style="padding:7px 14px;border-radius:7px;background:#f8fafc;border:1px solid #e2e8f0;color:#718096;font-size:.72rem;cursor:pointer;">✕ Close</button>
       </div>
     </div>`;
 
@@ -6429,25 +6743,17 @@ async function _dovLoadGroqQuestions(){
   const loadDiv=document.getElementById('dovGroqLoader');
   if(loadDiv) loadDiv.style.display='flex';
   try{
-    const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    const quizPrompt=`Generate exactly 10 multiple-choice quiz questions about AI for Indian learners (students, job seekers, business owners). Return ONLY a valid JSON array with no extra text, no markdown, no explanation. Format: [{"q":"question","opts":["A option","B option","C option"],"ans":0,"exp":"explanation"}] ans is the index (0,1,2) of the correct answer. Topics: AI tools, prompt engineering, ChatGPT, Claude, career use, business use, Indian context. Keep questions practical and India-relevant.`;
+    const resp=await fetch(WORKER_URL,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer gsk_placeholder_replace_with_your_groq_key'},
+      headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'llama-3.3-70b-versatile',
-        max_tokens:2000,
-        messages:[{
-          role:'user',
-          content:`Generate exactly 10 multiple-choice quiz questions about AI for Indian learners (students, job seekers, business owners). 
-Return ONLY a valid JSON array with no extra text, no markdown, no explanation.
-Format: [{"q":"question","opts":["A option","B option","C option"],"ans":0,"exp":"explanation"}]
-ans is the index (0,1,2) of the correct answer.
-Topics: AI tools, prompt engineering, ChatGPT, Claude, career use, business use, Indian context.
-Keep questions practical and India-relevant.`
-        }]
+        system:'You are a quiz generator for AI Katrukko, an Indian AI learning platform. Return only valid JSON arrays, no markdown, no explanation.',
+        messages:[{role:'user',parts:[{text:quizPrompt}]}]
       })
     });
     const data=await resp.json();
-    const text=data.choices?.[0]?.message?.content||'';
+    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
     const clean=text.replace(/```json|```/g,'').trim();
     const parsed=JSON.parse(clean);
     if(Array.isArray(parsed)&&parsed.length>0){
@@ -6623,18 +6929,21 @@ async function dovAiSend(){
   msgs.scrollTop=msgs.scrollHeight;
   const systemPrompt='You are an AI Coach for AI Katrukko — a Tamil Nadu AI learning platform. Help students, job seekers, and business owners understand AI. Keep answers clear, friendly, concise (under 150 words), India-relevant. Use simple Indian English. Add emojis.';
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    const workerMessages=dovAiHistory.slice(-6).map(m=>({
+      role:m.role==='assistant'?'model':'user',
+      parts:[{text:m.text}]
+    }));
+    // Ensure last message is the current user msg
+    if(!workerMessages.length||workerMessages[workerMessages.length-1].role!=='user'){
+      workerMessages.push({role:'user',parts:[{text:msg}]});
+    }
+    const resp=await fetch(WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:300,
-        system:systemPrompt,
-        messages:[...dovAiHistory.slice(-6).filter(m=>m.role==='user').map(m=>({role:'user',content:m.text})),{role:'user',content:msg}]
-      })
+      body:JSON.stringify({system:systemPrompt, messages:workerMessages})
     });
     const data=await resp.json();
-    const reply=data.content?.[0]?.text||'⚠️ Could not connect. Try again!';
+    const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'⚠️ Could not connect. Try again!';
     dovAiHistory.push({role:'assistant',text:reply});
     document.getElementById('dovAiThink').outerHTML=`<div style="background:#f8fafc;border-radius:10px;padding:10px 14px;font-size:.78rem;color:#1a202c;max-width:85%;align-self:flex-start;border:1px solid #e2e8f0;">${reply.replace(/\n/g,'<br>')}</div>`;
   }catch(e){
@@ -7716,26 +8025,209 @@ window.simulateWeeks = function(n){
 
 /* Open free trial — if not logged in, show signup first */
 function openFreeTrial(){
-  /* If already logged in, open dashboard directly */
-  if(user){
-    curCat = 'student';
-    document.getElementById('homepage').style.display='none';
-    var plat = document.getElementById('platform');
-    plat.style.display='block';
-    var name = user.name ? user.name.split(' ')[0] : 'Learner';
-    var el = document.getElementById('dovName');
-    if(el) el.textContent = name;
-    var av = document.getElementById('dovAva');
-    if(av) av.textContent = name.charAt(0).toUpperCase();
-    document.getElementById('dashOverview').style.display='block';
-    document.body.classList.add('dash-open');
-    updateDovMobTopbar();
-    window.scrollTo(0,0);
-  } else {
-    /* Not logged in — show signup modal, then open dashboard after login */
-    window._openTrialAfterAuth = true;
+  /* If not logged in → show signup modal first */
+  if(!user){
+    window._postLoginAction = 'openDashboard';
     openAuth('signup');
+    return;
   }
+  /* Already logged in → open dashboard directly */
+  openDashboard();
+}
+
+function openDashboard(){
+  curCat = 'student';
+  document.getElementById('homepage').style.display='none';
+  var plat = document.getElementById('platform');
+  plat.style.display='block';
+
+  /* ── Update user name in dashboard ── */
+  var name = (user && user.name) ? user.name.split(' ')[0] : 'Learner';
+  var el = document.getElementById('dovName');
+  if(el) el.textContent = name;
+  var av = document.getElementById('dovAva');
+  if(av) av.textContent = name.charAt(0).toUpperCase();
+
+  /* ── Show dashboard overview ── */
+  document.getElementById('dashOverview').style.display='block';
+  document.body.classList.add('dash-open');
+  updateDovMobTopbar();
+  window.scrollTo(0,0);
+
+  /* ── New user vs Returning user detection ── */
+  var uid = user ? user.uid || user.email : 'guest';
+  var visitKey = 'ak_visited_' + uid;
+  var isNewUser = !localStorage.getItem(visitKey);
+
+  if(isNewUser){
+    /* ━━ NEW USER: Welcome banner + auto-open Module 1, Lesson 1 ━━ */
+    localStorage.setItem(visitKey, '1');
+    _showNewUserWelcome(name);
+  } else {
+    /* ━━ RETURNING USER: show progress summary + resume button ━━ */
+    _showReturningUserDashboard(name);
+  }
+}
+
+/* ── NEW USER: Welcome card + directly open Module 1 Lesson 1 ── */
+function _showNewUserWelcome(name){
+  /* Inject welcome overlay inside dashboard panel */
+  var existing = document.getElementById('_akWelcomeBanner');
+  if(existing) existing.remove();
+
+  var banner = document.createElement('div');
+  banner.id = '_akWelcomeBanner';
+  banner.style.cssText = 'position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;';
+  banner.innerHTML = `
+    <div style="background:#fff;border-radius:22px;max-width:420px;width:100%;padding:36px 28px;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,0.2);animation:scaleIn .35s cubic-bezier(.34,1.56,.64,1);">
+      <div style="font-size:3rem;margin-bottom:10px;">🎉</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:#1a202c;margin-bottom:8px;">
+        Vanakkam, ${name}!
+      </div>
+      <div style="font-size:.88rem;color:#64748b;line-height:1.7;margin-bottom:6px;">
+        AI Katrukko-க்கு welcome!<br>
+        <strong style="color:#1a202c;">Module 1 உங்களுக்கு 100% Free.</strong>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(220,20,60,0.06),#fff);border:1.5px solid rgba(220,20,60,0.2);border-radius:14px;padding:14px 16px;margin:16px 0;text-align:left;">
+        <div style="font-size:.72rem;font-weight:700;color:#dc143c;letter-spacing:.4px;text-transform:uppercase;margin-bottom:8px;">🎓 Module 1 — AI Foundations</div>
+        <div style="font-size:.78rem;color:#4a5568;display:flex;flex-direction:column;gap:6px;">
+          <div>📘 Lesson 1 — What is AI? Why it matters for you</div>
+          <div>📘 Lesson 2 — ChatGPT basics — hands-on</div>
+          <div>📘 Lesson 3 — Prompt Engineering for beginners</div>
+        </div>
+      </div>
+      <button onclick="
+        document.getElementById('_akWelcomeBanner').remove();
+        showDovPanel('mycourses');
+        setTimeout(function(){
+          dovSelectPlan('student');
+          setTimeout(function(){ openLessonMerged(0,0); },400);
+        },200);
+      " style="width:100%;padding:14px;border:none;border-radius:12px;background:#dc143c;color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:.92rem;cursor:pointer;transition:all .2s;margin-bottom:10px;"
+        onmouseover="this.style.background='#c01235'" onmouseout="this.style.background='#dc143c'">
+        🚀 Start Module 1 — Free →
+      </button>
+      <div onclick="document.getElementById('_akWelcomeBanner').remove();" style="font-size:.72rem;color:#94a3b8;cursor:pointer;">
+        Skip — Explore dashboard first
+      </div>
+    </div>`;
+  document.body.appendChild(banner);
+}
+
+/* ── RETURNING USER: Progress summary + Resume button ── */
+function _showReturningUserDashboard(name){
+  /* Calculate progress across all categories */
+  var cats = [
+    {key:'student',   label:'AI Starter',      icon:'🌱', color:'#dc143c'},
+    {key:'business',  label:'AI Professional',  icon:'🚀', color:'#7c3aed'},
+    {key:'unemployed',label:'AI Elite',         icon:'👑', color:'#d97706'}
+  ];
+  var totalDone = 0;
+  var lastCat = 'student', lastMi = 0, lastLi = 0, lastTitle = '';
+
+  cats.forEach(function(c){
+    var mods = (typeof MODULES !== 'undefined' && MODULES[c.key]) ? MODULES[c.key] : [];
+    mods.forEach(function(m, mi){
+      (m.lessons||[]).forEach(function(les, li){
+        var doneKey = c.key+'_'+mi+'_'+li;
+        if(completed[doneKey]){
+          totalDone++;
+          lastCat = c.key; lastMi = mi; lastLi = li;
+          lastTitle = (les.icon||'📘')+' '+les.title;
+        }
+      });
+    });
+  });
+
+  /* Find next lesson after last completed */
+  var mods = (typeof MODULES !== 'undefined' && MODULES[lastCat]) ? MODULES[lastCat] : [];
+  var nextMi = lastMi, nextLi = lastLi + 1;
+  if(mods[lastMi] && nextLi >= (mods[lastMi].lessons||[]).length){
+    nextMi = lastMi + 1; nextLi = 0;
+  }
+  var nextLesson = (mods[nextMi] && mods[nextMi].lessons && mods[nextMi].lessons[nextLi]);
+  var nextTitle = nextLesson ? ((nextLesson.icon||'📘')+' '+nextLesson.title) : null;
+
+  /* Streak */
+  var streak = parseInt(localStorage.getItem('ak_streak')||'0');
+  var xp = parseInt(localStorage.getItem('ak_xp')||'0');
+
+  /* Build banner */
+  var existing = document.getElementById('_akResumeBanner');
+  if(existing) existing.remove();
+
+  var banner = document.createElement('div');
+  banner.id = '_akResumeBanner';
+  banner.style.cssText = 'position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.50);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;';
+
+  var progressRows = cats.map(function(c){
+    var mods2 = (typeof MODULES !== 'undefined' && MODULES[c.key]) ? MODULES[c.key] : [];
+    var done = 0, total = 0;
+    mods2.forEach(function(m,mi){
+      (m.lessons||[]).forEach(function(_,li){
+        total++;
+        if(completed[c.key+'_'+mi+'_'+li]) done++;
+      });
+    });
+    var pct = total ? Math.round((done/total)*100) : 0;
+    var owned = purchases.includes(c.key);
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:.76rem;font-weight:700;color:#1a202c;">${c.icon} ${c.label}</span>
+        <span style="font-size:.68rem;color:${c.color};font-weight:700;">${done}/${total} lessons · ${pct}%${owned?' · ✅':' · 🔒'}</span>
+      </div>
+      <div style="height:5px;background:#f0f0f0;border-radius:3px;overflow:hidden;">
+        <div style="width:${pct}%;height:100%;background:${c.color};border-radius:3px;transition:width .6s;"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  var resumeBtn = nextTitle
+    ? `<button onclick="
+        document.getElementById('_akResumeBanner').remove();
+        curCat='${lastCat}';
+        showDovPanel('mycourses');
+        setTimeout(function(){
+          dovSelectPlan('${lastCat}');
+          setTimeout(function(){ openLessonMerged(${nextMi},${nextLi}); },400);
+        },200);
+      " style="width:100%;padding:13px;border:none;border-radius:12px;background:#dc143c;color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;margin-bottom:10px;"
+        onmouseover="this.style.background='#c01235'" onmouseout="this.style.background='#dc143c'">
+        ▶ Continue — ${nextTitle} →
+      </button>`
+    : `<button onclick="
+        document.getElementById('_akResumeBanner').remove();
+        showDovPanel('mycourses');
+      " style="width:100%;padding:13px;border:none;border-radius:12px;background:#dc143c;color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;margin-bottom:10px;">
+        📚 View My Courses →
+      </button>`;
+
+  banner.innerHTML = `
+    <div style="background:#fff;border-radius:22px;max-width:440px;width:100%;padding:32px 26px;box-shadow:0 24px 80px rgba(0,0,0,0.2);animation:scaleIn .35s cubic-bezier(.34,1.56,.64,1);">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+        <div style="width:48px;height:48px;border-radius:14px;background:#dc143c;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#fff;flex-shrink:0;">${name.charAt(0).toUpperCase()}</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;color:#1a202c;">Welcome back, ${name}! 👋</div>
+          <div style="font-size:.75rem;color:#64748b;margin-top:2px;">🔥 ${streak} day streak &nbsp;·&nbsp; ⚡ ${xp} XP &nbsp;·&nbsp; ✅ ${totalDone} lessons done</div>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-bottom:16px;">
+        <div style="font-size:.68rem;font-weight:700;color:#94a3b8;letter-spacing:.4px;text-transform:uppercase;margin-bottom:12px;">📊 Your Progress</div>
+        ${progressRows}
+      </div>
+
+      ${lastTitle ? `<div style="background:linear-gradient(135deg,rgba(220,20,60,0.05),#fff);border:1px solid rgba(220,20,60,0.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:.74rem;color:#64748b;">
+        <span style="font-weight:700;color:#1a202c;">Last studied:</span> ${lastTitle}
+      </div>` : ''}
+
+      ${resumeBtn}
+
+      <button onclick="document.getElementById('_akResumeBanner').remove();" style="width:100%;padding:11px;border:1px solid #e2e8f0;border-radius:12px;background:#fff;color:#64748b;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;">
+        Dashboard பார்க்க →
+      </button>
+    </div>`;
+  document.body.appendChild(banner);
 }
 
 function showFreeTrialDashboard(){
@@ -8767,5 +9259,121 @@ function restoreProfileStar(){
   Feedback
 </button>
 
+<script>
+/* ══ 2026: CURSOR GLOW ══ */
+(function(){
+  var g=document.getElementById("cursorGlow");
+  if(!g||window.matchMedia("(max-width:600px)").matches)return;
+  document.addEventListener("mousemove",function(e){
+    g.style.left=e.clientX+"px";
+    g.style.top=e.clientY+"px";
+  });
+})();
+/* ══ 2026: SCROLL REVEAL ══ */
+(function(){
+  var els=document.querySelectorAll("[data-reveal]");
+  if(!els.length)return;
+  var io=new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){en.target.classList.add("revealed");io.unobserve(en.target);}
+    });
+  },{threshold:0.12});
+  els.forEach(function(el){io.observe(el);});
+})();
+
+/* ══ SOCIAL PROOF — FIREBASE USER COUNT ══ */
+(function(){
+  function updateSocialProof(count){
+    var bar = document.getElementById('socialProofBar');
+    var cnt = document.getElementById('spStudentCount');
+    if(!bar||!cnt) return;
+    cnt.textContent = count + '+ students';
+    bar.style.display = 'block';
+  }
+  // Try Firebase Firestore to get user count
+  (window._fbReady || Promise.resolve()).then(function(){
+    try{
+      // Use a simple counter doc if available, otherwise fallback
+      var count = 0;
+      // Count from localStorage cached value first (fast)
+      var cached = localStorage.getItem('ak_user_count');
+      if(cached) updateSocialProof(parseInt(cached)||4);
+      // Then try to get real count from Firestore
+      if(window._fbGetDoc && window._fbDoc){
+        window._fbGetDoc(window._fbDoc('meta','stats')).then(function(snap){
+          if(snap && snap.exists && snap.exists()){
+            var d = snap.data();
+            if(d && d.userCount){ 
+              localStorage.setItem('ak_user_count', d.userCount);
+              updateSocialProof(d.userCount);
+            } else { updateSocialProof(4); }
+          } else { updateSocialProof(4); }
+        }).catch(function(){ updateSocialProof(4); });
+      } else { updateSocialProof(4); }
+    }catch(e){ updateSocialProof(4); }
+  });
+})();
+
+/* ══ EMAIL CAPTURE POPUP LOGIC ══ */
+(function(){
+  var shown = false;
+  function showEmailPopup(){
+    if(shown) return;
+    var dismissed = localStorage.getItem('ak_email_popup_dismissed');
+    if(dismissed) return;
+    var user = window._currentUser;
+    if(user) return; // already logged in
+    shown = true;
+    document.getElementById('emailPopupOverlay').classList.add('show');
+  }
+  setTimeout(showEmailPopup, 35000); // 35 seconds
+  window.closeEmailPopup = function(){
+    document.getElementById('emailPopupOverlay').classList.remove('show');
+    localStorage.setItem('ak_email_popup_dismissed','1');
+  };
+  window.submitEmailPopup = function(){
+    var email = document.getElementById('emailPopupInput').value.trim();
+    if(!email || !email.includes('@')){ 
+      document.getElementById('emailPopupInput').style.borderColor='#dc143c';
+      return; 
+    }
+    localStorage.setItem('ak_email_popup_dismissed','1');
+    localStorage.setItem('ak_captured_email', email);
+    document.getElementById('emailPopupOverlay').classList.remove('show');
+    // Pre-fill signup form and open it
+    closeEmailPopup();
+    openAuth('signup');
+    setTimeout(function(){
+      var inp = document.querySelector('#signupEmail, input[type="email"]');
+      if(inp){ inp.value = email; }
+    }, 400);
+    toast('Welcome! Redirecting you to sign up 🎉','ok');
+  };
+})();
+
+/* ══ CURRICULUM TOGGLE ══ */
+function toggleCurrMod(el){
+  var body = el.querySelector('.curr-mod-body');
+  var arrow = el.querySelector('.curr-arrow');
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.textContent = isOpen ? '▶' : '▼';
+}
+
+/* ══ BACK TO TOP SHOW/HIDE ══ */
+(function(){
+  var btn = document.getElementById('backToTop');
+  if(!btn) return;
+  window.addEventListener('scroll', function(){
+    if(window.scrollY > 400){
+      btn.style.display='flex';
+      setTimeout(function(){ btn.style.opacity='1'; },10);
+    } else {
+      btn.style.opacity='0';
+      setTimeout(function(){ btn.style.display='none'; },250);
+    }
+  });
+})();
+</script>
 </body>
 </html>
