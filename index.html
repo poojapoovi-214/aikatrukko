@@ -193,7 +193,7 @@ setTimeout(function(){
            updateProfile, sendPasswordResetEmail,
            onAuthStateChanged }                   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
   import { getFirestore, doc, setDoc,
-           getDoc, updateDoc }                    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+           getDoc, updateDoc, increment }          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const config = {
     apiKey: "AIzaSyAF-FUEXFxBNMCyNLErnTGoW8aEq8nNxMU",
@@ -227,6 +227,27 @@ setTimeout(function(){
     window._fbGetDoc        = (ref)  => getDoc(ref);
     window._fbUpdateDoc     = (ref,data) => updateDoc(ref,data);
     window._fbFallbackActive = false;
+
+    /* ── Real signup counter — increments meta/stats.userCount on every NEW signup ── */
+    window._fbIncrementUserCount = async function(){
+      try{
+        const statsRef = doc(db,'meta','stats');
+        await updateDoc(statsRef, { userCount: increment(1) });
+      }catch(e){
+        // Doc doesn't exist yet — create it starting at 5 (baseline + this new user)
+        try{ await setDoc(doc(db,'meta','stats'), { userCount: 5 }, { merge:true }); }catch(e2){}
+      }
+    };
+
+    /* ── Real page-view counter — increments meta/stats.viewCount on every visit ── */
+    window._fbIncrementViewCount = async function(){
+      try{
+        const statsRef = doc(db,'meta','stats');
+        await updateDoc(statsRef, { viewCount: increment(1) });
+      }catch(e){
+        try{ await setDoc(doc(db,'meta','stats'), { viewCount: 1 }, { merge:true }); }catch(e2){}
+      }
+    };
 
     /* ── Auth state listener ── */
     let _firstFire = true;
@@ -580,7 +601,7 @@ setTimeout(function(){
   /* Stats row */
   .h-stats { }
   .h-stat-n { font-size:1.2rem; }
-  .h-stat-l { font-size:.68rem; }
+  .h-stat-l { font-size:.55rem; }
 
   /* Touch active states */
   .cat-card:active, .feat-card:active, .h-cat:active {
@@ -608,6 +629,93 @@ setTimeout(function(){
   .hbtn-p, .hbtn-s { font-size:.82rem; }
   .faq-q-text { font-size:.78rem; }
 }
+
+/* ══ MOBILE BOTTOM NAV BAR (left-right scroll) ══ */
+#mobileNavBar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-top: 1px solid rgba(220,20,60,0.12);
+  box-shadow: 0 -2px 20px rgba(0,0,0,0.08);
+  padding: 0;
+  height: 52px;
+  overflow: hidden;
+}
+#mobileNavBar .mnb-inner {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  height: 52px;
+  padding: 0 8px;
+}
+#mobileNavBar .mnb-inner::-webkit-scrollbar { display: none; }
+#mobileNavBar .mnb-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 16px;
+  min-width: fit-content;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background .18s, color .18s;
+  font-family: 'Syne', sans-serif;
+  font-size: .62rem;
+  font-weight: 700;
+  color: #718096;
+  letter-spacing: .2px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+}
+#mobileNavBar .mnb-item .mnb-ic {
+  font-size: .95rem;
+  line-height: 1;
+}
+#mobileNavBar .mnb-item:active,
+#mobileNavBar .mnb-item.active {
+  background: rgba(220,20,60,0.09);
+  color: #dc143c;
+}
+/* Divider between link groups */
+#mobileNavBar .mnb-div {
+  width: 1px;
+  height: 24px;
+  background: #e2e8f0;
+  flex-shrink: 0;
+  margin: 0 4px;
+}
+/* Auth buttons inside mobile nav */
+#mobileNavBar .mnb-auth {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px 0 4px;
+  flex-shrink: 0;
+}
+@media (max-width: 768px) {
+  #mobileNavBar { display: block; }
+  /* Push page content up so bottom nav doesn't cover it */
+  body { padding-bottom: 52px; }
+  /* Hide desktop nav-mid links on mobile (already hidden) */
+}
+@media (min-width: 769px) {
+  #mobileNavBar { display: none !important; }
+}
+
 
 *{margin:0;padding:0;box-sizing:border-box;}html{overflow-x:hidden;max-width:100%;}body{overflow-x:hidden;max-width:100%;width:100%;}
 html{scroll-behavior:smooth;}
@@ -893,7 +1001,7 @@ nav{
 .h-cat-pr{text-align:right;}
 .h-cat-ol{font-size:.62rem;color:var(--gray2);text-decoration:line-through;}
 .h-cat-nw{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:700;color:var(--aqua);}
-.off-pill{font-size:.65rem;font-weight:800;padding:1px 5px;border-radius:100px;background:rgba(0,212,200,0.15);color:var(--aqua);display:block;}
+.off-pill{font-size:.52rem;font-weight:800;padding:1px 5px;border-radius:100px;background:rgba(0,212,200,0.15);color:var(--aqua);display:block;}
 
 /* ══ FEATURE CARD 3D HOVER ══ */
 .feat-card{
@@ -973,13 +1081,13 @@ nav{
 .cat-disc{
   position:absolute;top:0;right:0;
   background:var(--aqua);color:var(--black);
-  font-size:.68rem;font-weight:800;padding:5px 12px;
+  font-size:.55rem;font-weight:800;padding:5px 12px;
   border-radius:0 18px 0 10px;letter-spacing:.3px;
 }
 .unlock-badge{
   position:absolute;top:10px;left:10px;
   background:var(--aqua);color:var(--black);
-  font-size:.68rem;font-weight:800;padding:2px 8px;border-radius:100px;display:none;
+  font-size:.55rem;font-weight:800;padding:2px 8px;border-radius:100px;display:none;
 }
 .cat-ic{
   width:50px;height:50px;border-radius:12px;background:var(--aqua-dim);
@@ -1540,7 +1648,7 @@ footer{
   /* NAV extras */
   .nav-user{gap:4px;flex-wrap:nowrap;overflow:hidden;}
   .nav-name{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.7rem;}
-  #navDeviceBadge{font-size:.68rem;padding:2px 6px;}
+  #navDeviceBadge{font-size:.55rem;padding:2px 6px;}
   .nav-user .nb-o{padding:5px 7px;font-size:.62rem;}
   .hero-trust{gap:12px;}
   .trust-i{font-size:.65rem;}
@@ -1594,7 +1702,7 @@ footer{
 .cs-card.owned{border-color:var(--aqua);background:var(--aqua-dim);}
 .cs-num{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:var(--aqua);}
 .cs-lbl{font-size:.58rem;font-weight:700;color:var(--gray2);margin-top:2px;text-transform:uppercase;letter-spacing:.3px;}
-.cs-badge{display:inline-block;font-size:.65rem;font-weight:800;padding:2px 7px;border-radius:100px;background:var(--aqua);color:#fff;margin-top:5px;}
+.cs-badge{display:inline-block;font-size:.52rem;font-weight:800;padding:2px 7px;border-radius:100px;background:var(--aqua);color:#fff;margin-top:5px;}
 .lesson-prog-list{display:flex;flex-direction:column;gap:8px;}
 .lp-row{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--bg-main);border:1px solid var(--border);border-radius:10px;}
 .lp-label{font-size:.73rem;font-weight:600;color:var(--white);min-width:88px;}
@@ -1610,7 +1718,7 @@ footer{
 .prof-copy-btn{padding:7px 14px;border-radius:7px;background:#f8fafc;border:1px solid var(--border2);color:var(--gray1);font-size:.68rem;font-weight:600;cursor:pointer;transition:all .2s;}
 .prof-copy-btn:hover{border-color:var(--aqua);color:var(--aqua);}
 .aim-card{background:#fff;border:1px solid var(--border);border-radius:11px;padding:13px;position:relative;margin-bottom:9px;}
-.aim-new::before{content:'NEW';position:absolute;top:9px;right:10px;background:var(--aqua);color:#fff;font-size:.65rem;font-weight:800;padding:2px 6px;border-radius:100px;}
+.aim-new::before{content:'NEW';position:absolute;top:9px;right:10px;background:var(--aqua);color:#fff;font-size:.5rem;font-weight:800;padding:2px 6px;border-radius:100px;}
 
 /* ══ FEEDBACK OVERLAY ══ */
 .fb-type-btn{background:rgba(255,255,255,0.30);border:1.5px solid rgba(255,255,255,0.45);border-radius:10px;padding:11px 6px;cursor:pointer;transition:all .2s;text-align:center;width:100%;backdrop-filter:blur(8px);}
@@ -1928,8 +2036,8 @@ footer{
   <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:32px;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:8px;">
       <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;animation:blink 1.5s infinite;flex-shrink:0;"></div>
-      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;color:#1a202c;" id="spStudentCount">— students</span>
-      <span style="font-size:.75rem;color:#64748b;">enrolled so far</span>
+      <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;color:#1a202c;" id="spViewCount">— people</span>
+      <span style="font-size:.75rem;color:#64748b;">viewed this page</span>
     </div>
     <div style="width:1px;height:16px;background:#e2e8f0;"></div>
     <div style="font-size:.75rem;color:#64748b;">🎓 Module 1 always free · No card needed</div>
@@ -2049,6 +2157,8 @@ footer{
 <div id="announcementBanner" style="background:linear-gradient(90deg,#0f0c29,#2d0060,#5a0fbf,#7b2fff,#9d4fff,#7b2fff,#5a0fbf,#2d0060,#0f0c29);background-size:300% 100%;animation:bannerGradShift 8s ease infinite;overflow:hidden;height:38px;display:flex;align-items:center;position:relative;z-index:201;box-shadow:0 3px 16px rgba(123,47,255,0.5);">
   <div style="display:flex;animation:marqueeScroll 55s linear infinite;white-space:nowrap;will-change:transform;">
     <span style="display:inline-flex;align-items:center;gap:32px;padding-right:60px;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:#fff;letter-spacing:.4px;">
+      <span>🔥 First 10 Buyers Get 50% OFF — Message us on WhatsApp to claim</span>
+      <span style="opacity:.4;">✦</span>
       <span>🇮🇳 Built for Indian Students, Job Seekers &amp; Business Owners</span>
       <span style="opacity:.4;">✦</span>
       <span>🎓 Module 1 is 100% FREE — No credit card needed!</span>
@@ -2061,6 +2171,8 @@ footer{
       <span style="opacity:.4;">✦</span>
     </span>
     <span style="display:inline-flex;align-items:center;gap:32px;padding-right:60px;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;color:#fff;letter-spacing:.4px;" aria-hidden="true">
+      <span>🔥 First 10 Buyers Get 50% OFF — Message us on WhatsApp to claim</span>
+      <span style="opacity:.4;">✦</span>
       <span>🇮🇳 Built for Indian Students, Job Seekers &amp; Business Owners</span>
       <span style="opacity:.4;">✦</span>
       <span>🎓 Module 1 is 100% FREE — No credit card needed!</span>
@@ -2161,7 +2273,7 @@ footer{
         </div>
         <div class="h-cat" onclick="pick('business')">
           <div class="h-cat-ic">🚀</div>
-          <div class="h-cat-inf"><div class="h-cat-nm">Professional <span style="background:var(--aqua);color:#fff;font-size:.68rem;padding:2px 7px;border-radius:100px;font-weight:800;vertical-align:middle;">BEST SELLER</span></div><div class="h-cat-dc">Full course for job seekers & pros</div></div>
+          <div class="h-cat-inf"><div class="h-cat-nm">Professional <span style="background:var(--aqua);color:#fff;font-size:.55rem;padding:2px 7px;border-radius:100px;font-weight:800;vertical-align:middle;">BEST SELLER</span></div><div class="h-cat-dc">Full course for job seekers & pros</div></div>
           <div class="h-cat-pr"><div class="h-cat-nw">₹999</div></div>
         </div>
         <div class="h-cat" onclick="pick('unemployed')">
@@ -2609,37 +2721,16 @@ footer{
 
     <div class="video-wrap" data-scroll="anim-up" data-delay="180">
       <div class="video-container">
-        <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:16px;overflow:hidden;background:#000;" id="ytFacade">
-          <!-- YouTube Facade: thumbnail shown first, iframe loads only on click -->
-          <img
-            id="ytThumb"
-            src="https://img.youtube.com/vi/kIwK7m6FwA8/maxresdefault.jpg"
-            onerror="this.src='https://img.youtube.com/vi/kIwK7m6FwA8/hqdefault.jpg'"
-            alt="AI Katrukko — Prompt Engineering Basics"
-            style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:16px;cursor:pointer;"
-            onclick="loadYTVideo()"
-          />
-          <!-- Play button overlay -->
-          <div id="ytPlayBtn" onclick="loadYTVideo()" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:72px;height:72px;background:rgba(220,20,60,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 24px rgba(220,20,60,0.5);transition:transform .2s ease,box-shadow .2s ease;z-index:2;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
-          </div>
-          <div id="ytIframeHolder" style="position:absolute;top:0;left:0;width:100%;height:100%;display:none;"></div>
+        <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:16px;overflow:hidden;background:#000;">
+          <iframe
+            src="https://www.youtube.com/embed/kIwK7m6FwA8?rel=0&modestbranding=1"
+            title="AI Katrukko — Prompt Engineering Basics"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:16px;"
+          ></iframe>
         </div>
-        <script>
-        function loadYTVideo(){
-          document.getElementById('ytThumb').style.display='none';
-          document.getElementById('ytPlayBtn').style.display='none';
-          var holder = document.getElementById('ytIframeHolder');
-          holder.style.display='block';
-          holder.innerHTML='<iframe src="https://www.youtube.com/embed/kIwK7m6FwA8?rel=0&modestbranding=1&autoplay=1" title="AI Katrukko — Prompt Engineering Basics" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border-radius:16px;"></iframe>';
-        }
-        // Hover effect on play button
-        var btn=document.getElementById('ytPlayBtn');
-        if(btn){
-          btn.addEventListener('mouseenter',function(){this.style.transform='translate(-50%,-50%) scale(1.1)';this.style.boxShadow='0 8px 32px rgba(220,20,60,0.7)';});
-          btn.addEventListener('mouseleave',function(){this.style.transform='translate(-50%,-50%) scale(1)';this.style.boxShadow='0 4px 24px rgba(220,20,60,0.5)';});
-        }
-        </script>
         <div class="video-label">
           <span>📚 Module 1 Preview</span>
           <span>Prompt Engineering Basics · 2 min</span>
@@ -2882,7 +2973,7 @@ footer{
 .dns-item.dns-active { color:#dc143c; font-weight:700; border-bottom-color:#dc143c; }
 /* Show nav strip only on mobile/tablet — desktop uses left sidebar */
 @media(max-width:768px){
-  #dovDesktopNavStrip { display:block !important; }
+  #dovDesktopNavStrip { display:none !important; }
 }
 </style>
 <style>
@@ -3078,7 +3169,7 @@ footer{
 }
 .dov-mob-item{
   display:flex;flex-direction:column;align-items:center;gap:3px;
-  font-size:.68rem;font-weight:600;color:#718096;cursor:pointer;
+  font-size:.55rem;font-weight:600;color:#718096;cursor:pointer;
   padding:4px 6px;border-radius:8px;transition:all .15s;min-width:48px;max-width:64px;
   font-family:'DM Sans',sans-serif;flex:1;
 }
@@ -3245,15 +3336,15 @@ footer{
           </button>
           <div style="display:flex;gap:14px;">
             <div style="text-align:center;">
-              <div style="font-size:.65rem;color:#a0aec0;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Week Total</div>
+              <div style="font-size:.52rem;color:#a0aec0;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Week Total</div>
               <div style="font-family:'Syne',sans-serif;font-size:.82rem;font-weight:800;color:#1a202c;" id="trackerWeekTotal">0m</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:.65rem;color:#a0aec0;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Sessions</div>
+              <div style="font-size:.52rem;color:#a0aec0;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Sessions</div>
               <div style="font-family:'Syne',sans-serif;font-size:.82rem;font-weight:800;color:#1a202c;" id="trackerSessions">0</div>
             </div>
             <div style="text-align:center;">
-              <div style="font-size:.65rem;color:#a0aec0;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Dot</div>
+              <div style="font-size:.52rem;color:#a0aec0;font-weight:600;text-transform:uppercase;letter-spacing:.4px;">Dot</div>
               <div style="width:8px;height:8px;border-radius:50%;margin:4px auto 0;" id="trackerDot" style="background:#22c55e;"></div>
             </div>
           </div>
@@ -3305,12 +3396,12 @@ footer{
           <!-- Event 4 - Re-schedule -->
           <div style="position:absolute;right:2%;top:46px;width:30%;background:#f5f3f0;border:1px solid #e8e4df;border-radius:8px;padding:6px 8px;">
             <div style="font-size:.65rem;font-weight:700;color:#1a202c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Prompt Engineering</div>
-            <div style="font-size:.68rem;color:#a0aec0;">09:00AM &nbsp;<span style="color:#dc143c;font-weight:600;">Re-schedule</span></div>
+            <div style="font-size:.56rem;color:#a0aec0;">09:00AM &nbsp;<span style="color:#dc143c;font-weight:600;">Re-schedule</span></div>
           </div>
           <!-- Event 5 - Collect -->
           <div style="position:absolute;right:2%;top:82px;width:30%;background:#f5f3f0;border:1px solid #e8e4df;border-radius:8px;padding:6px 8px;">
             <div style="font-size:.65rem;font-weight:700;color:#1a202c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Review Quiz Notes</div>
-            <div style="font-size:.68rem;color:#a0aec0;">09:00AM &nbsp;<span style="color:#f39c12;font-weight:600;">Collect</span></div>
+            <div style="font-size:.56rem;color:#a0aec0;">09:00AM &nbsp;<span style="color:#f39c12;font-weight:600;">Collect</span></div>
           </div>
         </div>
         <!-- Self-paced note -->
@@ -3414,7 +3505,7 @@ footer{
         var shadow=active&&isToday?'box-shadow:0 0 6px rgba(220,20,60,0.5);':'';
         col+='<div style="width:'+size+'px;height:'+size+'px;border-radius:50%;background:'+bg+';'+shadow+'transition:all .3s;"></div>';
       }
-      col+='<div style="font-size:.68rem;color:'+(d.isToday?'#dc143c':'#c0c0c0')+';font-weight:'+(d.isToday?'700':'400')+';">'+d.label+'</div>';
+      col+='<div style="font-size:.56rem;color:'+(d.isToday?'#dc143c':'#c0c0c0')+';font-weight:'+(d.isToday?'700':'400')+';">'+d.label+'</div>';
       col+='</div>';
       html+=col;
     });
@@ -3558,7 +3649,7 @@ footer{
       </div>
       <!-- Quiz 3 - In Progress -->
       <div style="background:linear-gradient(135deg,#fff5f7,#fff);border-radius:12px;border:2px solid rgba(220,20,60,0.25);padding:14px 16px;display:flex;align-items:center;gap:12px;position:relative;">
-        <div style="position:absolute;top:-1px;right:10px;background:#dc143c;color:#fff;font-size:.68rem;font-weight:800;padding:2px 10px;border-radius:0 0 8px 8px;letter-spacing:.3px;">NEXT UP</div>
+        <div style="position:absolute;top:-1px;right:10px;background:#dc143c;color:#fff;font-size:.55rem;font-weight:800;padding:2px 10px;border-radius:0 0 8px 8px;letter-spacing:.3px;">NEXT UP</div>
         <div style="width:36px;height:36px;border-radius:10px;background:rgba(220,20,60,0.1);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🎯</div>
         <div style="flex:1;min-width:0;">
           <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:#1a202c;">5 Free AI Tools — Quiz 3</div>
@@ -4945,11 +5036,15 @@ function goHome(){
   document.getElementById('homepage').style.display='block';
   document.getElementById('dashOverview').style.display='none';
   document.body.classList.remove('dash-open');
+  var stickyHdr = document.getElementById('stickyHeader');
+  if(stickyHdr) stickyHdr.style.display='block';
   stopVoice();
 }
 
 function goToDashboard(){
   stopVoice();
+  var stickyHdr = document.getElementById('stickyHeader');
+  if(stickyHdr) stickyHdr.style.display='none';
   // Always show dashOverview (works for both guest and logged in)
   var dashOv = document.getElementById('dashOverview');
   if(dashOv) dashOv.style.display='block';
@@ -4970,6 +5065,8 @@ function pick(cat){
   curCat = cat;
   /* Always route through dashOverview → My Courses panel */
   document.getElementById('homepage').style.display='none';
+  var stickyHdr = document.getElementById('stickyHeader');
+  if(stickyHdr) stickyHdr.style.display='none';
   const plat = document.getElementById('platform');
   plat.style.display='block';
   const dashOv = document.getElementById('dashOverview');
@@ -6067,6 +6164,7 @@ async function doSignup(){
         name: n, email: e, purchases: [], createdAt: new Date().toISOString()
       });
     }catch(fe){ console.warn('Firestore write error:', fe); }
+    if(window._fbIncrementUserCount) window._fbIncrementUserCount().catch(()=>{});
     _authBusy = false;
     saveSession(nu, [], null);
     setLoggedIn(nu, []);
@@ -6118,6 +6216,7 @@ async function _finishGoogleLogin(result){
         email: fu.email, purchases: [],
         createdAt: new Date().toISOString(), loginMethod: 'google'
       });
+      if(window._fbIncrementUserCount) window._fbIncrementUserCount().catch(()=>{});
     }
   }catch(fe){ console.warn('Firestore:', fe); }
   const u = {
@@ -6465,7 +6564,7 @@ function renderDovMyCourses(){
       ${p.best?`<div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:${p.color};color:#fff;font-size:.58rem;font-weight:800;padding:3px 12px;border-radius:100px;letter-spacing:.5px;white-space:nowrap;font-family:'Syne',sans-serif;">⭐ BEST SELLER</div>`:''}
 
       <!-- FREE badge on Module 1 -->
-      <div style="position:absolute;top:12px;right:12px;background:#dcfce7;color:#16a34a;font-size:.68rem;font-weight:800;padding:3px 8px;border-radius:20px;font-family:'Syne',sans-serif;letter-spacing:.3px;">Module 1 FREE</div>
+      <div style="position:absolute;top:12px;right:12px;background:#dcfce7;color:#16a34a;font-size:.55rem;font-weight:800;padding:3px 8px;border-radius:20px;font-family:'Syne',sans-serif;letter-spacing:.3px;">Module 1 FREE</div>
 
       <div style="font-size:2rem;margin-top:4px;">${p.icon}</div>
 
@@ -7555,7 +7654,7 @@ async function fetchTrendModule(feed){
     if(p.title&&p.desc){
       const card=document.createElement('div');
       card.className='aim-card aim-new';
-      card.innerHTML='<div style="font-size:.65rem;font-weight:800;color:var(--aqua);margin-bottom:4px;">AI GENERATED \u00B7 JUST NOW</div><div class="aim-title">'+p.title+'</div><div class="aim-desc">'+p.desc+'</div>';
+      card.innerHTML='<div style="font-size:.52rem;font-weight:800;color:var(--aqua);margin-bottom:4px;">AI GENERATED \u00B7 JUST NOW</div><div class="aim-title">'+p.title+'</div><div class="aim-desc">'+p.desc+'</div>';
       feed.insertBefore(card,feed.firstChild);
     }
   }catch(e){}
@@ -7607,18 +7706,18 @@ function initHomeWeeklyTips(){
           <div style="width:32px;height:32px;border-radius:8px;background:var(--aqua-dim);display:flex;align-items:center;justify-content:center;font-size:1rem;">${item.icon}</div>
           <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.78rem;color:var(--white);">${item.label}</div>
         </div>
-        <span style="font-size:.68rem;font-weight:800;padding:2px 7px;border-radius:100px;background:var(--aqua);color:#fff;">WEEK ${weekNum}</span>
+        <span style="font-size:.55rem;font-weight:800;padding:2px 7px;border-radius:100px;background:var(--aqua);color:#fff;">WEEK ${weekNum}</span>
       </div>
       <div style="font-size:.76rem;color:var(--gray1);line-height:1.7;">${altTip}</div>
       <div style="background:var(--bg-main);border:1px solid var(--border);border-radius:9px;padding:11px 13px;">
         <div style="font-size:.58rem;font-weight:800;color:var(--aqua);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;justify-content:space-between;">
           ⚡ Try This Exercise
-          <button onclick="navigator.clipboard.writeText(this.closest('div').nextElementSibling.innerText).then(()=>toast('Copied! 📋','ok'))" style="padding:2px 8px;border-radius:5px;background:var(--aqua-dim);border:1px solid rgba(220,20,60,0.2);color:var(--aqua);font-size:.68rem;font-weight:700;cursor:pointer;">Copy</button>
+          <button onclick="navigator.clipboard.writeText(this.closest('div').nextElementSibling.innerText).then(()=>toast('Copied! 📋','ok'))" style="padding:2px 8px;border-radius:5px;background:var(--aqua-dim);border:1px solid rgba(220,20,60,0.2);color:var(--aqua);font-size:.55rem;font-weight:700;cursor:pointer;">Copy</button>
         </div>
         <div style="font-size:.74rem;color:var(--gray1);line-height:1.65;">${item.prompt}</div>
       </div>
       <div style="background:linear-gradient(135deg,rgba(255,153,0,0.06),rgba(19,136,8,0.04));border:1px solid rgba(255,153,0,0.2);border-radius:8px;padding:9px 11px;">
-        <div style="font-size:.68rem;font-weight:800;color:#b8600a;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">🇮🇳 India Context</div>
+        <div style="font-size:.55rem;font-weight:800;color:#b8600a;letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;">🇮🇳 India Context</div>
         <div style="font-size:.72rem;color:var(--gray1);line-height:1.65;">${item.india}</div>
       </div>
     </div>`;
@@ -7657,7 +7756,7 @@ function appendHomeLiveTip(grid, p){
   card.style.cssText='background:linear-gradient(135deg,rgba(220,20,60,0.05),#fff);border:1.5px solid rgba(220,20,60,0.3);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px;';
   card.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;">
     <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:.82rem;color:var(--white);">${p.headline||'🤖 AI Tip'}</div>
-    <span style="font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:100px;background:var(--aqua);color:#fff;">AI LIVE</span>
+    <span style="font-size:.52rem;font-weight:800;padding:2px 8px;border-radius:100px;background:var(--aqua);color:#fff;">AI LIVE</span>
   </div>
   <div style="font-size:.76rem;color:var(--gray1);line-height:1.7;">${p.tip}</div>
   ${p.prompt?`<div style="background:var(--bg-main);border:1px solid var(--border);border-radius:9px;padding:11px 13px;">
@@ -7768,7 +7867,7 @@ function renderMods(){
       const isWeeklyNew = les._weekly === true;
       html += `<div class="lesson-row ${isDone?'done':''}" onclick="openLessonMerged(${mi},${li})" id="lesRow${mi}_${li}">
         <div class="lesson-num">${isDone ? '✓' : li + 1}</div>
-        <div class="lesson-title">${les.icon || '📘'} ${les.title}${isWeeklyNew ? ' <span style="font-size:.65rem;font-weight:800;padding:1px 5px;border-radius:100px;background:var(--aqua);color:#fff;margin-left:4px;">NEW</span>' : ''}</div>
+        <div class="lesson-title">${les.icon || '📘'} ${les.title}${isWeeklyNew ? ' <span style="font-size:.52rem;font-weight:800;padding:1px 5px;border-radius:100px;background:var(--aqua);color:#fff;margin-left:4px;">NEW</span>' : ''}</div>
         <div class="lesson-lock ${canAccess?'free':''}">${isFree ? '<span style="color:var(--aqua);font-size:.6rem;font-weight:800;">FREE</span>' : (hasAcc ? '<span style="color:var(--aqua);font-size:.6rem;font-weight:800;">✓</span>' : '<span style="font-size:.75rem;">🔒</span>')}</div>
       </div>`;
     });
@@ -8062,6 +8161,8 @@ function openFreeTrial(){
 function openDashboard(){
   curCat = 'student';
   document.getElementById('homepage').style.display='none';
+  var stickyHdr = document.getElementById('stickyHeader');
+  if(stickyHdr) stickyHdr.style.display='none';
   var plat = document.getElementById('platform');
   plat.style.display='block';
 
@@ -9305,36 +9406,45 @@ function restoreProfileStar(){
   els.forEach(function(el){io.observe(el);});
 })();
 
-/* ══ SOCIAL PROOF — FIREBASE USER COUNT ══ */
+/* ══ SOCIAL PROOF — REAL VIEW COUNT (floor of 50, grows with real visits) ══ */
 (function(){
-  function updateSocialProof(count){
+  var MIN_BASELINE = 50; // Never show below this, regardless of actual Firestore count
+  function showBar(){
     var bar = document.getElementById('socialProofBar');
-    var cnt = document.getElementById('spStudentCount');
-    if(!bar||!cnt) return;
-    cnt.textContent = count + '+ students';
-    bar.style.display = 'block';
+    if(bar) bar.style.display='block';
   }
-  // Try Firebase Firestore to get user count
+  function updateViewCount(realCount){
+    var v = document.getElementById('spViewCount');
+    if(!v) return;
+    var display = Math.max(parseInt(realCount)||0, MIN_BASELINE);
+    v.textContent = display + '+';
+    showBar();
+  }
   (window._fbReady || Promise.resolve()).then(function(){
     try{
-      // Use a simple counter doc if available, otherwise fallback
-      var count = 0;
-      // Count from localStorage cached value first (fast)
-      var cached = localStorage.getItem('ak_user_count');
-      if(cached) updateSocialProof(parseInt(cached)||4);
-      // Then try to get real count from Firestore
+      // Show cached value instantly (fast paint)
+      var cachedViews = localStorage.getItem('ak_view_count');
+      updateViewCount(cachedViews ? parseInt(cachedViews) : MIN_BASELINE);
+
+      // Increment view count once per browser session (avoids inflating on refresh)
+      var alreadyCountedThisSession = sessionStorage.getItem('ak_view_counted');
+      if(!alreadyCountedThisSession && window._fbIncrementViewCount){
+        sessionStorage.setItem('ak_view_counted','1');
+        window._fbIncrementViewCount().catch(function(){});
+      }
+
+      // Then get the real count from Firestore — display floors at 50, grows from real data above that
       if(window._fbGetDoc && window._fbDoc){
         window._fbGetDoc(window._fbDoc('meta','stats')).then(function(snap){
           if(snap && snap.exists && snap.exists()){
             var d = snap.data();
-            if(d && d.userCount){ 
-              localStorage.setItem('ak_user_count', d.userCount);
-              updateSocialProof(d.userCount);
-            } else { updateSocialProof(4); }
-          } else { updateSocialProof(4); }
-        }).catch(function(){ updateSocialProof(4); });
-      } else { updateSocialProof(4); }
-    }catch(e){ updateSocialProof(4); }
+            var real = (d && d.viewCount) ? d.viewCount : 0;
+            localStorage.setItem('ak_view_count', real);
+            updateViewCount(real);
+          } else { updateViewCount(0); }
+        }).catch(function(){ updateViewCount(0); });
+      } else { updateViewCount(0); }
+    }catch(e){ updateViewCount(0); }
   });
 })();
 
@@ -9399,5 +9509,85 @@ function toggleCurrMod(el){
   });
 })();
 </script>
+
+<!-- ══ MOBILE BOTTOM NAV BAR ══ -->
+<div id="mobileNavBar">
+  <div class="mnb-inner" id="mnbInner">
+    <!-- Logo/Home -->
+    <button class="mnb-item" onclick="goHome(); mnbSetActive(this)">
+      <span class="mnb-ic">🏠</span>
+      Home
+    </button>
+    <div class="mnb-div"></div>
+    <!-- Nav links -->
+    <button class="mnb-item" onclick="scrollTo2('catsSection'); mnbSetActive(this)">
+      <span class="mnb-ic">📚</span>
+      Courses
+    </button>
+    <button class="mnb-item" onclick="scrollTo2('featSection'); mnbSetActive(this)">
+      <span class="mnb-ic">✨</span>
+      Features
+    </button>
+    <button class="mnb-item" onclick="scrollTo2('howSection'); mnbSetActive(this)">
+      <span class="mnb-ic">🗺️</span>
+      How It Works
+    </button>
+    <button class="mnb-item" onclick="scrollTo2('faqSection'); mnbSetActive(this)">
+      <span class="mnb-ic">❓</span>
+      FAQ
+    </button>
+    <div class="mnb-div"></div>
+    <!-- Free Trial -->
+    <button class="mnb-item" onclick="openFreeTrial && openFreeTrial(); mnbSetActive(this)" id="mnbTrialBtn">
+      <span class="mnb-ic">🎯</span>
+      Free Trial
+    </button>
+    <div class="mnb-div"></div>
+    <!-- Auth buttons (logged out) -->
+    <div class="mnb-auth" id="mnbAuthArea">
+      <button class="nb nb-o" style="font-size:.62rem;padding:5px 11px;min-height:32px;" onclick="openAuth('login')">Login</button>
+      <button class="nb nb-p" style="font-size:.62rem;padding:5px 11px;min-height:32px;" onclick="openAuth('signup')">Sign Up</button>
+    </div>
+    <!-- Auth area (logged in) - hidden by default -->
+    <div class="mnb-auth" id="mnbUserArea" style="display:none;">
+      <button class="nb nb-p" style="font-size:.62rem;padding:5px 11px;min-height:32px;" onclick="openDashboard && openDashboard()">Dashboard</button>
+    </div>
+  </div>
+</div>
+<script>
+/* ══ MOBILE NAV BAR LOGIC ══ */
+function mnbSetActive(el){
+  document.querySelectorAll('#mobileNavBar .mnb-item').forEach(function(b){ b.classList.remove('active'); });
+  if(el) el.classList.add('active');
+}
+/* Sync auth state with mobile nav */
+(function(){
+  var origOnAuthChange = window._onAuthChange;
+  function syncMnbAuth(user){
+    var authArea = document.getElementById('mnbAuthArea');
+    var userArea = document.getElementById('mnbUserArea');
+    if(!authArea || !userArea) return;
+    if(user){
+      authArea.style.display = 'none';
+      userArea.style.display = 'flex';
+    } else {
+      authArea.style.display = 'flex';
+      userArea.style.display = 'none';
+    }
+  }
+  // Wrap the existing _onAuthChange
+  window._onAuthChange = function(user, purchases){
+    syncMnbAuth(user);
+    if(typeof origOnAuthChange === 'function') origOnAuthChange(user, purchases);
+  };
+  // Also watch for _currentUser changes via polling as fallback
+  var _lastUser = null;
+  setInterval(function(){
+    var cur = window._currentUser || null;
+    if(cur !== _lastUser){ _lastUser = cur; syncMnbAuth(cur); }
+  }, 800);
+})();
+</script>
+
 </body>
 </html>
