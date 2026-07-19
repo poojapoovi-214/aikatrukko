@@ -1224,6 +1224,7 @@ nav{
 .v-prog-wrap{flex:1;height:4px;background:var(--border2);border-radius:2px;overflow:hidden;}
 .v-prog{width:0%;height:100%;background:var(--aqua);transition:width .1s;}
 .v-speed{background:transparent;border:1px solid var(--border2);color:var(--gray1);border-radius:6px;padding:4px 8px;font-size:.7rem;}
+html[lang="ta"] .voice-bar{display:none !important;}
 .vword.active{background:rgba(0,212,200,0.2);border-radius:3px;color:var(--aqua);}
 .lesson-content{font-size:.82rem;color:var(--gray1);line-height:1.8;}
 .lc-title{display:none;}
@@ -5310,13 +5311,16 @@ function openLesson(mi,li){
   panel+=`</div>`;
 
   if(canAccess){
-    panel+=`<div class="voice-bar">
+    const _olIsTa=document.documentElement.getAttribute('lang')==='ta';
+    if(!_olIsTa){
+      panel+=`<div class="voice-bar">
       <button class="v-play" id="vP${mi}${li}" onclick="startVoice(${mi},${li})">🎙️ Play Lesson</button>
       <button class="v-stop" id="vS${mi}${li}" onclick="stopVoice(${mi},${li})">⏹ Stop</button>
       <div class="v-prog-wrap"><div class="v-prog" id="vf${mi}${li}"></div></div>
       <select class="v-speed" id="vSp${mi}${li}"><option value="0.75">0.75x</option><option value="0.88" selected>0.88x</option><option value="1">1x</option><option value="1.25">1.25x</option></select>
-    </div>
-    <div class="lesson-content"><div id="vs${mi}${li}">${les.content}</div></div>`;
+    </div>`;
+    }
+    panel+=`<div class="lesson-content"><div id="vs${mi}${li}">${les.content}</div></div>`;
     if(qd){
       panel+=`<div class="quiz-wrap">
         <div class="quiz-q">🎯 Quick Check: ${qd.q}</div>
@@ -5885,43 +5889,8 @@ async function startVoice(mi,li){
     '<div style="margin-top:12px;line-height:2.2;font-size:.8rem;color:var(--gray1);">'+
     words.map((w,i)=>`<span class="vword" id="vw${mi}${li}_${i}">${w} </span>`).join('')+'</div>';
   vWords=words.map((_,i)=>document.getElementById('vw'+mi+li+'_'+i));vIdx=0;
-  const isTaLang=isTamilScript(script);
-
-  // ── Tamil: try our own AI voice (Hugging Face via Cloudflare Worker) first ──
-  if(isTaLang){
-    toggleVB(mi,li,true);
-    try{
-      const resp=await fetch(WORKER_URL+'/tts',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({text:script,lang:'tam'})
-      });
-      if(!resp.ok) throw new Error('tts-unavailable');
-      const blob=await resp.blob();
-      const audioUrl=URL.createObjectURL(blob);
-      const audioEl=new Audio(audioUrl);
-      currentAudioEl=audioEl;
-      audioEl.playbackRate=parseFloat(document.getElementById('vSp'+mi+li)?.value||0.88);
-      audioEl.ontimeupdate=()=>{
-        const pf=document.getElementById('vf'+mi+li);
-        if(pf && audioEl.duration) pf.style.width=((audioEl.currentTime/audioEl.duration)*100)+'%';
-        const idx=Math.floor((audioEl.currentTime/(audioEl.duration||1))*vWords.length);
-        vWords.forEach((s,i)=>{if(s)s.classList.toggle('active',i===idx);});
-      };
-      audioEl.onended=()=>{
-        vWords.forEach(s=>s&&s.classList.remove('active'));
-        const pf=document.getElementById('vf'+mi+li);
-        if(pf){pf.style.width='100%';setTimeout(()=>pf.style.width='0%',800);}
-        toggleVB(mi,li,false);
-        currentAudioEl=null;
-      };
-      await audioEl.play();
-      return; // success — don't fall through to browser voice
-    }catch(e){
-      toast('AI voice loading… ஆங்கில browser voice-க்கு மாறுகிறோம்','info');
-      // fall through to browser speechSynthesis below
-    }
-  }
+  // Audio is English-only now — Tamil AI voice path removed.
+  const isTaLang=false;
 
   startVoiceBrowser(mi,li,mods,script,isTaLang);
 }
@@ -5934,17 +5903,9 @@ function startVoiceBrowser(mi,li,mods,script,isTaLang){
   }
   const rate=parseFloat(document.getElementById('vSp'+mi+li)?.value||0.88);
   const u=new SpeechSynthesisUtterance(script);
-  const uiIsTa=document.documentElement.getAttribute('lang')==='ta';
-  if(uiIsTa && !isTaLang){ toast('இந்தப் பாடம் இன்னும் தமிழில் மொழிபெயர்க்கப்படவில்லை — ஆங்கிலத்தில் படிக்கப்படும்','err'); }
-  let taVoiceFound=null;
-  if(isTaLang){
-    taVoiceFound=window.speechSynthesis.getVoices().find(x=>x.lang&&x.lang.startsWith('ta'));
-    if(!taVoiceFound){
-      toast('இந்த சாதனத்தில் தமிழ் குரல் இல்லை 🔊 Settings-இல் Tamil TTS சேர்க்கவும்','err');
-    }
-  }
-  const v=isTaLang?(taVoiceFound||getFemaleVoice()):getFemaleVoice();if(v)u.voice=v;
-  u.rate=rate;u.pitch=1.05;u.lang=isTaLang?'ta-IN':'en-IN';
+  // Audio is English-only now.
+  const v=getFemaleVoice();if(v)u.voice=v;
+  u.rate=rate;u.pitch=1.05;u.lang='en-IN';
   u.onboundary=e=>{if(e.name==='word'){if(vIdx>0&&vWords[vIdx-1])vWords[vIdx-1].classList.remove('active');if(vWords[vIdx])vWords[vIdx].classList.add('active');vIdx++;}};
   u.onend=()=>{vWords.forEach(s=>s&&s.classList.remove('active'));const pf=document.getElementById('vf'+mi+li);if(pf){pf.style.width='100%';setTimeout(()=>pf.style.width='0%',800);}toggleVB(mi,li,false);};
   u.onerror=()=>toggleVB(mi,li,false);
@@ -6922,13 +6883,16 @@ function dovOpenLesson(key,mi,li){
     </div>`;
 
   if(canAccess){
-    html+=`<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f8fafc;border-radius:10px;margin-bottom:14px;border:1px solid #e2e8f0;">
+    const _dovIsTa=document.documentElement.getAttribute('lang')==='ta';
+    if(!_dovIsTa){
+      html+=`<div class="voice-bar" style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f8fafc;border-radius:10px;margin-bottom:14px;border:1px solid #e2e8f0;">
       <button onclick="startVoice(${mi},${li})" style="background:#dc143c;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:.75rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">🎙️ Play Lesson</button>
       <button onclick="stopVoice(${mi},${li})" style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:7px;padding:8px 12px;font-size:.75rem;cursor:pointer;">⏹ Stop</button>
       <div style="flex:1;height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden;"><div id="vf${mi}${li}" style="height:100%;width:0%;background:#dc143c;border-radius:2px;transition:width .3s;"></div></div>
       <select id="vSp${mi}${li}" style="border:1px solid #e2e8f0;border-radius:6px;padding:4px 8px;font-size:.7rem;background:#fff;"><option value="0.75">0.75x</option><option value="0.88" selected>0.88x</option><option value="1">1x</option><option value="1.25">1.25x</option></select>
-    </div>
-    <div style="font-size:.82rem;color:#4a5568;line-height:1.8;" id="vs${mi}${li}">${les.content}</div>`;
+    </div>`;
+    }
+    html+=`<div style="font-size:.82rem;color:#4a5568;line-height:1.8;" id="vs${mi}${li}">${les.content}</div>`;
     if(qd){
       const _advJS = "(function(){var rows=document.querySelectorAll('[id^=dovLesRow_]');for(var i=0;i<rows.length;i++){if(rows[i].id==='dovLesRow_"+key+"_"+mi+"_"+li+"'){if(rows[i+1]){rows[i+1].click();}else if(typeof toast==='function'){toast('🎉 All lessons done!','ok');}break;}}})()";
       html+=`<div style="background:#f8fafc;border-radius:12px;padding:18px;margin-top:16px;border:1px solid #e2e8f0;">
@@ -8623,13 +8587,15 @@ function openLessonMerged(mi, li){
   panel += `</div>`;
 
   if(canAccess){
-    panel += `<div class="voice-bar">
-      <button class="v-play" id="vP${mi}${li}" onclick="startVoiceMerged(${mi},${li})">🎙️ ${_isTa0?'பாடத்தை இயக்கு':'Play Lesson'}</button>
-      <button class="v-stop" id="vS${mi}${li}" onclick="stopVoice(${mi},${li})">⏹ ${_isTa0?'நிறுத்து':'Stop'}</button>
+    if(!_isTa0){
+      panel += `<div class="voice-bar">
+      <button class="v-play" id="vP${mi}${li}" onclick="startVoiceMerged(${mi},${li})">🎙️ Play Lesson</button>
+      <button class="v-stop" id="vS${mi}${li}" onclick="stopVoice(${mi},${li})">⏹ Stop</button>
       <div class="v-prog-wrap"><div class="v-prog" id="vf${mi}${li}"></div></div>
       <select class="v-speed" id="vSp${mi}${li}"><option value="0.75">0.75x</option><option value="0.88" selected>0.88x</option><option value="1">1x</option><option value="1.25">1.25x</option></select>
-    </div>
-    <div class="lesson-content"><div id="vs${mi}${li}">${les.content || '<div class="lc-body">'+les.title+'</div>'}</div></div>`;
+    </div>`;
+    }
+    panel += `<div class="lesson-content"><div id="vs${mi}${li}">${les.content || '<div class="lc-body">'+les.title+'</div>'}</div></div>`;
     if(qd){
       const _isTa = _isTa0;
       const _list0 = getLessonList();
@@ -8711,20 +8677,12 @@ function startVoiceMerged(mi, li){
   vIdx = 0;
   const speed = parseFloat(document.getElementById(`vSp${mi}${li}`)?.value || '0.88');
   const prog = document.getElementById(`vf${mi}${li}`);
-  const isTaLang = isTamilScript(les.voice);
-  const uiIsTa = document.documentElement.getAttribute('lang') === 'ta';
-  const taVoice = isTaLang ? synth.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith('ta')) : null;
-  if(uiIsTa && !isTaLang){
-    toast('இந்தப் பாடம் இன்னும் தமிழில் மொழிபெயர்க்கப்படவில்லை — ஆங்கிலத்தில் படிக்கப்படும்','err');
-  } else if(isTaLang && !taVoice){
-    toast('இந்த சாதனத்தில் தமிழ் குரல் இல்லை — உங்கள் தொலைபேசி அமைப்புகளில் தமிழ் TTS சேர்க்கவும்','err');
-  }
+  // Audio is English-only now — Tamil voice path removed.
   function speakNext(){
     if(vIdx >= vWords.length){ if(prog) prog.style.width='100%'; return; }
     const utt = new SpeechSynthesisUtterance(vWords.slice(vIdx, vIdx+8).join(' '));
     utt.rate = speed;
-    if(isTaLang){ utt.lang = 'ta-IN'; if(taVoice) utt.voice = taVoice; }
-    else { utt.lang = 'en-IN'; const fv = getFemaleVoice(); if(fv) utt.voice = fv; }
+    utt.lang = 'en-IN'; const fv = getFemaleVoice(); if(fv) utt.voice = fv;
     utt.onend = () => { vIdx += 8; if(prog) prog.style.width = Math.min(100,(vIdx/vWords.length*100))+'%'; speakNext(); };
     synth.speak(utt);
   }
